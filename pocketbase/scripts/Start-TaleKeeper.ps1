@@ -17,10 +17,20 @@ if (!(Test-Path $CLOUDFLARED_PATH)) {
     exit 1
 }
 
+# Unblock files if they were downloaded from the internet
+Write-Host "Verifying permissions..." -ForegroundColor Gray
+Unblock-File -Path $POCKETBASE_PATH -ErrorAction SilentlyContinue
+Unblock-File -Path $CLOUDFLARED_PATH -ErrorAction SilentlyContinue
+
 Write-Host "Starting Project Codex (Tale-Keeper) Services..." -ForegroundColor Cyan
 
 # Start PocketBase in a minimized window
-Start-Process -FilePath $POCKETBASE_PATH -ArgumentList "serve --dir $DB_DIR" -WindowStyle Minimized
+try {
+    Start-Process -FilePath $POCKETBASE_PATH -ArgumentList "serve --dir $DB_DIR" -WindowStyle Minimized -ErrorAction Stop
+} catch {
+    Write-Error "Failed to start PocketBase. Ensure the file is not blocked by your antivirus: $_"
+    exit 1
+}
 
 # Wait a moment for PB to initialize
 Start-Sleep -Seconds 2

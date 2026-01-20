@@ -38,9 +38,11 @@ Thumbs.db
 # Prisma
 prisma/migrations/
 
-# Database
-*.db
-*.sqlite
+# PocketBase
+pocketbase/bin/
+pocketbase/pb_data/
+pocketbase/pb_public/
+pocketbase/cloudflared/
 
 # Temporary files
 tmp/

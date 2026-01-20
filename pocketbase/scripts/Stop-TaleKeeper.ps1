@@ -3,8 +3,14 @@
 
 Write-Host "Stopping Tale-Keeper Services..." -ForegroundColor Red
 
-Get-Process -Name "pocketbase" -ErrorAction SilentlyContinue | Stop-Process -Force
-Get-Process -Name "cloudflared" -ErrorAction SilentlyContinue | Stop-Process -Force
+# Stop processes silently
+$procs = "pocketbase", "cloudflared"
+foreach ($p in $procs) {
+    if (Get-Process -Name $p -ErrorAction SilentlyContinue) {
+        Stop-Process -Name $p -Force -ErrorAction SilentlyContinue
+        Write-Host "Stopped $p." -ForegroundColor Gray
+    }
+}
 
 Write-Host "All services stopped." -ForegroundColor Green
 Start-Sleep -Seconds 2

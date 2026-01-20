@@ -91,17 +91,18 @@ export interface PlayerRevealedHex {
 
 export interface Map {
   id: string;
-  campaignId: string;
-  name: string;
-  description: string | null;
+  campaignId?: string;
+  name?: string;
+  description?: string | null;
   imageUrl: string;
   imageWidth: number;
   imageHeight: number;
-  hexSize: number;
+  hexSize?: number;
   hexColumns: number;
   hexRows: number;
   hexOrientation: string;
-  hexData: Record<string, { terrain: string; elevation?: number }>;
+  hexData?: Record<string, { terrain: string; elevation?: number }>;
+  z: number;
   createdAt: string;
   updatedAt: string;
 }

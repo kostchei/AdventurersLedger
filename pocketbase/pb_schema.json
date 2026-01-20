@@ -1,0 +1,206 @@
+[
+    {
+        "name": "users_stats",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "user",
+                "type": "relation",
+                "required": true,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": true,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "email"
+                    ]
+                }
+            },
+            {
+                "name": "hp",
+                "type": "number",
+                "required": false
+            },
+            {
+                "name": "max_hp",
+                "type": "number",
+                "required": false
+            },
+            {
+                "name": "stats",
+                "type": "json",
+                "required": false
+            },
+            {
+                "name": "gold",
+                "type": "number",
+                "required": false
+            },
+            {
+                "name": "xp",
+                "type": "number",
+                "required": false
+            },
+            {
+                "name": "conditions",
+                "type": "json",
+                "required": false
+            }
+        ],
+        "listRule": "@request.auth.id = user.id",
+        "viewRule": "@request.auth.id = user.id",
+        "createRule": "@request.auth.id = user.id",
+        "updateRule": "@request.auth.id = user.id",
+        "deleteRule": "@request.auth.id = user.id"
+    },
+    {
+        "name": "fog_of_war",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "user",
+                "type": "relation",
+                "required": true,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": true,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "email"
+                    ]
+                }
+            },
+            {
+                "name": "q",
+                "type": "number",
+                "required": true
+            },
+            {
+                "name": "r",
+                "type": "number",
+                "required": true
+            },
+            {
+                "name": "z",
+                "type": "number",
+                "required": true
+            }
+        ],
+        "listRule": "@request.auth.id = user.id",
+        "viewRule": "@request.auth.id = user.id",
+        "createRule": "@request.auth.id = user.id",
+        "updateRule": "@request.auth.id = user.id",
+        "deleteRule": "@request.auth.id = user.id"
+    },
+    {
+        "name": "world_state",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "layer_id",
+                "type": "text",
+                "required": true
+            },
+            {
+                "name": "z_index",
+                "type": "number",
+                "required": true
+            },
+            {
+                "name": "map_url",
+                "type": "url",
+                "required": true
+            },
+            {
+                "name": "cleared_dungeons",
+                "type": "json",
+                "required": false
+            }
+        ],
+        "listRule": "@request.auth.id != \"\"",
+        "viewRule": "@request.auth.id != \"\"",
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null
+    },
+    {
+        "name": "decals",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "site_name",
+                "type": "text",
+                "required": true
+            },
+            {
+                "name": "q",
+                "type": "number",
+                "required": true
+            },
+            {
+                "name": "r",
+                "type": "number",
+                "required": true
+            },
+            {
+                "name": "z",
+                "type": "number",
+                "required": true
+            },
+            {
+                "name": "image_url",
+                "type": "url",
+                "required": true
+            },
+            {
+                "name": "is_visible",
+                "type": "bool",
+                "required": true
+            }
+        ],
+        "listRule": "@request.auth.id != \"\"",
+        "viewRule": "@request.auth.id != \"\"",
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null
+    },
+    {
+        "name": "campaigns",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "name",
+                "type": "text",
+                "required": true
+            },
+            {
+                "name": "description",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "dm",
+                "type": "relation",
+                "required": true,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": true,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "email"
+                    ]
+                }
+            }
+        ],
+        "listRule": "@request.auth.id != \"\"",
+        "viewRule": "@request.auth.id != \"\"",
+        "createRule": "@request.auth.id != \"\"",
+        "updateRule": "@request.auth.id = dm.id",
+        "deleteRule": "@request.auth.id = dm.id"
+    }
+]

@@ -1,88 +1,82 @@
 import { create } from 'zustand';
-import { User } from '../types';
-import api from '../lib/api';
+import type { User } from '../types';
+import { pb } from '../lib/pb';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   token: string | null;
-  login: (token: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => void;
-  fetchUser: () => Promise<void>;
+  fetchUser: () => void;
   setUser: (user: User | null) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  token: localStorage.getItem('auth_token'),
+// Helper to map PocketBase record to our User interface
+const mapPBUser = (record: any): User | null => {
+  if (!record) return null;
+  return {
+    id: record.id,
+    email: record.email,
+    name: record.name || record.username || 'Adventurer',
+    avatarUrl: pb.files.getUrl(record, record.avatar),
+    createdAt: record.created,
+  };
+};
 
-  login: async (token: string) => {
-    localStorage.setItem('auth_token', token);
-    set({ token, isLoading: true });
+export const useAuthStore = create<AuthState>((set) => {
+  // Initialize state from existing authStore
+  const initialUser = mapPBUser(pb.authStore.model);
+  const initialToken = pb.authStore.token;
 
-    try {
-      const response = await api.get<User>('/auth/me');
-      set({
-        user: response.data,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      localStorage.removeItem('auth_token');
-      set({
-        user: null,
-        isAuthenticated: false,
-        token: null,
-        isLoading: false,
-      });
-      throw error;
-    }
-  },
-
-  logout: () => {
-    localStorage.removeItem('auth_token');
+  // Listen for auth changes to keep Zustand in sync
+  pb.authStore.onChange((token, model) => {
     set({
-      user: null,
-      isAuthenticated: false,
-      token: null,
+      user: mapPBUser(model),
+      token,
+      isAuthenticated: !!model,
     });
-  },
+  }, true);
 
-  fetchUser: async () => {
-    const token = localStorage.getItem('auth_token');
+  return {
+    user: initialUser,
+    isAuthenticated: !!initialUser,
+    isLoading: false,
+    token: initialToken,
 
-    if (!token) {
-      set({ isLoading: false, isAuthenticated: false, user: null });
-      return;
-    }
+    loginWithGoogle: async () => {
+      set({ isLoading: true });
+      try {
+        await pb.collection('users').authWithOAuth2({ provider: 'google' });
+        // onChange will handle the state update
+      } catch (error) {
+        console.error('Failed to login with Google:', error);
+        throw error;
+      } finally {
+        set({ isLoading: false });
+      }
+    },
 
-    set({ isLoading: true });
+    logout: () => {
+      pb.authStore.clear();
+      // onChange will handle the state update
+    },
 
-    try {
-      const response = await api.get<User>('/auth/me');
+    fetchUser: () => {
+      // PocketBase handles persistence automatically via localStorage
+      // But we can manually refresh if needed
+      const model = pb.authStore.model;
       set({
-        user: response.data,
-        isAuthenticated: true,
-        token,
+        user: mapPBUser(model),
+        isAuthenticated: !!model,
+        token: pb.authStore.token,
         isLoading: false,
       });
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      localStorage.removeItem('auth_token');
-      set({
-        user: null,
-        isAuthenticated: false,
-        token: null,
-        isLoading: false,
-      });
-    }
-  },
+    },
 
-  setUser: (user: User | null) => {
-    set({ user, isAuthenticated: !!user });
-  },
-}));
+    setUser: (user: User | null) => {
+      set({ user, isAuthenticated: !!user });
+    },
+  };
+});

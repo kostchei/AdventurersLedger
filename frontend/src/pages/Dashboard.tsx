@@ -82,11 +82,10 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-semibold text-white truncate">{campaign.name}</h3>
                   <span
-                    className={`px-2 py-1 text-white text-xs rounded ${
-                      campaign.role === 'DM' ? 'bg-green-500' : 'bg-blue-500'
-                    }`}
+                    className={`px-2 py-1 text-white text-xs rounded ${user?.id === campaign.dmId ? 'bg-green-500' : 'bg-blue-500'
+                      }`}
                   >
-                    {campaign.role}
+                    {user?.id === campaign.dmId ? 'DM' : 'Player'}
                   </span>
                 </div>
                 {campaign.description && (

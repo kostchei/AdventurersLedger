@@ -2,11 +2,10 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, loginWithGoogle } = useAuthStore();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -14,8 +13,13 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/auth/google`;
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   return (

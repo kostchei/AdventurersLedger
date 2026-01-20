@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
-import { HexGrid, HexCoord } from '../utils/hexGrid';
-import { Map } from '../types';
+import { HexGrid } from '../utils/hexGrid';
+import type { HexCoord } from '../utils/hexGrid';
+import type { Map } from '../types';
 
 interface HexMapViewerProps {
   map: Map;
-  revealedHexes: Set<string>; // Set of "q,r" strings
-  partyPosition?: { hexX: number; hexY: number };
+  currentZ: number;
+  revealedHexes: Set<string>; // Set of "q,r,z" strings
+  partyPosition?: { hexX: number; hexY: number; z: number };
   isDM: boolean;
-  onHexClick?: (hex: HexCoord) => void;
+  onHexClick?: (hex: HexCoord & { z: number }) => void;
 }
 
 export default function HexMapViewer({
   map,
+  currentZ,
   revealedHexes,
   partyPosition,
   isDM,
@@ -32,7 +35,7 @@ export default function HexMapViewer({
       map.hexRows,
       map.imageWidth,
       map.imageHeight,
-      map.hexOrientation as 'flat' | 'pointy'
+      (map.hexOrientation as 'flat' | 'pointy') || 'flat'
     );
     setHexGrid(grid);
 
@@ -43,6 +46,7 @@ export default function HexMapViewer({
       setImageLoaded(true);
     };
     img.src = map.imageUrl;
+    setImageLoaded(false); // Reset while loading new layer
   }, [map]);
 
   // Render canvas
@@ -53,42 +57,53 @@ export default function HexMapViewer({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
+    // 1. Draw map image
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw map image
     ctx.drawImage(imageRef.current, 0, 0, map.imageWidth, map.imageHeight);
 
-    // Draw fog of war (for non-DMs or DM preview)
-    if (!isDM || true) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      for (let q = 0; q < map.hexColumns; q++) {
-        for (let r = 0; r < map.hexRows; r++) {
-          const hex = { q, r };
-          const hexKey = `${q},${r}`;
+    // 2. Prepare Fog Overlay (Off-screen canvas or layer)
+    // We use a temporary canvas to create the fog effect
+    const fogCanvas = document.createElement('canvas');
+    fogCanvas.width = canvas.width;
+    fogCanvas.height = canvas.height;
+    const fogCtx = fogCanvas.getContext('2d');
+    if (!fogCtx) return;
 
-          // If hex is not revealed, draw fog
-          if (!revealedHexes.has(hexKey)) {
-            const corners = hexGrid.getHexCorners(hex);
-            ctx.beginPath();
-            ctx.moveTo(corners[0].x, corners[0].y);
-            for (let i = 1; i < corners.length; i++) {
-              ctx.lineTo(corners[i].x, corners[i].y);
-            }
-            ctx.closePath();
-            ctx.fill();
+    // Fill with total fog
+    fogCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+
+    // Punch holes for revealed hexes on the current Z layer
+    fogCtx.globalCompositeOperation = 'destination-out';
+
+    for (let q = 0; q < map.hexColumns; q++) {
+      for (let r = 0; r < map.hexRows; r++) {
+        const hexKey = `${q},${r},${currentZ}`;
+        if (revealedHexes.has(hexKey) || isDM) {
+          const corners = hexGrid.getHexCorners({ q, r });
+          fogCtx.beginPath();
+          fogCtx.moveTo(corners[0].x, corners[0].y);
+          for (let i = 1; i < corners.length; i++) {
+            fogCtx.lineTo(corners[i].x, corners[i].y);
           }
+          fogCtx.closePath();
+          fogCtx.fill();
         }
       }
     }
 
-    // Draw hex grid overlay (semi-transparent)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    // Optional: add a bit of "softness" to the holes
+    // (This is a simplified version; real soft fog would use gradients)
+
+    // Draw the fog layer back onto the main canvas
+    ctx.drawImage(fogCanvas, 0, 0);
+
+    // 3. Draw hex grid overlay
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.lineWidth = 1;
     for (let q = 0; q < map.hexColumns; q++) {
       for (let r = 0; r < map.hexRows; r++) {
-        const hex = { q, r };
-        const corners = hexGrid.getHexCorners(hex);
+        const corners = hexGrid.getHexCorners({ q, r });
         ctx.beginPath();
         ctx.moveTo(corners[0].x, corners[0].y);
         for (let i = 1; i < corners.length; i++) {
@@ -99,7 +114,7 @@ export default function HexMapViewer({
       }
     }
 
-    // Highlight hovered hex (if DM)
+    // 4. Highlight hovered hex (if DM)
     if (isDM && hoveredHex && hexGrid.isInBounds(hoveredHex)) {
       const corners = hexGrid.getHexCorners(hoveredHex);
       ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
@@ -116,71 +131,60 @@ export default function HexMapViewer({
       ctx.stroke();
     }
 
-    // Draw party position
-    if (partyPosition) {
+    // 5. Draw party position if on current Z layer
+    if (partyPosition && partyPosition.z === currentZ) {
       const partyHex = { q: partyPosition.hexX, r: partyPosition.hexY };
       const center = hexGrid.hexToPixel(partyHex);
+      const hexSize = (hexGrid as any).hexSize;
 
-      // Draw party marker (circle)
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.8)'; // Green
+      // Draw party marker (circle with glow)
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(34, 197, 94, 0.8)';
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.9)'; // Green
       ctx.beginPath();
-      ctx.arc(center.x, center.y, hexGrid['hexSize'] * 0.4, 0, 2 * Math.PI);
+      ctx.arc(center.x, center.y, hexSize * 0.45, 0, 2 * Math.PI);
       ctx.fill();
 
+      ctx.shadowBlur = 0; // Reset shadow
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.lineWidth = 3;
       ctx.stroke();
 
       // Draw "P" text
       ctx.fillStyle = 'white';
-      ctx.font = `bold ${hexGrid['hexSize'] * 0.6}px Arial`;
+      ctx.font = `bold ${hexSize * 0.6}px Inter, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('P', center.x, center.y);
     }
-  }, [hexGrid, imageLoaded, revealedHexes, hoveredHex, partyPosition, isDM, map]);
+  }, [hexGrid, imageLoaded, revealedHexes, hoveredHex, partyPosition, isDM, map, currentZ]);
 
-  // Handle mouse move
+  // Interaction handlers...
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!hexGrid || !isDM) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-
     const hex = hexGrid.pixelToHex({ x, y });
-
-    if (hexGrid.isInBounds(hex)) {
-      setHoveredHex(hex);
-    } else {
-      setHoveredHex(null);
-    }
+    setHoveredHex(hexGrid.isInBounds(hex) ? hex : null);
   };
 
-  // Handle click
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!hexGrid || !isDM || !onHexClick) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-
     const hex = hexGrid.pixelToHex({ x, y });
-
     if (hexGrid.isInBounds(hex)) {
-      onHexClick(hex);
+      onHexClick({ ...hex, z: currentZ });
     }
   };
 
@@ -189,14 +193,14 @@ export default function HexMapViewer({
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading map...</p>
+          <p className="text-gray-400">Loading map layer {currentZ}...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full overflow-auto bg-gray-900">
+    <div className="relative w-full h-full overflow-auto bg-gray-950">
       <canvas
         ref={canvasRef}
         width={map.imageWidth}
@@ -204,14 +208,15 @@ export default function HexMapViewer({
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setHoveredHex(null)}
         onClick={handleClick}
-        className={`max-w-full h-auto ${isDM ? 'cursor-crosshair' : ''}`}
+        className={`max-w-full h-auto ${isDM ? 'cursor-crosshair' : ''} shadow-2xl mx-auto`}
         style={{ display: 'block' }}
       />
 
       {isDM && hoveredHex && (
-        <div className="absolute top-4 left-4 bg-black bg-opacity-75 text-white px-3 py-2 rounded text-sm">
-          Hex: ({hoveredHex.q}, {hoveredHex.r})
-          {onHexClick && <span className="block text-xs text-gray-400 mt-1">Click to move party</span>}
+        <div className="absolute top-4 left-4 bg-gray-900 border border-gray-700 text-white px-4 py-3 rounded-lg shadow-xl text-sm backdrop-blur-md bg-opacity-80">
+          <div className="font-bold border-b border-gray-700 pb-1 mb-1">Hex Coordinates</div>
+          q: {hoveredHex.q}, r: {hoveredHex.r}, z: {currentZ}
+          {onHexClick && <div className="text-xs text-primary-400 mt-2 font-medium">Click to Move Party</div>}
         </div>
       )}
     </div>

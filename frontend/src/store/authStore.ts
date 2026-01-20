@@ -48,7 +48,10 @@ export const useAuthStore = create<AuthState>((set) => {
     loginWithGoogle: async () => {
       set({ isLoading: true });
       try {
-        await pb.collection('users').authWithOAuth2({ provider: 'google' });
+        await pb.collection('users').authWithOAuth2({
+          provider: 'google',
+          scopes: ['profile', 'email'],
+        });
         // onChange will handle the state update
       } catch (error) {
         console.error('Failed to login with Google:', error);

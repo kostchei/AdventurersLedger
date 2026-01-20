@@ -5,11 +5,10 @@ import { useAuthStore } from '../store/authStore';
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = searchParams.get('token');
     const errorParam = searchParams.get('error');
 
     if (errorParam) {
@@ -18,21 +17,22 @@ export default function AuthCallback() {
       return;
     }
 
-    if (token) {
-      login(token)
-        .then(() => {
-          navigate('/dashboard');
-        })
-        .catch((err) => {
-          console.error('Login error:', err);
-          setError('Failed to complete login. Please try again.');
-          setTimeout(() => navigate('/login'), 3000);
-        });
+    // PocketBase handles the OAuth callback automatically
+    // If we're authenticated, redirect to dashboard
+    if (isAuthenticated) {
+      navigate('/dashboard');
     } else {
-      setError('No authentication token received.');
-      setTimeout(() => navigate('/login'), 3000);
+      // Wait a bit for PocketBase to process the auth, then redirect
+      setTimeout(() => {
+        if (isAuthenticated) {
+          navigate('/dashboard');
+        } else {
+          setError('Authentication timed out. Please try again.');
+          setTimeout(() => navigate('/login'), 2000);
+        }
+      }, 1000);
     }
-  }, [searchParams, login, navigate]);
+  }, [searchParams, isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">

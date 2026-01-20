@@ -15,23 +15,19 @@ export class HexGrid {
   private orientation: 'flat' | 'pointy';
   private columns: number;
   private rows: number;
-  private width: number;
-  private height: number;
 
   constructor(
     hexSize: number,
     columns: number,
     rows: number,
-    width: number,
-    height: number,
+    _width: number,
+    _height: number,
     orientation: 'flat' | 'pointy' = 'flat'
   ) {
     this.hexSize = hexSize;
     this.orientation = orientation;
     this.columns = columns;
     this.rows = rows;
-    this.width = width;
-    this.height = height;
   }
 
   // Convert hex coordinates to pixel coordinates

@@ -50,3 +50,6 @@ Secrets/
 # Temporary files
 tmp/
 temp/
+
+# OAuth migrations with credentials
+pocketbase/pb_migrations/*oauth*.js

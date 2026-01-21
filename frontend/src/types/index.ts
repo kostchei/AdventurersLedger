@@ -1,3 +1,6 @@
+// Re-export PocketBase types
+export * from './pocketbase';
+
 export interface User {
   id: string;
   email: string;

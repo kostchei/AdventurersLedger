@@ -30,6 +30,7 @@ jobs:
           app_location: "/frontend"
           api_location: ""
           output_location: "dist"
+          app_build_command: "npm install && npm run build"
         env:
           VITE_PB_URL: "https://api.talekeeper.org"
 

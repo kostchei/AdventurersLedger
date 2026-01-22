@@ -10,6 +10,17 @@ export interface PBBaseRecord {
 }
 
 /**
+ * User interface for users collection
+ */
+export interface User extends PBBaseRecord {
+  username: string;
+  email: string;
+  name: string;
+  avatar: string;
+  global_role: 'USER' | 'GM' | 'ADMIN';
+}
+
+/**
  * TS-001: UserStats interface for users_stats collection
  * Stores character statistics, HP, gold, XP, and conditions
  */
@@ -71,24 +82,65 @@ export interface Decal extends PBBaseRecord {
   is_visible: boolean;
 }
 
+export interface CampaignRecord extends PBBaseRecord {
+  name: string;
+  dmId: string;
+  description?: string;
+  active_map_id?: string;
+  pending_nomination_player_id?: string;
+}
+
+export interface CampaignMembershipRecord extends PBBaseRecord {
+  campaign: string;
+  user: string;
+  role: 'PLAYER' | 'GM';
+  status: 'ACTIVE' | 'PENDING' | 'INACTIVE';
+  is_primary_dm: boolean;
+  joined_at?: string;
+  expand?: {
+    campaign?: CampaignRecord;
+    user?: User;
+  };
+}
+
+export interface CampaignNominationRecord extends PBBaseRecord {
+  campaign: string;
+  nominated_player: string;
+  nominated_by: string;
+  keep_access: boolean;
+  message?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'REVOKED';
+  expand?: {
+    nominated_player?: User;
+    nominated_by?: User;
+  };
+}
+
 /**
  * Type helpers for PocketBase collection names
  */
 export type PBCollectionName =
+  | 'users'
   | 'users_stats'
   | 'fog_of_war'
   | 'world_state'
   | 'decals'
-  | 'campaigns';
+  | 'campaigns'
+  | 'campaign_memberships'
+  | 'campaign_nominations';
 
 /**
  * Map collection names to their record types
  */
 export interface PBCollectionTypes {
+  users: User;
   users_stats: UserStats;
   fog_of_war: FogOfWar;
   world_state: WorldState;
   decals: Decal;
+  campaigns: CampaignRecord;
+  campaign_memberships: CampaignMembershipRecord;
+  campaign_nominations: CampaignNominationRecord;
 }
 
 /**

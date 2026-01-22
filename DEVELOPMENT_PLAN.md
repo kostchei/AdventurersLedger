@@ -31,6 +31,9 @@ The PRD specifies PocketBase as the primary backend. We need to align the Pocket
 | PB-006 | Set `world_state` access rules | Configure Authenticated Users (Read) policy | PocketBase Admin UI |
 | PB-007 | Verify `decals` collection schema | Ensure fields: site_name, q, r, z, image_url, is_visible | PocketBase Admin UI |
 | PB-008 | Set `decals` access rules | Configure Authenticated Users (Read) policy | PocketBase Admin UI |
+| PB-009 | Add `global_role` to `users` | Add select field (USER, GM, ADMIN) to users | [Completed] |
+| PB-010 | Restrict Campaign Creation | Update `campaigns` createRule to require global_role=GM | [Completed] |
+| PB-011 | Configure Role Promotion | Update `users` updateRule to allow GMs to promote | [Completed] |
 
 ---
 
@@ -54,10 +57,8 @@ The PRD specifies PocketBase as the primary backend. We need to align the Pocket
 
 | Task ID | Task | Description | Files Affected |
 |---------|------|-------------|----------------|
-| AUTH-001 | Add Discord OAuth provider config | Configure PocketBase for Discord OAuth | PocketBase Admin UI |
-| AUTH-002 | Create OAuth provider selector component | UI to choose Google or Discord login | `frontend/src/components/OAuthSelector.tsx` |
-| AUTH-003 | Update Login page with provider selector | Integrate OAuthSelector into Login page | `frontend/src/pages/Login.tsx` |
-| AUTH-004 | Add Discord OAuth callback handler | Handle Discord OAuth redirect | `frontend/src/pages/AuthCallback.tsx` |
+| AUTH-001 | Verify Google OAuth config | Ensure Google OAuth is correctly configured in PocketBase | PocketBase Admin UI |
+| AUTH-002 | Enhancement Login UI | Improve Login page visual appeal | `frontend/src/pages/Login.tsx` |
 
 ---
 

@@ -44,6 +44,24 @@ Each player has a unique record in the users collection. Data is isolated via ba
 * **Total XP:** Cumulative experience points for level tracking.  
 * **Vault:** Tracking of Gold and a list of unique Magical Items (UUID-linked to a master item database).  
 * **Faction Renown:** Numerical values representing standing with various world organizations.
+    
+#### **3.4 Global Permissions & Roles**
+
+To distinguish between players and those authorized to create and run campaigns, a global role system is implemented in the `users` collection.
+
+*   **Global Role (`global_role`):** A select field on the user record.
+    *   **Options:** `USER` (Default), `GM`, `ADMIN`.
+    *   **USER:** Can join campaigns.
+    *   **GM:** Can create new campaigns and promote others to GM.
+    *   **ADMIN:** Full system access (Superuser logic).
+*   **Permissions Logic:**
+    *   **Campaign Creation:** Restricted to users where `global_role = 'GM'` or `'ADMIN'`.
+    *   **Promotion:** A user with `global_role = 'GM'` (or Admin) can update another user's `global_role` to `GM`.
+    *   **Initial Bootstrap:** The initial Admin/GM (`ashley.stevens.hoare@gmail.com`) is seeded or manually set to `GM`/`ADMIN`.
+*   **Dual Roles:**
+    *   A Global GM can still be a `PLAYER` in a specific campaign (managed via `campaign_memberships`).
+    *   A Global GM can be a `GM` in their own campaign.
+    *   This separates "License to host" (Global) from "Role in game" (Membership).
 
 ### ---
 
@@ -87,7 +105,7 @@ Data accessible to all authorized players, representing the "state of the world.
 
 **6\. User Experience (UX) Flow**
 
-1. **Authentication:** Player visits the Azure URL and logs in via Google/Discord (handled by PocketBase OAuth).  
+1. **Authentication:** Player visits the Azure URL and logs in via Google (handled by PocketBase OAuth).  
 2. **Handshake:** The Azure app pings the local Home Server. If the server is offline, the app displays a "Campaign Resting (Server Offline)" message.  
 3. **Map Load:** Upon successful connection, the app fetches the Global Map for the current $z$-layer.  
 4. **Fog Masking:** The app fetches the player's unique fog\_of\_war coordinates and clears the overlay.  
@@ -156,7 +174,7 @@ This provides:
 
 ## **3\. Authentication Flow**
 
-PocketBase handles all player and GM authentication, including Google/Discord OAuth.
+PocketBase handles all player and GM authentication, including Google OAuth.
 
 Flow:
 

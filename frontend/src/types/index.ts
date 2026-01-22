@@ -17,6 +17,54 @@ export interface Campaign {
   activeMapId: string | null;
   createdAt: string;
   updatedAt: string;
+  role?: 'DM' | 'GM' | 'Player' | 'Viewer';
+  pendingNominationPlayerId?: string | null;
+  membershipId?: string | null;
+  membershipRole?: 'PLAYER' | 'GM';
+  membershipStatus?: 'ACTIVE' | 'PENDING' | 'INACTIVE';
+  isPrimaryDM?: boolean;
+}
+
+export interface CampaignMember {
+  id: string;
+  campaignId: string;
+  userId: string;
+  role: 'PLAYER' | 'GM';
+  status: 'ACTIVE' | 'PENDING' | 'INACTIVE';
+  isPrimaryDM: boolean;
+  joinedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name: string | null;
+    email: string;
+    avatarUrl: string | null;
+  };
+}
+
+export interface CampaignNomination {
+  id: string;
+  campaignId: string;
+  nominatedPlayerId: string;
+  nominatedById: string;
+  keepAccess: boolean;
+  message: string | null;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'REVOKED';
+  createdAt: string;
+  updatedAt: string;
+  nominatedPlayer?: {
+    id: string;
+    name: string | null;
+    email: string;
+    avatarUrl: string | null;
+  };
+  nominatedBy?: {
+    id: string;
+    name: string | null;
+    email: string;
+    avatarUrl: string | null;
+  };
 }
 
 export interface Character {

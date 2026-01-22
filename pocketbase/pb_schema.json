@@ -157,12 +157,33 @@
                 "system": false,
                 "onCreate": true,
                 "onUpdate": true
+            },
+            {
+                "id": "select_global_role",
+                "name": "global_role",
+                "type": "select",
+                "system": false,
+                "required": true,
+                "options": [
+                    {
+                        "label": "User",
+                        "value": "USER"
+                    },
+                    {
+                        "label": "Game Master",
+                        "value": "GM"
+                    },
+                    {
+                        "label": "Admin",
+                        "value": "ADMIN"
+                    }
+                ]
             }
         ],
         "listRule": "id = @request.auth.id",
         "viewRule": "id = @request.auth.id",
-        "updateRule": "id = @request.auth.id",
-        "deleteRule": "id = @request.auth.id"
+        "updateRule": "id = @request.auth.id || @request.auth.global_role = 'GM' || @request.auth.global_role = 'ADMIN'",
+        "deleteRule": "id = @request.auth.id || @request.auth.global_role = 'ADMIN'"
     },
     {
         "id": "pbc_stats_001",
@@ -440,6 +461,25 @@
                 "required": true
             },
             {
+                "id": "txt_description",
+                "name": "description",
+                "type": "text",
+                "system": false,
+                "max": 2048
+            },
+            {
+                "id": "txt_active_map",
+                "name": "active_map_id",
+                "type": "text",
+                "system": false
+            },
+            {
+                "id": "text_pending_nomination_player",
+                "name": "pending_nomination_player_id",
+                "type": "text",
+                "system": false
+            },
+            {
                 "id": "autodate2990389176",
                 "name": "created",
                 "type": "autodate",
@@ -449,14 +489,238 @@
                 "id": "autodate3332085495",
                 "name": "updated",
                 "type": "autodate",
+                "system": true,
                 "onCreate": true,
                 "onUpdate": true
             }
         ],
         "listRule": "@request.auth.id != ''",
         "viewRule": "@request.auth.id != ''",
-        "createRule": "@request.auth.id != ''",
-        "updateRule": "@request.auth.id = dmId"
+        "createRule": "@request.auth.global_role = 'GM' || @request.auth.global_role = 'ADMIN'",
+        "updateRule": "@request.auth.id = dmId || @request.auth.id = pending_nomination_player_id"
+    },
+    {
+        "id": "pbc_camp_members_001",
+        "name": "campaign_memberships",
+        "type": "base",
+        "system": false,
+        "fields": [
+            {
+                "id": "text3208210256",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "required": true,
+                "primaryKey": true
+            },
+            {
+                "id": "rel_campaign",
+                "name": "campaign",
+                "type": "relation",
+                "required": true,
+                "collectionId": "pbc_camp_001",
+                "maxSelect": 1,
+                "cascadeDelete": true
+            },
+            {
+                "id": "rel_user",
+                "name": "user",
+                "type": "relation",
+                "required": true,
+                "collectionId": "_pb_users_auth_",
+                "maxSelect": 1,
+                "cascadeDelete": true
+            },
+            {
+                "id": "select_role",
+                "name": "role",
+                "type": "select",
+                "required": true,
+                "options": [
+                    {
+                        "label": "Player",
+                        "value": "PLAYER",
+                        "color": "#94a3b8"
+                    },
+                    {
+                        "label": "Gamemaster",
+                        "value": "GM",
+                        "color": "#fbbf24"
+                    }
+                ]
+            },
+            {
+                "id": "select_status",
+                "name": "status",
+                "type": "select",
+                "required": true,
+                "options": [
+                    {
+                        "label": "Active",
+                        "value": "ACTIVE",
+                        "color": "#22c55e"
+                    },
+                    {
+                        "label": "Pending",
+                        "value": "PENDING",
+                        "color": "#f97316"
+                    },
+                    {
+                        "label": "Inactive",
+                        "value": "INACTIVE",
+                        "color": "#94a3b8"
+                    }
+                ]
+            },
+            {
+                "id": "bool_primary",
+                "name": "is_primary_dm",
+                "type": "bool",
+                "required": true,
+                "system": false
+            },
+            {
+                "id": "autodate_joined",
+                "name": "joined_at",
+                "type": "autodate",
+                "system": false,
+                "onCreate": true
+            },
+            {
+                "id": "autodate2990389176",
+                "name": "created",
+                "type": "autodate",
+                "system": true,
+                "onCreate": true
+            },
+            {
+                "id": "autodate3332085495",
+                "name": "updated",
+                "type": "autodate",
+                "system": true,
+                "onCreate": true,
+                "onUpdate": true
+            }
+        ],
+        "indexes": [
+            "CREATE UNIQUE INDEX `campaign_memberships_campaign_user_unique` ON `campaign_memberships` (`campaign`, `user`)",
+            "CREATE INDEX `campaign_memberships_campaign_idx` ON `campaign_memberships` (`campaign`)",
+            "CREATE INDEX `campaign_memberships_user_idx` ON `campaign_memberships` (`user`)"
+        ],
+        "listRule": "@request.auth.id = user || @request.auth.id = campaign->dmId",
+        "viewRule": "@request.auth.id = user || @request.auth.id = campaign->dmId",
+        "createRule": "(@request.auth.id = campaign->dmId) || (@request.auth.id = user && @request.data.role = \"PLAYER\")",
+        "updateRule": "(@request.auth.id = user) || (@request.auth.id = campaign->dmId)",
+        "deleteRule": "(@request.auth.id = user) || (@request.auth.id = campaign->dmId)"
+    },
+    {
+        "id": "pbc_camp_nom_001",
+        "name": "campaign_nominations",
+        "type": "base",
+        "system": false,
+        "fields": [
+            {
+                "id": "text3208210256",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "required": true,
+                "primaryKey": true
+            },
+            {
+                "id": "rel_campaign",
+                "name": "campaign",
+                "type": "relation",
+                "required": true,
+                "collectionId": "pbc_camp_001",
+                "maxSelect": 1,
+                "cascadeDelete": true
+            },
+            {
+                "id": "rel_nominated",
+                "name": "nominated_player",
+                "type": "relation",
+                "required": true,
+                "collectionId": "_pb_users_auth_",
+                "maxSelect": 1,
+                "cascadeDelete": true
+            },
+            {
+                "id": "rel_nominated_by",
+                "name": "nominated_by",
+                "type": "relation",
+                "required": true,
+                "collectionId": "_pb_users_auth_",
+                "maxSelect": 1,
+                "cascadeDelete": true
+            },
+            {
+                "id": "bool_keep_access",
+                "name": "keep_access",
+                "type": "bool",
+                "required": true,
+                "system": false
+            },
+            {
+                "id": "text_message",
+                "name": "message",
+                "type": "text",
+                "system": false,
+                "max": 2048
+            },
+            {
+                "id": "select_status",
+                "name": "status",
+                "type": "select",
+                "required": true,
+                "options": [
+                    {
+                        "label": "Pending",
+                        "value": "PENDING",
+                        "color": "#f97316"
+                    },
+                    {
+                        "label": "Accepted",
+                        "value": "ACCEPTED",
+                        "color": "#22c55e"
+                    },
+                    {
+                        "label": "Declined",
+                        "value": "DECLINED",
+                        "color": "#ef4444"
+                    },
+                    {
+                        "label": "Revoked",
+                        "value": "REVOKED",
+                        "color": "#94a3b8"
+                    }
+                ]
+            },
+            {
+                "id": "autodate2990389176",
+                "name": "created",
+                "type": "autodate",
+                "system": true,
+                "onCreate": true
+            },
+            {
+                "id": "autodate3332085495",
+                "name": "updated",
+                "type": "autodate",
+                "system": true,
+                "onCreate": true,
+                "onUpdate": true
+            }
+        ],
+        "indexes": [
+            "CREATE INDEX `campaign_nominations_campaign_idx` ON `campaign_nominations` (`campaign`)",
+            "CREATE INDEX `campaign_nominations_status_idx` ON `campaign_nominations` (`status`)"
+        ],
+        "listRule": "@request.auth.id = nominated_player || @request.auth.id = nominated_by || @request.auth.id = campaign->dmId",
+        "viewRule": "@request.auth.id = nominated_player || @request.auth.id = nominated_by || @request.auth.id = campaign->dmId",
+        "createRule": "@request.auth.id = campaign->dmId",
+        "updateRule": "@request.auth.id = nominated_player || @request.auth.id = campaign->dmId",
+        "deleteRule": "@request.auth.id = campaign->dmId"
     },
     {
         "id": "pbc_4275539003",

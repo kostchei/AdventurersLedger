@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { campaignApi } from '../lib/campaigns';
@@ -8,12 +8,31 @@ import CreateCampaignModal from '../components/CreateCampaignModal';
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const { data: campaigns, isLoading } = useQuery({
-    queryKey: ['campaigns'],
+  const { data: memberCampaigns, isLoading: isMemberLoading } = useQuery({
+    queryKey: ['campaigns', 'member'],
     queryFn: campaignApi.getUserCampaigns,
   });
+
+  const { data: allCampaigns } = useQuery({
+    queryKey: ['campaigns', 'all'],
+    queryFn: campaignApi.getAllCampaigns,
+  });
+
+  const joinMutation = useMutation({
+    mutationFn: campaignApi.joinCampaign,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['campaigns', 'member'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns', 'all'] });
+    },
+  });
+
+  const memberIds = new Set(memberCampaigns?.map((campaign) => campaign.id));
+  const discoverCampaigns = allCampaigns?.filter(
+    (campaign) => !memberIds.has(campaign.id)
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -34,10 +53,7 @@ export default function Dashboard() {
                 )}
                 <span className="text-white">{user?.name || user?.email}</span>
               </div>
-              <button
-                onClick={logout}
-                className="btn btn-secondary text-sm"
-              >
+              <button onClick={logout} className="btn btn-secondary text-sm">
                 Logout
               </button>
             </div>
@@ -53,7 +69,7 @@ export default function Dashboard() {
           <p className="text-gray-400">Choose a campaign or create a new one to get started.</p>
         </div>
 
-        {isLoading ? (
+        {isMemberLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mx-auto"></div>
             <p className="text-gray-400 mt-4">Loading campaigns...</p>
@@ -66,14 +82,14 @@ export default function Dashboard() {
               className="card hover:shadow-xl transition-shadow border-2 border-dashed border-gray-600 flex items-center justify-center min-h-[200px] hover:border-primary-500"
             >
               <div className="text-center">
-                <div className="text-5xl mb-3">➕</div>
+                <div className="text-5xl mb-3">+</div>
                 <h3 className="text-xl font-semibold text-white mb-2">Create Campaign</h3>
                 <p className="text-gray-400 text-sm">Start a new adventure</p>
               </div>
             </button>
 
             {/* Campaign Cards */}
-            {campaigns?.map((campaign: any) => (
+            {memberCampaigns?.map((campaign) => (
               <div
                 key={campaign.id}
                 onClick={() => navigate(`/campaign/${campaign.id}`)}
@@ -82,32 +98,64 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-semibold text-white truncate">{campaign.name}</h3>
                   <span
-                    className={`px-2 py-1 text-white text-xs rounded ${user?.id === campaign.dmId ? 'bg-green-500' : 'bg-blue-500'
-                      }`}
+                    className={`px-2 py-1 text-white text-xs rounded ${campaign.role === 'DM' ? 'bg-green-500' : 'bg-blue-500'}`}
                   >
-                    {user?.id === campaign.dmId ? 'DM' : 'Player'}
+                    {campaign.role}
                   </span>
                 </div>
                 {campaign.description && (
                   <p className="text-gray-400 text-sm mb-4 line-clamp-2">{campaign.description}</p>
                 )}
                 <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span>👥 {campaign.characters?.length || 0} players</span>
-                  {campaign.sessions?.[0] && (
-                    <span>📅 Session {campaign.sessions[0].sessionNumber}</span>
-                  )}
+                  <span>{campaign.role === 'DM' ? 'Dungeon Master' : 'Player'}</span>
                 </div>
               </div>
             ))}
 
-            {campaigns?.length === 0 && (
+            {memberCampaigns?.length === 0 && (
               <div className="col-span-full text-center py-12">
-                <p className="text-gray-400 mb-4">No campaigns yet. Create one to get started!</p>
+                <p className="text-gray-400 mb-4">No campaigns yet. Create or join one to get started!</p>
               </div>
             )}
           </div>
         )}
       </main>
+
+      {discoverCampaigns && discoverCampaigns.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-white">Discover Campaigns</h2>
+            <p className="text-sm text-gray-400">
+              Browse playable adventures and request to join.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {discoverCampaigns.map((campaign) => (
+              <div key={campaign.id} className="card border-gray-700 flex flex-col">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-white truncate">{campaign.name}</h3>
+                  <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">
+                    Viewer
+                  </span>
+                </div>
+                <p className="text-sm text-gray-400 mb-4 line-clamp-3">
+                  {campaign.description || 'No description yet.'}
+                </p>
+                <p className="text-xs text-gray-500 mb-6">
+                  Hosted by <span className="text-white">{campaign.dmId}</span>
+                </p>
+                <button
+                  onClick={() => joinMutation.mutate(campaign.id)}
+                  className="btn btn-primary text-sm mt-auto"
+                  disabled={joinMutation.isPending}
+                >
+                  {joinMutation.isPending ? 'Joining...' : 'Join Campaign'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <CreateCampaignModal
         isOpen={isCreateModalOpen}

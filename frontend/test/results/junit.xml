@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="4" failures="1" errors="0" time="0.1359828">
+    <testsuite name="test/globalRoles.test.ts" timestamp="2026-01-22T13:04:15.698Z" hostname="DESKTOP-J05866Q" tests="4" failures="1" errors="0" skipped="0" time="0.1359828">
+        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should connect to PocketBase" time="0.0201823">
+        </testcase>
+        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should allow user registration (default role USER)" time="0.114405">
+            <system-err>
+Registration failed: {
+  data: {
+    id: { code: [32m&apos;validation_required&apos;[39m, message: [32m&apos;Cannot be blank.&apos;[39m },
+    tokenKey: { code: [32m&apos;validation_required&apos;[39m, message: [32m&apos;Cannot be blank.&apos;[39m }
+  },
+  message: [32m&apos;Failed to create record.&apos;[39m,
+  status: [33m400[39m
+}
+
+            </system-err>
+            <failure message="Cannot register test user. Is registration open?" type="Error">
+Error: Cannot register test user. Is registration open?
+ ❯ test/globalRoles.test.ts:32:23
+            </failure>
+        </testcase>
+        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should allow login as USER" time="0.0001056">
+        </testcase>
+        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should FORBID USER from creating campaigns" time="0.0000766">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -46,6 +46,7 @@ pocketbase/cloudflared/
 
 # Secrets
 Secrets/
+secrets/
 
 # Temporary files
 tmp/

@@ -356,9 +356,7 @@ export const campaignApi = {
   },
 
   uploadMapLayer: async (campaignId: string, formData: FormData): Promise<RecordModel> => {
-    // formData should contain map_file, z_index, hex_columns, hex_rows, etc.
-    formData.append('campaign', campaignId);
-
+    // formData already contains all fields including campaign
     console.log('Calling PocketBase to create world_state record for campaign:', campaignId);
     console.log('FormData contents:', Array.from(formData.entries()));
 

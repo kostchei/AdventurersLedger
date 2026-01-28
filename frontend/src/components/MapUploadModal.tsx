@@ -48,6 +48,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
         try {
             const formData = new FormData();
             formData.append('map_file', file);
+            formData.append('campaign', campaignId);
             formData.append('z_index', zIndex.toString());
             formData.append('hex_columns', cols.toString());
             formData.append('hex_rows', rows.toString());

@@ -1277,7 +1277,7 @@
     ],
     "listRule": "@request.auth.id != '' && (campaign.dmId = @request.auth.id || campaign.campaign_memberships_via_campaign.user ?= @request.auth.id)",
     "viewRule": "@request.auth.id != '' && (campaign.dmId = @request.auth.id || campaign.campaign_memberships_via_campaign.user ?= @request.auth.id)",
-    "createRule": "@request.auth.id != '' && campaign.dmId = @request.auth.id",
+    "createRule": "@request.auth.id != '' && @request.body.campaign:isset && @collection.campaigns.id ?= @request.body.campaign && @collection.campaigns.dmId ?= @request.auth.id",
     "updateRule": "@request.auth.id != '' && campaign.dmId = @request.auth.id",
     "deleteRule": "@request.auth.id != '' && campaign.dmId = @request.auth.id",
     "indexes": []

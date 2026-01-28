@@ -70,36 +70,24 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
 
             onUploadSuccess();
             onClose();
-        } catch (err: unknown) {
+        } catch (err: any) {
             console.error('Upload failed:', err);
 
-            // Extract detailed error message from PocketBase
-            let errorMessage = 'Failed to upload map layer.';
-            if (err instanceof Error) {
-                errorMessage = err.message;
-            } else if (typeof err === 'object' && err !== null) {
-                const errorObj = err as {
-                    data?: {
-                        message?: string;
-                        data?: Record<string, { message?: string; code?: string }>;
-                    };
-                    message?: string;
-                };
+            // Try to get the most specific message possible
+            let displayMsg = err.message || 'Failed to upload map layer.';
 
-                // Try to extract field-specific validation errors
-                if (errorObj.data?.data) {
-                    const fieldErrors = Object.entries(errorObj.data.data)
-                        .map(([field, error]) => `${field}: ${error.message || error.code}`)
-                        .join(', ');
-                    if (fieldErrors) {
-                        errorMessage = `Validation error: ${fieldErrors}`;
-                    }
-                } else {
-                    errorMessage = errorObj.data?.message || errorObj.message || errorMessage;
+            // If it's a PocketBase error with data
+            if (err.data && typeof err.data === 'object' && err.data.data) {
+                const fieldErrors = Object.entries(err.data.data)
+                    .map(([key, val]: [string, any]) => `${key}: ${val.message || val}`)
+                    .join(', ');
+
+                if (fieldErrors) {
+                    displayMsg = `Validation Error: ${fieldErrors}`;
                 }
             }
 
-            setError(errorMessage);
+            setError(displayMsg);
         } finally {
             setIsUploading(false);
         }

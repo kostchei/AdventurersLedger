@@ -358,6 +358,15 @@ export const campaignApi = {
   uploadMapLayer: async (campaignId: string, formData: FormData): Promise<RecordModel> => {
     // formData should contain map_file, z_index, hex_columns, hex_rows, etc.
     formData.append('campaign', campaignId);
-    return pb.collection('world_state').create(formData);
+
+    console.log('Calling PocketBase to create world_state record for campaign:', campaignId);
+    try {
+      const result = await pb.collection('world_state').create(formData);
+      console.log('Successfully created world_state record:', result.id);
+      return result;
+    } catch (error) {
+      console.error('PocketBase error details:', error);
+      throw error;
+    }
   },
 };

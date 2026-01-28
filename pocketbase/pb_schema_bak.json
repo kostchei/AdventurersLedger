@@ -427,6 +427,21 @@
                 "type": "number"
             },
             {
+                "id": "num_px_per_mile",
+                "name": "pixels_per_mile",
+                "type": "number"
+            },
+            {
+                "id": "num_miles_per_hex",
+                "name": "miles_per_hex",
+                "type": "number"
+            },
+            {
+                "id": "num_hex_size",
+                "name": "hex_size",
+                "type": "number"
+            },
+            {
                 "id": "autodate2990389176",
                 "name": "created",
                 "type": "autodate",

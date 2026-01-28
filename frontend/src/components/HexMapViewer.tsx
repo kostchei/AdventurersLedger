@@ -26,7 +26,8 @@ export default function HexMapViewer({
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const hexGrid = useMemo(() => {
-    const hexSize = Math.min(map.imageWidth / map.hexColumns, map.imageHeight / map.hexRows) / 2;
+    const fallbackSize = Math.min(map.imageWidth / map.hexColumns, map.imageHeight / map.hexRows) / 2;
+    const hexSize = map.hexSize ?? fallbackSize;
     return new HexGrid(
       hexSize,
       map.hexColumns,
@@ -35,7 +36,14 @@ export default function HexMapViewer({
       map.imageHeight,
       (map.hexOrientation as 'flat' | 'pointy') || 'flat'
     );
-  }, [map.imageWidth, map.hexColumns, map.imageHeight, map.hexRows, map.hexOrientation]);
+  }, [
+    map.imageWidth,
+    map.hexColumns,
+    map.imageHeight,
+    map.hexRows,
+    map.hexOrientation,
+    map.hexSize,
+  ]);
 
   // Load map image
   useEffect(() => {

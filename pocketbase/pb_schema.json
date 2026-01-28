@@ -1256,6 +1256,42 @@
       },
       {
         "hidden": false,
+        "id": "num_px_per_mile",
+        "max": null,
+        "min": null,
+        "name": "pixels_per_mile",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "num_miles_per_hex",
+        "max": null,
+        "min": null,
+        "name": "miles_per_hex",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "num_hex_size",
+        "max": null,
+        "min": null,
+        "name": "hex_size",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
         "onCreate": true,

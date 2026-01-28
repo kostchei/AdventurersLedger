@@ -150,6 +150,8 @@ export interface MapLayer {
   imageWidth: number;
   imageHeight: number;
   hexSize?: number;
+  pixelsPerMile?: number;
+  milesPerHex?: number;
   hexColumns: number;
   hexRows: number;
   hexOrientation: string;

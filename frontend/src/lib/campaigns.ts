@@ -360,12 +360,29 @@ export const campaignApi = {
     formData.append('campaign', campaignId);
 
     console.log('Calling PocketBase to create world_state record for campaign:', campaignId);
+    console.log('FormData contents:', Array.from(formData.entries()));
+
     try {
       const result = await pb.collection('world_state').create(formData);
       console.log('Successfully created world_state record:', result.id);
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('PocketBase error details:', error);
+
+      // Extract all possible error information
+      if (error && typeof error === 'object') {
+        const err = error as {
+          status?: number;
+          response?: unknown;
+          data?: unknown;
+          message?: string;
+        };
+        console.error('Error status:', err.status);
+        console.error('Error response:', err.response);
+        console.error('Error data:', err.data);
+        console.error('Error message:', err.message);
+      }
+
       throw error;
     }
   },

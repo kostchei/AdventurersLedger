@@ -368,6 +368,7 @@ export const campaignApi = {
       return result;
     } catch (error: unknown) {
       console.error('PocketBase error details:', error);
+      console.error('Full error as JSON:', JSON.stringify(error, null, 2));
 
       // Extract all possible error information
       if (error && typeof error === 'object') {
@@ -378,8 +379,8 @@ export const campaignApi = {
           message?: string;
         };
         console.error('Error status:', err.status);
-        console.error('Error response:', err.response);
-        console.error('Error data:', err.data);
+        console.error('Error response:', JSON.stringify(err.response, null, 2));
+        console.error('Error data:', JSON.stringify(err.data, null, 2));
         console.error('Error message:', err.message);
       }
 

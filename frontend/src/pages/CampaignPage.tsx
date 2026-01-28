@@ -216,7 +216,7 @@ export default function CampaignPage() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Map Viewer */}
-        <div className="flex-1 relative overflow-hidden bg-black">
+        <div className="flex-1 relative overflow-auto bg-black">
           {activeMap ? (
             <HexMapViewer
               map={activeMap}

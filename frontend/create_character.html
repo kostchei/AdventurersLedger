@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Create Character - Adventurers Ledger</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .step-container {
+            display: none;
+        }
+
+        .step-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+        }
+
+        .selection-card {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .selection-card:hover {
+            border-color: var(--border-dark);
+            background-color: var(--bg-primary);
+        }
+
+        .selection-card.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(139, 0, 0, 0.08);
+        }
+
+        .selection-card h3 {
+            font-family: var(--font-heading);
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+
+        .desc-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .subclass-preview {
+            font-size: 0.75rem;
+            color: var(--accent-hover);
+            margin-top: 4px;
+        }
+
+        .button-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-lg);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <header class="main-header">
+            <h1 class="logo">Create Character</h1>
+        </header>
+
+        <main class="content-area" style="align-items: flex-start; overflow-y: auto;">
+            <div style="width: 100%; max-width: 600px;">
+                <form id="create-char-form" novalidate>
+
+                    <!-- Step 0: Generation Method -->
+                    <div class="step-container active" id="step-0">
+                        <h2>How do you want to start?</h2>
+                        <div class="selection-card" onclick="setGenMode('handcrafted')">
+                            <h3>Guide Me</h3>
+                            <div class="desc-text">Step-by-step selection of Species and Class.</div>
+                        </div>
+                        <div class="selection-card" onclick="setGenMode('random')">
+                            <h3>I'm Feeling Lucky</h3>
+                            <div class="desc-text">Generate a completely random character.</div>
+                        </div>
+                        <div class="selection-card" onclick="setGenMode('archetype')">
+                            <h3>Pick an Archetype</h3>
+                            <div class="desc-text">Choose a role (e.g. Tank, Mage) and we'll do the rest.</div>
+                        </div>
+                        <div class="button-bar">
+                            <button type="button" class="btn-secondary"
+                                onclick="window.location.href='/'">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 0.5: Archetype Selection (Only for Archetype Mode) -->
+                    <div class="step-container" id="step-0-5">
+                        <h2>Choose an Archetype</h2>
+                        <div id="archetype-list">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="button-bar">
+                            <button type="button" class="btn-secondary" onclick="nextStep(0)">Back</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Identity -->
+                    <div class="step-container" id="step-1">
+                        <h2>Who are you?</h2>
+                        <div class="form-group">
+                            <label for="char-name">Character Name</label>
+                            <input type="text" id="char-name" required placeholder="Ex. Drizzt Do'Urden">
+                        </div>
+                        <div class="form-group">
+                            <label for="char-background">Background</label>
+                            <select id="char-background">
+                                <option value="Acolyte">Acolyte</option>
+                                <option value="Criminal">Criminal</option>
+                                <option value="Folk Hero">Folk Hero</option>
+                                <option value="Noble">Noble</option>
+                                <option value="Sage">Sage</option>
+                                <option value="Soldier">Soldier</option>
+                                <!-- More can be added or fetched -->
+                            </select>
+                        </div>
+                        <div class="button-bar">
+                            <button type="button" class="btn-secondary"
+                                onclick="window.location.href='/'">Cancel</button>
+                            <button type="button" class="btn-primary" onclick="nextStep(2)">Next: Species</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Species -->
+                    <div class="step-container" id="step-2">
+                        <h2>Choose your Species</h2>
+                        <div id="species-list">
+                            <p>Loading species from Open5e...</p>
+                        </div>
+                        <input type="hidden" id="char-species">
+                        <div class="button-bar">
+                            <button type="button" class="btn-secondary" onclick="nextStep(1)">Back</button>
+                            <button type="button" class="btn-primary" onclick="nextStep(3)">Next: Class</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Class -->
+                    <div class="step-container" id="step-3">
+                        <h2>Choose your Class</h2>
+                        <div id="class-list">
+                            <p>Loading classes from Open5e...</p>
+                        </div>
+                        <input type="hidden" id="char-class">
+                        <div class="button-bar">
+                            <button type="button" class="btn-secondary" onclick="nextStep(2)">Back</button>
+                            <button type="button" class="btn-primary" onclick="nextStep(4)">Next: Review</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Submit -->
+                    <div class="step-container" id="step-4">
+                        <h2>Review</h2>
+                        <div class="selection-card">
+                            <h3>Summary</h3>
+                            <p id="summary-name"></p>
+                            <p id="summary-species"></p>
+                            <p id="summary-class"></p>
+                            <p id="summary-background"></p>
+                        </div>
+                        <div class="button-bar">
+                            <button type="button" class="btn-secondary" onclick="nextStep(3)">Back</button>
+                            <button type="submit" class="btn-primary">Create Character</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- ES Module support for direct import -->
+    <script type="module" src="/static/js/create_char.js"></script>
+    <script>
+        // Simple Step Logic
+        function nextStep(targetStep) {
+            // Validation Concept:
+            // If moving forward (e.g. 1 -> 2), validate current step.
+            // If moving backward (e.g. 2 -> 1), just go.
+
+            const currentStepDiv = document.querySelector('.step-container.active');
+            let currentStepNum = 0;
+            if (currentStepDiv.id === 'step-0-5') currentStepNum = 0.5;
+            else currentStepNum = parseInt(currentStepDiv.id.replace('step-', ''));
+
+            let targetStepNum = targetStep === '0-5' ? 0.5 : targetStep;
+
+            if (targetStepNum > currentStepNum) {
+                // We are moving forward, check validity of inputs in current step
+                const inputs = currentStepDiv.querySelectorAll('input, select');
+                let valid = true;
+                inputs.forEach(input => {
+                    if (input.hasAttribute('required') && !input.value.trim()) {
+                        valid = false;
+                        input.style.borderColor = 'var(--danger-color)';
+                    } else {
+                        input.style.borderColor = '#333';
+                    }
+                });
+
+                // Specific checks for hidden inputs like species/class
+                if (currentStepNum === 2 && !document.getElementById('char-species').value) {
+                    alert("Please select a Species.");
+                    valid = false;
+                }
+                if (currentStepNum === 3 && !document.getElementById('char-class').value) {
+                    alert("Please select a Class.");
+                    valid = false;
+                }
+
+                if (!valid) {
+                    // Start of animation shake or just return
+                    return;
+                }
+            }
+
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${targetStep}`).classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

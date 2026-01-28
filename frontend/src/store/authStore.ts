@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User } from '../types';
+import type { User, PBUser } from '../types';
 import { pb } from '../lib/pb';
 
 interface AuthState {
@@ -14,7 +14,7 @@ interface AuthState {
 }
 
 // Helper to map PocketBase record to our User interface
-const mapPBUser = (record: any): User | null => {
+const mapPBUser = (record: PBUser | any): User | null => {
   if (!record) return null;
   return {
     id: record.id,

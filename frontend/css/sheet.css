@@ -1,0 +1,422 @@
+/* 
+ * Character Sheet Styles - Official D&D 5e 2024 PDF Style
+ * Light parchment theme with dark red accents
+ */
+
+:root {
+    /* Official PDF-inspired color palette */
+    --sheet-bg: #f4f1e8;
+    /* Warm parchment background */
+    --sheet-bg-alt: #ebe7dc;
+    /* Slightly darker for sections */
+    --sheet-border: #d4d0c6;
+    /* Light gray decorative lines */
+    --sheet-border-dark: #a8a49a;
+    /* Darker borders for emphasis */
+    --sheet-text: #1a1918;
+    /* Near-black text */
+    --sheet-accent: #8b0000;
+    /* Dark red headers (PHB style) */
+    --sheet-accent-light: #c41e3a;
+    /* Lighter accent for hover */
+    --sheet-muted: #6b6561;
+    /* Secondary/muted text */
+    --sheet-input-bg: #faf8f3;
+    /* Input field background */
+    --sheet-success: #2d5016;
+    /* Proficiency green */
+
+    /* Typography */
+    --font-sheet-heading: 'EB Garamond', 'Libre Baskerville', 'Georgia', serif;
+    --font-sheet-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* Spacing */
+    --sheet-gap-xs: 4px;
+    --sheet-gap-sm: 8px;
+    --sheet-gap-md: 12px;
+    --sheet-gap-lg: 16px;
+    --sheet-gap-xl: 24px;
+
+    /* Borders */
+    --sheet-radius: 4px;
+}
+
+/* Base sheet container */
+.character-sheet {
+    background-color: var(--sheet-bg);
+    color: var(--sheet-text);
+    font-family: var(--font-sheet-body);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Header bar - Name, Level, Class */
+.sheet-header {
+    background: linear-gradient(135deg, var(--sheet-accent) 0%, #5c0000 100%);
+    color: #fff;
+    padding: var(--sheet-gap-lg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.sheet-header .char-name {
+    font-family: var(--font-sheet-heading);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0 0 var(--sheet-gap-xs) 0;
+    letter-spacing: 0.5px;
+}
+
+.sheet-header .char-info {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.sheet-header .back-btn {
+    position: absolute;
+    top: var(--sheet-gap-md);
+    left: var(--sheet-gap-md);
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sheet-header .back-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Content area */
+.sheet-content {
+    padding: var(--sheet-gap-md);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Combat Stats Bar (AC, HP, Speed) */
+.combat-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sheet-gap-sm);
+    margin-bottom: var(--sheet-gap-lg);
+}
+
+.combat-stat {
+    background: var(--sheet-bg-alt);
+    border: 2px solid var(--sheet-border-dark);
+    border-radius: var(--sheet-radius);
+    padding: var(--sheet-gap-sm);
+    text-align: center;
+}
+
+.combat-stat .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--sheet-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.combat-stat .value {
+    font-family: var(--font-sheet-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sheet-text);
+}
+
+.combat-stat.hp {
+    border-color: var(--sheet-accent);
+}
+
+.combat-stat.hp .value {
+    color: var(--sheet-accent);
+}
+
+/* HP inline editing */
+.hp-edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-family: var(--font-sheet-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.hp-edit input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-bottom: 2px solid var(--sheet-border);
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: var(--sheet-accent);
+    padding: 0;
+}
+
+.hp-edit input:focus {
+    outline: none;
+    border-bottom-color: var(--sheet-accent);
+}
+
+/* Collapsible Sections */
+.sheet-section {
+    background: var(--sheet-bg-alt);
+    border: 1px solid var(--sheet-border);
+    border-radius: var(--sheet-radius);
+    margin-bottom: var(--sheet-gap-md);
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sheet-gap-md);
+    background: var(--sheet-bg);
+    border-bottom: 1px solid var(--sheet-border);
+    cursor: pointer;
+    user-select: none;
+}
+
+.section-header:hover {
+    background: var(--sheet-input-bg);
+}
+
+.section-header h2 {
+    font-family: var(--font-sheet-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sheet-accent);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-header .toggle-icon {
+    font-size: 1.2rem;
+    color: var(--sheet-muted);
+    transition: transform 0.2s;
+}
+
+.sheet-section.collapsed .section-header .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.section-content {
+    padding: var(--sheet-gap-md);
+    display: block;
+}
+
+.sheet-section.collapsed .section-content {
+    display: none;
+}
+
+/* Ability Scores Grid */
+.ability-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sheet-gap-sm);
+}
+
+.ability-block {
+    background: var(--sheet-bg);
+    border: 2px solid var(--sheet-border-dark);
+    border-radius: var(--sheet-radius);
+    padding: var(--sheet-gap-sm);
+    text-align: center;
+}
+
+.ability-block .name {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--sheet-muted);
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.ability-block .modifier {
+    font-family: var(--font-sheet-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sheet-text);
+}
+
+.ability-block .score {
+    font-size: 0.75rem;
+    color: var(--sheet-muted);
+    margin-top: 2px;
+}
+
+/* Skills List */
+.skills-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sheet-gap-xs) var(--sheet-gap-md);
+}
+
+.skill-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sheet-gap-sm);
+    padding: var(--sheet-gap-xs) 0;
+    border-bottom: 1px dotted var(--sheet-border);
+}
+
+.skill-row .proficiency {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--sheet-border-dark);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.skill-row.proficient .proficiency {
+    background: var(--sheet-success);
+    border-color: var(--sheet-success);
+}
+
+.skill-row .bonus {
+    font-family: var(--font-sheet-heading);
+    font-weight: 600;
+    min-width: 24px;
+    color: var(--sheet-text);
+}
+
+.skill-row .skill-name {
+    font-size: 0.8rem;
+    color: var(--sheet-muted);
+}
+
+.skill-row .ability-tag {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--sheet-border-dark);
+    margin-left: 4px;
+}
+
+/* Saving Throws */
+.saves-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sheet-gap-sm);
+}
+
+.save-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sheet-gap-sm);
+    padding: var(--sheet-gap-xs);
+    background: var(--sheet-bg);
+    border-radius: var(--sheet-radius);
+}
+
+.save-row .proficiency {
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--sheet-border-dark);
+    border-radius: 2px;
+}
+
+.save-row.proficient .proficiency {
+    background: var(--sheet-success);
+    border-color: var(--sheet-success);
+}
+
+.save-row .bonus {
+    font-family: var(--font-sheet-heading);
+    font-weight: 600;
+    min-width: 20px;
+}
+
+.save-row .save-name {
+    font-size: 0.75rem;
+    color: var(--sheet-muted);
+    text-transform: uppercase;
+}
+
+/* Equipment/Inventory */
+.inventory-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.inventory-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sheet-gap-sm);
+    border-bottom: 1px solid var(--sheet-border);
+}
+
+.inventory-item:last-child {
+    border-bottom: none;
+}
+
+.inventory-item .item-name {
+    font-weight: 500;
+}
+
+.inventory-item .item-qty {
+    color: var(--sheet-muted);
+    font-size: 0.85rem;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: var(--sheet-gap-lg);
+    color: var(--sheet-muted);
+    font-style: italic;
+}
+
+/* Loading state */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--sheet-muted);
+}
+
+/* Responsive adjustments for smaller phones */
+@media (max-width: 360px) {
+    .ability-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .combat-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .skills-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Desktop enhancements */
+@media (min-width: 768px) {
+    .sheet-content {
+        padding: var(--sheet-gap-xl);
+    }
+
+    .combat-bar {
+        gap: var(--sheet-gap-md);
+    }
+
+    .ability-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}

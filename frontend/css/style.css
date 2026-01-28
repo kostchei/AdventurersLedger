@@ -1,0 +1,135 @@
+:root {
+    /* Parchment theme - matching character sheet */
+    --bg-primary: #f4f1e8;
+    /* Warm parchment background */
+    --bg-secondary: #ebe7dc;
+    /* Slightly darker for sections */
+    --text-primary: #1a1918;
+    /* Near-black text */
+    --text-secondary: #6b6561;
+    /* Muted text */
+    --accent-color: #8b0000;
+    /* Dark red (PHB style) */
+    --accent-hover: #c41e3a;
+    /* Lighter accent for hover */
+    --danger-color: #cf6679;
+    --border-color: #d4d0c6;
+    /* Light gray decorative lines */
+    --border-dark: #a8a49a;
+    /* Darker borders */
+    --input-bg: #faf8f3;
+    /* Input field background */
+
+    --font-heading: 'EB Garamond', 'Georgia', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+}
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-header {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #5c0000 100%);
+    padding: var(--spacing-md);
+    border-bottom: 2px solid var(--border-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    color: #fff;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.content-area {
+    flex: 1;
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.welcome-screen {
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.welcome-screen h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.welcome-screen p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+}

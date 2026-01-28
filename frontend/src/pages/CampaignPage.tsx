@@ -10,6 +10,10 @@ import { useAuthStore } from '../store/authStore';
 import CharacterStats from '../components/CharacterStats';
 import WorldState from '../components/WorldState';
 import type { HexCoord } from '../utils/hexGrid';
+import type { User, CampaignMember, CampaignNomination, MapLayer } from '../types';
+import MapUploadModal from '../components/MapUploadModal';
+
+
 
 export default function CampaignPage() {
   const { campaignId } = useParams<{ campaignId: string }>();
@@ -17,8 +21,9 @@ export default function CampaignPage() {
   const { user } = useAuthStore();
 
   const [currentZ, setCurrentZ] = useState(0);
-  const { revealedHexes, revealHex } = useFogOfWar();
+  const { revealedHexes, revealHex } = useFogOfWar(currentZ);
   const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
+  const [isMapUploadModalOpen, setIsMapUploadModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'character' | 'world'>('character');
   const queryClient = useQueryClient();
   const [nomineeId, setNomineeId] = useState('');
@@ -73,28 +78,29 @@ export default function CampaignPage() {
     enabled: !!campaignId,
   });
 
-  const { data: members } = useQuery({
+  const { data: members } = useQuery<CampaignMember[]>({
     queryKey: ['campaign', campaignId, 'members'],
     queryFn: () => campaignApi.getCampaignMembers(campaignId!),
     enabled: !!campaignId,
   });
 
-  const { data: nominations } = useQuery({
+  const { data: nominations } = useQuery<CampaignNomination[]>({
     queryKey: ['campaign', campaignId, 'nominations'],
     queryFn: () => campaignApi.getCampaignNominations(campaignId!),
     enabled: !!campaignId,
   });
 
   // Fetch maps/layers from PocketBase (world_state)
-  const { data: maps } = useQuery({
+  const { data: maps, refetch: refetchMaps } = useQuery<MapLayer[]>({
     queryKey: ['maps', campaignId],
     queryFn: async () => {
       const records = await pb.collection('world_state').getFullList({
+        filter: `campaign = "${campaignId}"`,
         sort: 'z_index',
       });
       return records.map(r => ({
         id: r.id,
-        imageUrl: r.map_url,
+        imageUrl: r.map_file ? pb.files.getUrl(r, r.map_file) : r.map_url,
         hexColumns: r.hex_columns || 50,
         hexRows: r.hex_rows || 50,
         imageWidth: r.image_width || 2000,
@@ -170,35 +176,67 @@ export default function CampaignPage() {
     );
   }
 
-  const activeMap = maps?.find((m: any) => m.z === currentZ) || maps?.[0];
+  const handleCopyInviteLink = () => {
+    const link = `${window.location.origin}/campaign/${campaignId}/join`;
+    navigator.clipboard.writeText(link);
+    alert('Invitation link copied to chronicle clipboard!');
+  };
+
+  const activeMap = maps?.find((m: MapLayer) => m.z === currentZ) || maps?.[0];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       {/* Header */}
-      <nav className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center h-16 shadow-lg z-20">
-        <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/dashboard')} className="text-gray-400 hover:text-white transition-colors">
-            ← Dashboard
+      <header className="h-14 bg-slate-900/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 z-20 sticky top-0">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
           </button>
-          <h1 className="text-xl font-bold">{campaign.name}</h1>
-          <span className={`px-2 py-0.5 text-xs font-bold rounded ${isDM ? 'bg-amber-500/20 text-amber-500 border border-amber-500/50' : 'bg-blue-500/20 text-blue-500 border border-blue-500/50'}`}>
-            {isDM ? 'DUNGEON MASTER' : 'PLAYER'}
-          </span>
+          <div>
+            <h1 className="text-sm font-black uppercase tracking-[0.2em] line-clamp-1">{campaign?.name}</h1>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Chronicle Active</p>
+          </div>
         </div>
 
-        {/* Layer Switcher */}
-        <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
-          {maps?.map((m: any) => (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(`/campaign/${campaignId}/stats`)}
+            className="px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/30 transition-all flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+            Character Profile
+          </button>
+          <div className="flex bg-slate-800/50 rounded-lg p-1 border border-white/5">
+            {maps?.map((map: any) => (
+              <button
+                key={map.id}
+                onClick={() => setCurrentZ(map.z)}
+                className={`px-3 py-1 rounded text-[10px] font-black transition-all ${currentZ === map.z ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+              >
+                LEVEL {map.z}
+              </button>
+            ))}
+          </div>
+          {isDM && (
             <button
-              key={m.z}
-              onClick={() => setCurrentZ(m.z)}
-              className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${currentZ === m.z ? 'bg-primary-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-200'}`}
+              onClick={() => setIsMapUploadModalOpen(true)}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-black uppercase tracking-widest rounded-lg border border-white/10 transition-all flex items-center gap-2"
             >
-              L{m.z}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              Upload
             </button>
-          ))}
+          )}
         </div>
-      </nav>
+      </header>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
@@ -214,212 +252,108 @@ export default function CampaignPage() {
               onHexClick={handleHexClick}
             />
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <p className="text-gray-500 italic mb-4">No map data found for this layer.</p>
-                {isDM && (
-                  <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg transition-colors">
-                    Upload Layer Asset
-                  </button>
-                )}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center max-w-sm px-6">
+                <div className="text-4xl mb-4 opacity-20">🗺️</div>
+                <h2 className="text-slate-500 font-bold uppercase tracking-[0.3em] text-xs mb-2">Unmapped Territory</h2>
+                <p className="text-slate-600 text-[10px] uppercase font-bold tracking-widest leading-loose">
+                  This portion of the realm has not yet been chronicled in the ledger.
+                </p>
               </div>
             </div>
           )}
         </div>
 
         {/* Sidebar */}
-        <aside className="w-84 bg-gray-900 border-l border-gray-800 flex flex-col shadow-2xl z-10">
-          <div className="flex border-b border-gray-800 bg-gray-950/50">
-            <button
-              onClick={() => setActiveTab('character')}
-              className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-colors ${activeTab === 'character' ? 'text-primary-400 border-b-2 border-primary-500 bg-primary-500/5' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              Character
-            </button>
-            <button
-              onClick={() => setActiveTab('world')}
-              className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-colors ${activeTab === 'world' ? 'text-primary-400 border-b-2 border-primary-500 bg-primary-500/5' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              World
-            </button>
+        <aside className="w-84 bg-slate-900 border-l border-white/5 flex flex-col shadow-2xl z-10">
+          <div className="px-6 py-4 border-b border-white/5 bg-slate-950/50">
+            <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">World Log</h3>
           </div>
 
-            <div className="p-6 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
-              {activeTab === 'character' ? (
-                <>
-                  <section>
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Current Vitality</h3>
-                    <CharacterStats />
-                  </section>
+          <div className="p-6 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+            <section>
+              <WorldState />
+            </section>
 
-                  <section>
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Coordinates</h3>
-                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-800">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Party Location</span>
-                        <span className="text-primary-400 font-mono">
-                          {partyPosition ? `${partyPosition.hexX}, ${partyPosition.hexY} (Z:${partyPosition.z})` : 'Unknown'}
-                        </span>
-                      </div>
-                    </div>
-                  </section>
+            <section>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Nominations</h3>
+                {isDM && (
+                  <button
+                    onClick={handleCopyInviteLink}
+                    className="text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded border border-indigo-500/30 transition-all font-black uppercase tracking-tighter"
+                  >
+                    Copy Link
+                  </button>
+                )}
+              </div>
 
-                  <section>
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Party Members</h3>
-                    <div className="space-y-3">
-                      {members?.length ? (
-                        members.map((member) => (
-                          <div
-                            key={member.id}
-                            className="bg-gray-800/40 border border-gray-800 rounded-lg p-3 flex flex-col gap-1"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-semibold text-white">
-                                  {member.user?.name || member.userId}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                  {member.user?.email || `ID: ${member.userId}`}
-                                </p>
-                              </div>
-                              <span
-                                className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full ${member.isPrimaryDM ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50' : 'bg-blue-500/10 text-blue-300 border border-blue-500/40'}`}
-                              >
-                                {member.isPrimaryDM ? 'DM' : member.role}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-gray-500">
-                              Status: {member.status}
+              <div className="space-y-3">
+                {nominations?.length ? (
+                  nominations.map((nomination) => {
+                    const isCurrentNominee = nomination.nominatedPlayerId === user?.id;
+                    const canAct = isCurrentNominee && nomination.status === 'PENDING';
+                    return (
+                      <div
+                        key={nomination.id}
+                        className="bg-slate-800/40 border border-white/5 rounded-xl p-3 shadow-inner"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-xs font-bold text-white">
+                              {nomination.nominatedPlayer?.name || nomination.nominatedPlayerId}
+                            </p>
+                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tight">
+                              By {nomination.nominatedBy?.name || nomination.nominatedById}
                             </p>
                           </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-gray-500">No members yet.</p>
-                      )}
-                    </div>
-                  </section>
-
-                  <section>
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Nomination Center</h3>
-                    {campaign?.role === 'DM' && (
-                      <form onSubmit={handleNominationSubmit} className="space-y-3 bg-gray-800/50 border border-gray-800 rounded-lg p-4">
-                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                          Nominate a player
-                        </label>
-                        <select
-                          value={nomineeId}
-                          onChange={(event) => setNomineeId(event.target.value)}
-                          className="input bg-gray-900 text-sm"
-                        >
-                          <option value="">Select a player</option>
-                          {members
-                            ?.filter((member) => member.userId !== campaign?.dmId)
-                            .map((member) => (
-                              <option key={member.id} value={member.userId}>
-                                {member.user?.name || member.userId}
-                              </option>
-                            ))}
-                        </select>
-
-                        <label className="flex items-center gap-2 text-xs text-gray-400">
-                          <input
-                            type="checkbox"
-                            checked={keepAccess}
-                            onChange={(event) => setKeepAccess(event.target.checked)}
-                            className="form-checkbox"
-                          />
-                          Keep access to GM controls after handoff
-                        </label>
-
-                        <textarea
-                          value={nominationMessage}
-                          onChange={(event) => setNominationMessage(event.target.value)}
-                          placeholder="Optional note for the nominee"
-                          className="input min-h-[80px] text-sm"
-                        />
-
-                        <button
-                          type="submit"
-                          className="btn btn-primary w-full text-sm"
-                          disabled={nominationMutation.isPending || !nomineeId}
-                        >
-                          {nominationMutation.isPending ? 'Sending...' : 'Nominate Player'}
-                        </button>
-                      </form>
-                    )}
-
-                    <div className="space-y-3 mt-4">
-                      {nominations?.length ? (
-                        nominations.map((nomination) => {
-                          const isCurrentNominee = nomination.nominatedPlayerId === user?.id;
-                          const canAct = isCurrentNominee && nomination.status === 'PENDING';
-                          return (
-                            <div
-                              key={nomination.id}
-                              className="bg-gray-800/50 border border-gray-800 rounded-lg p-3"
+                          <span
+                            className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${nomination.status === 'PENDING'
+                              ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                              : 'bg-slate-800 text-slate-400 border-white/5'
+                              }`}
+                          >
+                            {nomination.status}
+                          </span>
+                        </div>
+                        {canAct && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <button
+                              onClick={() => acceptMutation.mutate(nomination.id)}
+                              className="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase rounded-lg border border-emerald-500/30 transition-all flex-1"
                             >
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <p className="text-sm font-semibold text-white">
-                                    {nomination.nominatedPlayer?.name || nomination.nominatedPlayerId}
-                                  </p>
-                                  <p className="text-[11px] text-gray-500">
-                                    Proposed by {nomination.nominatedBy?.name || nomination.nominatedById}
-                                  </p>
-                                </div>
-                                <span
-                                  className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full ${
-                                    nomination.status === 'PENDING'
-                                      ? 'bg-amber-500/10 text-amber-300 border border-amber-500/40'
-                                      : 'bg-gray-800/80 text-gray-200 border border-gray-700'
-                                  }`}
-                                >
-                                  {nomination.status}
-                                </span>
-                              </div>
-                              {nomination.message && (
-                                <p className="text-xs text-gray-400 mt-2 line-clamp-3">
-                                  {nomination.message}
-                                </p>
-                              )}
-
-                              {canAct && (
-                                <div className="flex items-center gap-2 mt-3">
-                                  <button
-                                    onClick={() => acceptMutation.mutate(nomination.id)}
-                                    className="btn btn-success text-xs flex-1"
-                                    disabled={acceptMutation.isPending}
-                                  >
-                                    {acceptMutation.isPending ? 'Accepting...' : 'Accept'}
-                                  </button>
-                                  <button
-                                    onClick={() => declineMutation.mutate(nomination.id)}
-                                    className="btn btn-secondary text-xs flex-1"
-                                    disabled={declineMutation.isPending}
-                                  >
-                                    {declineMutation.isPending ? 'Declining...' : 'Decline'}
-                                  </button>
-                                </div>
-                              )}
-
-                              <p className="text-xs text-gray-500 mt-2">
-                                Keep access: {nomination.keepAccess ? 'Yes' : 'No'}
-                              </p>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <p className="text-sm text-gray-500">No pending nominations.</p>
-                      )}
-                    </div>
-                  </section>
-                </>
-              ) : (
-                <WorldState />
-              )}
-            </div>
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => declineMutation.mutate(nomination.id)}
+                              className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-[10px] font-black uppercase rounded-lg border border-red-500/30 transition-all flex-1"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-[10px] text-slate-600 italic text-center py-4 bg-slate-900/20 rounded-lg border border-dashed border-slate-800">
+                    No active nominations.
+                  </p>
+                )}
+              </div>
+            </section>
+          </div>
         </aside>
       </div>
+
+      {/* Map Upload Modal */}
+      {isMapUploadModalOpen && (
+        <MapUploadModal
+          campaignId={campaignId!}
+          onClose={() => setIsMapUploadModalOpen(false)}
+          onUploadSuccess={() => refetchMaps()}
+        />
+      )}
     </div>
   );
 }

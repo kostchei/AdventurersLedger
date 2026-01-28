@@ -4,7 +4,10 @@ import Login from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
 import CampaignPage from './pages/CampaignPage';
+import JoinCampaign from './pages/JoinCampaign';
+import CharacterStatsPage from './pages/CharacterStatsPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import ServerOffline from './components/ServerOffline';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,30 +21,48 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/campaign/:campaignId"
-            element={
-              <ProtectedRoute>
-                <CampaignPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <ServerOffline>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/campaign/:campaignId"
+              element={
+                <ProtectedRoute>
+                  <CampaignPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/campaign/:campaignId/stats"
+              element={
+                <ProtectedRoute>
+                  <CharacterStatsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/campaign/:campaignId/join"
+              element={
+                <ProtectedRoute>
+                  <JoinCampaign />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </ServerOffline>
     </QueryClientProvider>
   );
 }

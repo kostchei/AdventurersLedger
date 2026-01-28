@@ -61,8 +61,7 @@ export default function HexMapViewer({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imageRef.current, 0, 0, map.imageWidth, map.imageHeight);
 
-    // 2. Prepare Fog Overlay (Off-screen canvas or layer)
-    // We use a temporary canvas to create the fog effect
+    // 2. Prepare Fog Overlay
     const fogCanvas = document.createElement('canvas');
     fogCanvas.width = canvas.width;
     fogCanvas.height = canvas.height;
@@ -76,11 +75,16 @@ export default function HexMapViewer({
     // Punch holes for revealed hexes on the current Z layer
     fogCtx.globalCompositeOperation = 'destination-out';
 
+    // Add SOFTNESS to the holes
+    fogCtx.shadowBlur = 20; // Softness radius
+    fogCtx.shadowColor = 'black'; // Color doesn't matter much for destination-out but helps preview
+    fogCtx.fillStyle = 'black';
+
     for (let q = 0; q < map.hexColumns; q++) {
       for (let r = 0; r < map.hexRows; r++) {
         const hexKey = `${q},${r},${currentZ}`;
         if (revealedHexes.has(hexKey) || isDM) {
-          const corners = hexGrid.getHexCorners({ q, r });
+          const corners = hexGrid.getHexCorners({ q, r, z: currentZ });
           fogCtx.beginPath();
           fogCtx.moveTo(corners[0].x, corners[0].y);
           for (let i = 1; i < corners.length; i++) {
@@ -92,8 +96,8 @@ export default function HexMapViewer({
       }
     }
 
-    // Optional: add a bit of "softness" to the holes
-    // (This is a simplified version; real soft fog would use gradients)
+    // Reset shadow for subsequent drawing
+    fogCtx.shadowBlur = 0;
 
     // Draw the fog layer back onto the main canvas
     ctx.drawImage(fogCanvas, 0, 0);
@@ -133,9 +137,9 @@ export default function HexMapViewer({
 
     // 5. Draw party position if on current Z layer
     if (partyPosition && partyPosition.z === currentZ) {
-      const partyHex = { q: partyPosition.hexX, r: partyPosition.hexY };
+      const partyHex = { q: partyPosition.hexX, r: partyPosition.hexY, z: partyPosition.z };
       const center = hexGrid.hexToPixel(partyHex);
-      const hexSize = (hexGrid as any).hexSize;
+      const hexSize = hexGrid.hexSize;
 
       // Draw party marker (circle with glow)
       ctx.shadowBlur = 10;

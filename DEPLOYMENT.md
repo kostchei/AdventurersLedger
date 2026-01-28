@@ -11,12 +11,13 @@
              ↓
 ┌─────────────────────────┐
 │  Cloudflare Tunnel      │ ← api.talekeeper.org
+│   (Running on VM)       │
 └────────────┬────────────┘
              │ Encrypted Tunnel
              ↓
 ┌─────────────────────────┐
-│  PocketBase (Local)     │ ← localhost:8090
-│  Desktop/Laptop Server  │
+│  PocketBase (GCP VM)    │ ← localhost:8090
+│  e2-micro Always Free   │
 └─────────────────────────┘
 ```
 
@@ -25,24 +26,19 @@
 - GitHub account
 - Azure account (free tier works)
 - Cloudflare account with `talekeeper.org` domain
-- Local machine running PocketBase + Cloudflare Tunnel
+- GCP Account (for backend)
 
-## Part 1: Local Backend Setup (Already Complete ✅)
+## Part 1: Backend Setup (GCP)
 
-### PocketBase
-- Running on `localhost:8090`
-- OAuth2 configured with Google
-- Database migrations applied
+**Refer to [MANAGEMENT.md](./MANAGEMENT.md) for detailed instructions on setting up the GCP backend.**
 
-### Cloudflare Tunnel
-- Tunnel ID: `081ada0c-35a5-4658-a833-7f39a91c7bf2`
-- Public URL: `https://api.talekeeper.org`
-- Config: `pocketbase/cloudflared/config.yml`
+Summary:
+1. Provision VM using `infrastructure/setup-vm.sh`.
+2. Migrate data using `infrastructure/migrate_data.sh`.
+3. Configure Cloudflare Tunnel on the VM.
 
-**Start services:**
-```bash
-start-talekeeper.bat
-```
+Once complete, `https://api.talekeeper.org` will be live.
+
 
 ## Part 2: Azure Static Web Apps Deployment
 

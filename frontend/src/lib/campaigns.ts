@@ -1,6 +1,6 @@
 import { pb } from './pb';
 import type { RecordModel } from 'pocketbase';
-import type { Campaign, CampaignMember, CampaignNomination } from '../types';
+import type { Campaign, CampaignMember, CampaignNomination, MapLayer } from '../types';
 import type {
   CampaignMembershipRecord,
   CampaignNominationRecord,
@@ -56,11 +56,11 @@ const mapMembershipRecord = (record: CampaignMembershipRecord & RecordModel): Ca
     updatedAt: record.updated,
     user: record.expand?.user
       ? {
-          id: record.expand.user.id,
-          name: record.expand.user.name ?? null,
-          email: record.expand.user.email,
-          avatarUrl: record.expand.user.avatar ?? null,
-        }
+        id: record.expand.user.id,
+        name: record.expand.user.name ?? null,
+        email: record.expand.user.email,
+        avatarUrl: record.expand.user.avatar ?? null,
+      }
       : undefined,
   };
 };
@@ -80,19 +80,19 @@ const mapNominationRecord = (
     updatedAt: record.updated,
     nominatedPlayer: record.expand?.nominated_player
       ? {
-          id: record.expand.nominated_player.id,
-          name: record.expand.nominated_player.name ?? null,
-          email: record.expand.nominated_player.email,
-          avatarUrl: record.expand.nominated_player.avatar ?? null,
-        }
+        id: record.expand.nominated_player.id,
+        name: record.expand.nominated_player.name ?? null,
+        email: record.expand.nominated_player.email,
+        avatarUrl: record.expand.nominated_player.avatar ?? null,
+      }
       : undefined,
     nominatedBy: record.expand?.nominated_by
       ? {
-          id: record.expand.nominated_by.id,
-          name: record.expand.nominated_by.name ?? null,
-          email: record.expand.nominated_by.email,
-          avatarUrl: record.expand.nominated_by.avatar ?? null,
-        }
+        id: record.expand.nominated_by.id,
+        name: record.expand.nominated_by.name ?? null,
+        email: record.expand.nominated_by.email,
+        avatarUrl: record.expand.nominated_by.avatar ?? null,
+      }
       : undefined,
   };
 };
@@ -346,5 +346,18 @@ export const campaignApi = {
     await pb.collection('campaign_nominations').update(nominationId, {
       status: 'DECLINED',
     });
+  },
+
+  getMaps: async (campaignId: string): Promise<RecordModel[]> => {
+    return pb.collection('world_state').getFullList({
+      filter: `campaign = "${campaignId}"`,
+      sort: 'z_index',
+    });
+  },
+
+  uploadMapLayer: async (campaignId: string, formData: FormData): Promise<RecordModel> => {
+    // formData should contain map_file, z_index, hex_columns, hex_rows, etc.
+    formData.append('campaign', campaignId);
+    return pb.collection('world_state').create(formData);
   },
 };

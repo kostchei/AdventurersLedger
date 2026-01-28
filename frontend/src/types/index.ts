@@ -141,7 +141,7 @@ export interface PlayerRevealedHex {
   revealedAt: string;
 }
 
-export interface Map {
+export interface MapLayer {
   id: string;
   campaignId?: string;
   name?: string;
@@ -158,6 +158,8 @@ export interface Map {
   createdAt: string;
   updatedAt: string;
 }
+
+export type Map = MapLayer;
 
 export interface PartyPosition {
   id: string;

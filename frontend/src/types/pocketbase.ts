@@ -10,9 +10,9 @@ export interface PBBaseRecord {
 }
 
 /**
- * User interface for users collection
+ * PBUser interface for users collection
  */
-export interface User extends PBBaseRecord {
+export interface PBUser extends PBBaseRecord {
   username: string;
   email: string;
   name: string;
@@ -32,6 +32,9 @@ export interface UserStats extends PBBaseRecord {
   gold: number;
   xp: number;
   conditions: string[];
+  factions: Record<string, number>;
+  active_deity: string | null;
+  piety_json: Record<string, number>;
 }
 
 /**
@@ -99,7 +102,7 @@ export interface CampaignMembershipRecord extends PBBaseRecord {
   joined_at?: string;
   expand?: {
     campaign?: CampaignRecord;
-    user?: User;
+    user?: PBUser;
   };
 }
 
@@ -111,8 +114,8 @@ export interface CampaignNominationRecord extends PBBaseRecord {
   message?: string;
   status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'REVOKED';
   expand?: {
-    nominated_player?: User;
-    nominated_by?: User;
+    nominated_player?: PBUser;
+    nominated_by?: PBUser;
   };
 }
 
@@ -133,7 +136,7 @@ export type PBCollectionName =
  * Map collection names to their record types
  */
 export interface PBCollectionTypes {
-  users: User;
+  users: PBUser;
   users_stats: UserStats;
   fog_of_war: FogOfWar;
   world_state: WorldState;

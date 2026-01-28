@@ -1,9 +1,8 @@
 // Hex grid utilities for flat-top hexagons
 
-export interface HexCoord {
-  q: number; // column
-  r: number; // row
-}
+import type { Hex3D } from '../types/hex';
+
+export type HexCoord = Hex3D;
 
 export interface Point {
   x: number;
@@ -11,7 +10,7 @@ export interface Point {
 }
 
 export class HexGrid {
-  private hexSize: number;
+  public readonly hexSize: number;
   private orientation: 'flat' | 'pointy';
   private columns: number;
   private rows: number;
@@ -63,7 +62,7 @@ export class HexGrid {
   }
 
   // Round fractional hex coordinates to nearest hex
-  private roundHex(q: number, r: number): HexCoord {
+  private roundHex(q: number, r: number, z: number = 0): HexCoord {
     const s = -q - r;
     let rq = Math.round(q);
     let rr = Math.round(r);
@@ -79,7 +78,7 @@ export class HexGrid {
       rr = -rq - rs;
     }
 
-    return { q: rq, r: rr };
+    return { q: rq, r: rr, z: Math.round(z) };
   }
 
   // Get all hex corners for drawing
@@ -106,7 +105,7 @@ export class HexGrid {
 
     for (let q = -range; q <= range; q++) {
       for (let r = Math.max(-range, -q - range); r <= Math.min(range, -q + range); r++) {
-        hexes.push({ q: center.q + q, r: center.r + r });
+        hexes.push({ q: center.q + q, r: center.r + r, z: center.z });
       }
     }
 

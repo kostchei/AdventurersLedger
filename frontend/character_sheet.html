@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Character Sheet - Adventurers Ledger</title>
+    <link rel="stylesheet" href="/static/css/sheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="character-sheet" id="app">
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <p>Loading character...</p>
+        </div>
+
+        <!-- Header -->
+        <header class="sheet-header" id="sheet-header" style="display: none;">
+            <button class="back-btn" onclick="window.location.href='/'" title="Back to Dashboard">←</button>
+            <h1 class="char-name" id="char-name">Character Name</h1>
+            <div class="char-info">
+                <span id="char-level">Level 1</span>
+                <span id="char-species-class">Human Fighter</span>
+                <span id="char-background">(Soldier)</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="sheet-content" id="sheet-content" style="display: none;">
+
+            <!-- Combat Stats Bar -->
+            <div class="combat-bar">
+                <div class="combat-stat">
+                    <div class="label">Armor Class</div>
+                    <div class="value" id="stat-ac">10</div>
+                </div>
+                <div class="combat-stat hp">
+                    <div class="label">Hit Points</div>
+                    <div class="hp-edit">
+                        <input type="number" id="hp-current" value="10" min="0">
+                        <span>/</span>
+                        <span id="hp-max">10</span>
+                    </div>
+                </div>
+                <div class="combat-stat">
+                    <div class="label">Speed</div>
+                    <div class="value" id="stat-speed">30 ft</div>
+                </div>
+                <div class="combat-stat">
+                    <div class="label">Initiative</div>
+                    <div class="value" id="stat-initiative">+0</div>
+                </div>
+            </div>
+
+            <!-- Proficiency & Inspiration -->
+            <div class="combat-bar" style="grid-template-columns: 1fr 1fr;">
+                <div class="combat-stat">
+                    <div class="label">Proficiency</div>
+                    <div class="value" id="stat-proficiency">+2</div>
+                </div>
+                <div class="combat-stat">
+                    <div class="label">Heroic Inspiration</div>
+                    <div class="value" id="stat-inspiration">○</div>
+                </div>
+            </div>
+
+            <!-- Ability Scores Section -->
+            <section class="sheet-section" id="section-abilities">
+                <div class="section-header" onclick="toggleSection('section-abilities')">
+                    <h2>Ability Scores</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="ability-grid" id="ability-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Saving Throws Section -->
+            <section class="sheet-section" id="section-saves">
+                <div class="section-header" onclick="toggleSection('section-saves')">
+                    <h2>Saving Throws</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="saves-grid" id="saves-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section class="sheet-section collapsed" id="section-skills">
+                <div class="section-header" onclick="toggleSection('section-skills')">
+                    <h2>Skills</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="skills-list" id="skills-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Combat & Actions Section -->
+            <section class="sheet-section collapsed" id="section-combat">
+                <div class="section-header" onclick="toggleSection('section-combat')">
+                    <h2>Attacks & Actions</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="empty-state">No attacks configured yet.</div>
+                </div>
+            </section>
+
+            <!-- Equipment Section -->
+            <section class="sheet-section collapsed" id="section-equipment">
+                <div class="section-header" onclick="toggleSection('section-equipment')">
+                    <h2>Equipment</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <ul class="inventory-list" id="inventory-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Features & Traits Section -->
+            <section class="sheet-section collapsed" id="section-features">
+                <div class="section-header" onclick="toggleSection('section-features')">
+                    <h2>Features & Traits</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="empty-state">No features listed yet.</div>
+                </div>
+            </section>
+
+            <!-- Spellcasting Section (if applicable) -->
+            <section class="sheet-section collapsed" id="section-spells">
+                <div class="section-header" onclick="toggleSection('section-spells')">
+                    <h2>Spellcasting</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="empty-state" id="spells-content">No spells known.</div>
+                </div>
+            </section>
+
+            <!-- Trackers Section (Renown, Piety, Bastion) -->
+            <section class="sheet-section collapsed" id="section-trackers">
+                <div class="section-header" onclick="toggleSection('section-trackers')">
+                    <h2>Faction & Piety</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div id="trackers-content">
+                        <div class="empty-state">No faction affiliations yet.</div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="/static/js/character_sheet.js"></script>
+</body>
+
+</html>

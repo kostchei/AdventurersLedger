@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+sqlalchemy
+pydantic
+python-dotenv
+httpx
+authlib
+itsdangerous
+

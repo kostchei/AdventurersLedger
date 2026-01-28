@@ -21,7 +21,7 @@ const mapPBUser = (record: PBUser | any): User | null => {
     id: record.id,
     email: record.email,
     name: record.name || record.username || 'Adventurer',
-    avatarUrl: pb.files.getUrl(record, record.avatar),
+    avatarUrl: pb.files.getURL(record, record.avatar),
     global_role: record.global_role,
     createdAt: record.created,
   };

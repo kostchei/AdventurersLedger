@@ -72,7 +72,7 @@ export default function CampaignPage() {
       });
       return records.map(r => ({
         id: r.id,
-        imageUrl: r.map_file ? pb.files.getUrl(r, r.map_file) : r.map_url,
+        imageUrl: r.map_file ? pb.files.getURL(r, r.map_file) : r.map_url,
         hexColumns: r.hex_columns || 50,
         hexRows: r.hex_rows || 50,
         imageWidth: r.image_width || 2000,

@@ -60,7 +60,17 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
             onClose();
         } catch (err: unknown) {
             console.error('Upload failed:', err);
-            setError(err instanceof Error ? err.message : 'Failed to upload map layer.');
+
+            // Extract detailed error message
+            let errorMessage = 'Failed to upload map layer.';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            } else if (typeof err === 'object' && err !== null) {
+                const errorObj = err as { data?: { message?: string }; message?: string };
+                errorMessage = errorObj.data?.message || errorObj.message || errorMessage;
+            }
+
+            setError(errorMessage);
         } finally {
             setIsUploading(false);
         }

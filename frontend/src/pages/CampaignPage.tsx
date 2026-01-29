@@ -22,6 +22,7 @@ export default function CampaignPage() {
   const { revealedHexes, revealHex } = useFogOfWar(currentZ);
   const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
   const [isMapUploadModalOpen, setIsMapUploadModalOpen] = useState(false);
+  const [viewAsPlayer, setViewAsPlayer] = useState(false);
   const queryClient = useQueryClient();
 
   /* Removed nominationMutation since it was unused */
@@ -88,7 +89,8 @@ export default function CampaignPage() {
     enabled: !!campaignId,
   });
 
-  const isDM = user?.id === campaign?.dmId;
+  const isRealDM = user?.id === campaign?.dmId;
+  const isDM = isRealDM && !viewAsPlayer;
 
   // Subscribe to Party Position
   useEffect(() => {
@@ -173,11 +175,29 @@ export default function CampaignPage() {
           </button>
           <div>
             <h1 className="text-sm font-black uppercase tracking-[0.2em] line-clamp-1">{campaign?.name}</h1>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Chronicle Active</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+              {viewAsPlayer ? 'Player View' : 'Chronicle Active'}
+            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          {isRealDM && (
+            <button
+              onClick={() => setViewAsPlayer(!viewAsPlayer)}
+              className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all flex items-center gap-2 ${viewAsPlayer
+                  ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-white/10'
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+              </svg>
+              {viewAsPlayer ? 'Exit Player View' : 'View as Player'}
+            </button>
+          )}
+
           <button
             onClick={() => navigate(`/campaign/${campaignId}/stats`)}
             className="px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/30 transition-all flex items-center gap-2"

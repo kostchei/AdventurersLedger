@@ -185,9 +185,15 @@ export const campaignApi = {
     );
 
     if (existing.items.length) {
+      const membership = existing.items[0];
+      // If already a GM, do not demote to PLAYER
+      if (membership.role === 'GM') {
+        return;
+      }
+
       await pb
         .collection('campaign_memberships')
-        .update(existing.items[0].id, { status: 'ACTIVE', role: 'PLAYER', is_primary_dm: false });
+        .update(membership.id, { status: 'ACTIVE', role: 'PLAYER', is_primary_dm: false });
       return;
     }
 

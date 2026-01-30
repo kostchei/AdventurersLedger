@@ -9,7 +9,7 @@ import { useAuthStore } from '../store/authStore';
 import WorldState from '../components/WorldState';
 import type { HexCoord } from '../utils/hexGrid';
 import type { CampaignMember, CampaignNomination, MapLayer } from '../types';
-import MapUploadModal from '../components/MapUploadModal';
+import MapAssetManager from '../components/MapAssetManager';
 
 
 
@@ -21,7 +21,7 @@ export default function CampaignPage() {
   const currentZ = 0;
   const { revealedHexes, revealHex } = useFogOfWar(currentZ);
   const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
-  const [isMapUploadModalOpen, setIsMapUploadModalOpen] = useState(false);
+  const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
   const queryClient = useQueryClient();
 
@@ -186,8 +186,8 @@ export default function CampaignPage() {
             <button
               onClick={() => setViewAsPlayer(!viewAsPlayer)}
               className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all flex items-center gap-2 ${viewAsPlayer
-                  ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-white/10'
+                ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-white/10'
                 }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -209,13 +209,13 @@ export default function CampaignPage() {
           </button>
           {isDM && (
             <button
-              onClick={() => setIsMapUploadModalOpen(true)}
+              onClick={() => setIsMapManagerOpen(true)}
               className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-black uppercase tracking-widest rounded-lg border border-white/10 transition-all flex items-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
               </svg>
-              Upload
+              Manage Maps
             </button>
           )}
         </div>
@@ -329,12 +329,13 @@ export default function CampaignPage() {
         </aside>
       </div>
 
-      {/* Map Upload Modal */}
-      {isMapUploadModalOpen && (
-        <MapUploadModal
+      {/* Map Manager Modal */}
+      {isMapManagerOpen && (
+        <MapAssetManager
           campaignId={campaignId!}
-          onClose={() => setIsMapUploadModalOpen(false)}
-          onUploadSuccess={() => refetchMaps()}
+          maps={maps || []}
+          onClose={() => setIsMapManagerOpen(false)}
+          onRefresh={() => refetchMaps()}
         />
       )}
     </div>

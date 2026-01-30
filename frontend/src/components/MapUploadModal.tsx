@@ -256,7 +256,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
             <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="p-6 border-b border-gray-800">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <span className="text-amber-500">🗺️</span> Upload Map Layer
+                        <span className="text-amber-500">🗺️</span> Upload Map
                     </h2>
                     <p className="text-gray-400 text-sm mt-1">Upload a map to expand your campaign world.</p>
                 </div>
@@ -269,7 +269,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Layer Image</label>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Map Image</label>
                         <input
                             type="file"
                             ref={fileInputRef}
@@ -366,8 +366,8 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                                     {!calibrationPoints.start
                                         ? 'Click the first endpoint'
                                         : !calibrationPoints.end
-                                        ? 'Click the second endpoint'
-                                        : 'Measurement captured — click again to restart'}
+                                            ? 'Click the second endpoint'
+                                            : 'Measurement captured — click again to restart'}
                                 </div>
                             </div>
 
@@ -419,7 +419,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                             disabled={!file || isUploading || !isCalibrated}
                             className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
                         >
-                            {isUploading ? 'Uploading...' : 'Upload Layer'}
+                            {isUploading ? 'Uploading...' : 'Upload Map'}
                         </button>
                     </div>
                 </form>

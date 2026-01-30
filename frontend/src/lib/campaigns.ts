@@ -391,4 +391,7 @@ export const campaignApi = {
       throw error;
     }
   },
+  deleteMapLayer: async (mapId: string): Promise<void> => {
+    await pb.collection('world_state').delete(mapId);
+  },
 };

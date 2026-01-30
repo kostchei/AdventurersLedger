@@ -21,7 +21,11 @@ jobs:
             # 1. Navigate to your app directory on the server
             # If you followed the 'Simple Edition' guide, this might be your home dir
             cd /home/pocketbase/AdventurersLedger
-
+            
+            # 1.5 Create a backup of the DB before applying migrations
+            mkdir -p backups
+            [ -f pocketbase/pb_data/data.db ] && cp pocketbase/pb_data/data.db backups/data.db.bak.$(date +%F_%H-%M-%S)
+            
             # 2. Pull latest changes
             git pull origin main
 

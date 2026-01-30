@@ -64,7 +64,22 @@ The GitHub Action `.github/workflows/deploy-backend.yml` will trigger:
 
 On restart, PocketBase automatically detects unapplied migrations in `pb_migrations` and applies them.
 
-## Troubleshooting
+## 🛑 The "Don't Break Shit" Golden Rules
+
+To prevent data loss (like the "Collection Wipe" incident), follow these strictly:
+
+### 1. Review Migrations BEFORE Committing
+Always check files in `pocketbase/pb_migrations/` before you `git add`. 
+- **⚠️ ALERT**: If you see a file named `..._deleted_...js` and you didn't mean to delete data, **DELETE THAT FILE** and restore it from Git.
+- PocketBase generates these whenever you change the schema. If you renamed a collection, it might "Delete" the old name and "Create" the new one—wiping data in the process!
+
+### 2. Local is the Sandbox
+Never make schema changes directly on the production Admin UI. Always do them locally, let the JS files generate, and push them.
+
+### 3. Automated Backups
+The GitHub Action is now configured to create a snapshot of your database (`data.db.bak`) every time it deploys. If something breaks, you can swap it back.
+
+## Troubleshooting & Recovery
 
 ### "Migration mismatch"
 If you and another dev both create migrations, they might conflict.

@@ -20,7 +20,7 @@ jobs:
           script: |
             # 1. Navigate to your app directory on the server
             # If you followed the 'Simple Edition' guide, this might be your home dir
-            cd /home/Admin/AdventurersLedger
+            cd /home/pocketbase/AdventurersLedger
 
             # 2. Pull latest changes
             git pull origin main

@@ -6,7 +6,6 @@ import type { Map } from '../types';
 interface HexMapViewerProps {
   map: Map;
   currentZ: number;
-  revealedHexes: Set<string>; // Set of "q,r,z" strings
   partyPosition?: { hexX: number; hexY: number; z: number };
   isDM: boolean;
   onHexClick?: (hex: HexCoord & { z: number }) => void;
@@ -15,7 +14,6 @@ interface HexMapViewerProps {
 export default function HexMapViewer({
   map,
   currentZ,
-  revealedHexes,
   partyPosition,
   isDM,
   onHexClick,
@@ -101,39 +99,7 @@ export default function HexMapViewer({
     ctx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
     ctx.drawImage(imageRef.current, 0, 0, map.imageWidth, map.imageHeight);
 
-    // 2. Prepare Fog Overlay
-    const fogCanvas = document.createElement('canvas');
-    fogCanvas.width = baseCanvas.width;
-    fogCanvas.height = baseCanvas.height;
-    const fogCtx = fogCanvas.getContext('2d');
-    if (fogCtx) {
-      fogCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-      fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
-      fogCtx.globalCompositeOperation = 'destination-out';
-
-      // Add softness to the fog holes
-      fogCtx.shadowBlur = 20;
-      fogCtx.shadowColor = 'black';
-      fogCtx.fillStyle = 'black';
-
-      for (let q = 0; q < map.hexColumns; q++) {
-        for (let r = 0; r < map.hexRows; r++) {
-          const hexKey = `${q},${r},${currentZ}`;
-          if (revealedHexes.has(hexKey) || isDM) {
-            const corners = hexGrid.getHexCorners({ q, r, z: currentZ });
-            fogCtx.beginPath();
-            fogCtx.moveTo(corners[0].x, corners[0].y);
-            for (let i = 1; i < corners.length; i++) {
-              fogCtx.lineTo(corners[i].x, corners[i].y);
-            }
-            fogCtx.closePath();
-            fogCtx.fill();
-          }
-        }
-      }
-      fogCtx.shadowBlur = 0; // Reset shadow
-      ctx.drawImage(fogCanvas, 0, 0);
-    }
+    ctx.drawImage(imageRef.current, 0, 0, map.imageWidth, map.imageHeight);
 
     // 3. Draw hex grid overlay
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
@@ -153,7 +119,7 @@ export default function HexMapViewer({
 
     baseCanvasRef.current = baseCanvas;
     triggerInteractiveRender();
-  }, [hexGrid, imageLoaded, revealedHexes, isDM, map.imageWidth, map.imageHeight, map.hexColumns, map.hexRows, currentZ]);
+  }, [hexGrid, imageLoaded, isDM, map.imageWidth, map.imageHeight, map.hexColumns, map.hexRows, currentZ]);
 
   // Render interactive layer (hover, party)
   useEffect(() => {

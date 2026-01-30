@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { campaignApi } from '../lib/campaigns';
 import { pb } from '../lib/pb';
 import HexMapViewer from '../components/HexMapViewer';
-import { useFogOfWar } from '../hooks/useFogOfWar';
 import { useAuthStore } from '../store/authStore';
 import WorldState from '../components/WorldState';
 import type { HexCoord } from '../utils/hexGrid';
@@ -19,7 +18,6 @@ export default function CampaignPage() {
   const { user } = useAuthStore();
 
   const currentZ = 0;
-  const { revealedHexes, revealHex } = useFogOfWar(currentZ);
   const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
   const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
@@ -122,8 +120,6 @@ export default function CampaignPage() {
         r: hex.r,
         z: hex.z,
       });
-
-      await revealHex(hex.q, hex.r, hex.z);
     } catch (err: unknown) {
       console.error('Failed to move party:', err);
     }
@@ -353,7 +349,6 @@ export default function CampaignPage() {
             <HexMapViewer
               map={activeMap}
               currentZ={currentZ}
-              revealedHexes={revealedHexes}
               partyPosition={partyPosition || undefined}
               isDM={isDM}
               onHexClick={handleHexClick}

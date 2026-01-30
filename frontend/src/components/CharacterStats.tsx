@@ -165,7 +165,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
             </div>
 
             {/* Conditions Section */}
-            {stats.conditions.length > 0 && (
+            {stats.conditions && stats.conditions.length > 0 && (
                 <section>
                     <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Active Afflictions</h3>
                     <div className="flex flex-wrap gap-1.5">

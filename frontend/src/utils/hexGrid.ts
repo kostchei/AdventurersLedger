@@ -14,19 +14,23 @@ export class HexGrid {
   private orientation: 'flat' | 'pointy';
   private columns: number;
   private rows: number;
+  private offsetX: number;
+  private offsetY: number;
 
   constructor(
     hexSize: number,
     columns: number,
     rows: number,
-    _width: number,
-    _height: number,
-    orientation: 'flat' | 'pointy' = 'flat'
+    orientation: 'flat' | 'pointy' = 'flat',
+    offsetX: number = 0,
+    offsetY: number = 0
   ) {
     this.hexSize = hexSize;
     this.orientation = orientation;
     this.columns = columns;
     this.rows = rows;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
   }
 
   // Convert hex coordinates to pixel coordinates
@@ -34,30 +38,32 @@ export class HexGrid {
     const size = this.hexSize;
 
     if (this.orientation === 'flat') {
-      const x = size * (3 / 2 * hex.q);
-      const y = size * Math.sqrt(3) * (hex.r + hex.q / 2);
+      const x = this.offsetX + size * (3 / 2 * hex.q);
+      const y = this.offsetY + size * Math.sqrt(3) * (hex.r + hex.q / 2);
       return { x, y };
     } else {
       // Pointy top
-      const x = size * Math.sqrt(3) * (hex.q + hex.r / 2);
-      const y = size * (3 / 2 * hex.r);
+      const x = this.offsetX + size * Math.sqrt(3) * (hex.q + hex.r / 2);
+      const y = this.offsetY + size * (3 / 2 * hex.r);
       return { x, y };
     }
   }
 
   // Convert pixel coordinates to hex coordinates
-  pixelToHex(point: Point): HexCoord {
+  pixelToHex(point: Point, z: number = 0): HexCoord {
     const size = this.hexSize;
+    const x = point.x - this.offsetX;
+    const y = point.y - this.offsetY;
 
     if (this.orientation === 'flat') {
-      const q = (2 / 3 * point.x) / size;
-      const r = (-1 / 3 * point.x + Math.sqrt(3) / 3 * point.y) / size;
-      return this.roundHex(q, r);
+      const q = (2 / 3 * x) / size;
+      const r = (-1 / 3 * x + Math.sqrt(3) / 3 * y) / size;
+      return this.roundHex(q, r, z);
     } else {
       // Pointy top
-      const q = (Math.sqrt(3) / 3 * point.x - 1 / 3 * point.y) / size;
-      const r = (2 / 3 * point.y) / size;
-      return this.roundHex(q, r);
+      const q = (Math.sqrt(3) / 3 * x - 1 / 3 * y) / size;
+      const r = (2 / 3 * y) / size;
+      return this.roundHex(q, r, z);
     }
   }
 

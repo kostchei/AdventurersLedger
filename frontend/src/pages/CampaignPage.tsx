@@ -23,6 +23,7 @@ export default function CampaignPage() {
   const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
   const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
+  const [enteredWorld, setEnteredWorld] = useState(false);
   const queryClient = useQueryClient();
 
   /* Removed nominationMutation since it was unused */
@@ -218,14 +219,99 @@ export default function CampaignPage() {
               Manage Maps
             </button>
           )}
+
+          {enteredWorld && (
+            <button
+              onClick={() => setEnteredWorld(false)}
+              className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
+              title="Return to Hub"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+              </svg>
+            </button>
+          )}
         </div>
       </header>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Map Viewer */}
+        {/* Map Viewer or Landing Dashboard */}
         <div className="flex-1 relative overflow-auto bg-black">
-          {activeMap ? (
+          {!enteredWorld ? (
+            <div className="absolute inset-0 flex items-center justify-center p-8 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900 to-black">
+              <div className="max-w-2xl w-full">
+                <div className="text-center mb-12">
+                  <div className="inline-block p-4 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                  </div>
+                  <h2 className="text-3xl font-black text-white uppercase tracking-[0.4em] mb-4">Mission Control</h2>
+                  <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em]">Select your next stage of adventure</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Enter World Choice */}
+                  <button
+                    onClick={() => setEnteredWorld(true)}
+                    className="group relative bg-slate-900/50 border border-white/5 p-8 rounded-2xl hover:bg-slate-800/80 transition-all hover:border-indigo-500/30 hover:shadow-[0_0_30px_-10px_rgba(99,102,241,0.3)] text-left active:scale-[0.98]"
+                  >
+                    <div className="mb-4 text-3xl opacity-50 group-hover:opacity-100 transition-opacity">🌍</div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2">Enter World Map</h3>
+                    <p className="text-slate-500 text-xs leading-relaxed">Venture forth into the cartographic realm. (Note: Large maps may take a moment to manifest)</p>
+                    <div className="mt-6 flex items-center gap-2 text-indigo-400 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                      Manifest Realm
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* Character Profile Choice */}
+                  <button
+                    onClick={() => navigate(`/campaign/${campaignId}/stats`)}
+                    className="group relative bg-slate-900/50 border border-white/5 p-8 rounded-2xl hover:bg-slate-800/80 transition-all hover:border-indigo-500/30 hover:shadow-[0_0_30px_-10px_rgba(99,102,241,0.3)] text-left active:scale-[0.98]"
+                  >
+                    <div className="mb-4 text-3xl opacity-50 group-hover:opacity-100 transition-opacity">📜</div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2">Character Profile</h3>
+                    <p className="text-slate-500 text-xs leading-relaxed">Consult the archives of your deeds, strength, and standing within the factions.</p>
+                    <div className="mt-6 flex items-center gap-2 text-indigo-400 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                      Open Chronicle
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* Manage Maps (DM Only) */}
+                  {isDM && (
+                    <button
+                      onClick={() => setIsMapManagerOpen(true)}
+                      className="group md:col-span-2 relative bg-slate-900/50 border border-white/5 p-8 rounded-2xl hover:bg-slate-800/80 transition-all hover:border-amber-500/30 hover:shadow-[0_0_30px_-10px_rgba(245,158,11,0.2)] text-left active:scale-[0.98]"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="mb-4 text-3xl opacity-50 group-hover:opacity-100 transition-opacity">🛠️</div>
+                          <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2">Manage Cartography</h3>
+                          <p className="text-slate-500 text-xs leading-relaxed truncate">Administer map assets, upload new perspectives, or purge ancient records.</p>
+                        </div>
+                        <div className="text-amber-500 text-[10px] font-black uppercase tracking-widest border border-amber-500/30 px-3 py-1 rounded-full group-hover:bg-amber-500/10 transition-colors">
+                          DM Tools
+                        </div>
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-12 text-center">
+                  <p className="text-[10px] text-slate-700 font-bold uppercase tracking-[0.2em] italic">
+                    "The Ledger tracks all, but the journey is yours to define."
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : activeMap ? (
             <HexMapViewer
               map={activeMap}
               currentZ={currentZ}

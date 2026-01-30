@@ -1,0 +1,33 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'pocketbase/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            # 1. Navigate to your app directory on the server
+            # If you followed the 'Simple Edition' guide, this might be your home dir
+            cd /home/Admin/AdventurersLedger
+
+            # 2. Pull latest changes
+            git pull origin main
+
+            # 3. Restart PocketBase to apply migrations
+            # Note: Requires sudo. See POCKETBASE_CICD.md for permission setup.
+            sudo systemctl restart pocketbase
+            
+            # 4. Optional: Check status
+            sudo systemctl status pocketbase --no-pager

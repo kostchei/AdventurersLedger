@@ -25,7 +25,7 @@ export interface PBUser extends PBBaseRecord {
  * Stores character statistics, HP, gold, XP, and conditions
  */
 export interface UserStats extends PBBaseRecord {
-  user_id: string;
+  user: string;
   hp: number;
   max_hp: number;
   stats_json: StatsJson;
@@ -54,7 +54,7 @@ export interface StatsJson {
  * Tracks revealed hexes per user with 3D coordinates (q, r, z)
  */
 export interface FogOfWar extends PBBaseRecord {
-  user_id: string;
+  user: string;
   q: number;
   r: number;
   z: number;

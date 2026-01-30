@@ -48,7 +48,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                             if (!userId) return;
                             try {
                                 await characterApi.create({
-                                    user_id: userId,
+                                    user: userId,
                                     hp: 10,
                                     max_hp: 10,
                                     stats_json: {

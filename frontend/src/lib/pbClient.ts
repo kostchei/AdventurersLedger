@@ -24,7 +24,7 @@ import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 export const userStatsApi = {
   getByUserId: async (userId: string): Promise<UserStats | null> => {
     const records = await pb.collection('users_stats').getList<UserStats>(1, 1, {
-      filter: `user_id = "${userId}"`,
+      filter: `user = "${userId}"`,
     });
     return records.items[0] ?? null;
   },
@@ -65,7 +65,7 @@ export const userStatsApi = {
 export const fogOfWarApi = {
   getByUserId: async (userId: string): Promise<FogOfWar[]> => {
     const records = await pb.collection('fog_of_war').getFullList<FogOfWar>({
-      filter: `user_id = "${userId}"`,
+      filter: `user = "${userId}"`,
       sort: '-timestamp',
     });
     return records;
@@ -73,7 +73,7 @@ export const fogOfWarApi = {
 
   getByUserIdAndLayer: async (userId: string, z: number): Promise<FogOfWar[]> => {
     const records = await pb.collection('fog_of_war').getFullList<FogOfWar>({
-      filter: `user_id = "${userId}" && z = ${z}`,
+      filter: `user = "${userId}" && z = ${z}`,
       sort: '-timestamp',
     });
     return records;
@@ -100,7 +100,7 @@ export const fogOfWarApi = {
     z: number
   ): Promise<boolean> => {
     const records = await pb.collection('fog_of_war').getList<FogOfWar>(1, 1, {
-      filter: `user_id = "${userId}" && q = ${q} && r = ${r} && z = ${z}`,
+      filter: `user = "${userId}" && q = ${q} && r = ${r} && z = ${z}`,
     });
     return records.totalItems > 0;
   },

@@ -35,7 +35,7 @@ export function useCharacterStats(targetUserId?: string) {
 
         const setupSubscription = async () => {
             unsubscribe = await characterApi.subscribeAll((e) => {
-                if (e.record.user_id === effectiveUserId) {
+                if (e.record.user === effectiveUserId) {
                     setStats(e.record);
                 }
             });

@@ -72,9 +72,9 @@ export default function DivinePiety({ isDM }: DivinePietyProps) {
 
     if (!stats) return null;
 
-    const activeDeityName = stats.active_deity;
+    const activeDeityName = stats.piety_deity;
     const activeDeity = DEITIES.find(d => d.name === activeDeityName);
-    const pietyScore = activeDeityName ? (stats.piety_json?.[activeDeityName] || 0) : 0;
+    const pietyScore = stats.piety_score || 0;
     const rank = getPietyRank(pietyScore);
 
     const filteredDeities = DEITIES.filter(d =>
@@ -90,7 +90,7 @@ export default function DivinePiety({ isDM }: DivinePietyProps) {
 
     const handlePietyUpdate = (amount: number) => {
         if (!activeDeityName) return;
-        updatePiety(activeDeityName, Math.max(0, pietyScore + amount));
+        updatePiety(Math.max(0, pietyScore + amount));
     };
 
     return (

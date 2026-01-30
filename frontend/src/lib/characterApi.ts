@@ -62,18 +62,40 @@ export const characterApi = {
      * Set the active deity for the character
      */
     selectDeity: async (id: string, deityName: string | null) => {
-        return userStatsApi.update(id, { active_deity: deityName });
+        return userStatsApi.update(id, { piety_deity: deityName });
     },
 
     /**
-     * Update piety for a specific deity
+     * Update piety score
      */
-    updatePiety: async (id: string, currentPiety: Record<string, number>, deityName: string, value: number) => {
-        return userStatsApi.update(id, {
-            piety_json: {
-                ...currentPiety,
-                [deityName]: value
-            }
-        });
+    updatePiety: async (id: string, value: number) => {
+        return userStatsApi.update(id, { piety_score: value });
+    },
+
+    /**
+     * Update a single ability score
+     */
+    updateAbilityScore: async (id: string, ability: string, value: number) => {
+        return userStatsApi.update(id, { [ability]: value });
+    },
+
+    /**
+     * Update class level for a specific class
+     */
+    updateClassLevel: async (id: string, currentLevels: Record<string, number>, className: string, level: number) => {
+        const newLevels = { ...currentLevels };
+        if (level <= 0) {
+            delete newLevels[className];
+        } else {
+            newLevels[className] = level;
+        }
+        return userStatsApi.update(id, { levels: newLevels });
+    },
+
+    /**
+     * Update max HP
+     */
+    updateMaxHP: async (id: string, maxHP: number) => {
+        return userStatsApi.update(id, { max_hp: maxHP });
     }
 };

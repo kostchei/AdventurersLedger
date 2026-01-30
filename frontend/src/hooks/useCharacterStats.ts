@@ -73,9 +73,24 @@ export function useCharacterStats(targetUserId?: string) {
         await characterApi.selectDeity(stats.id, deityName);
     };
 
-    const updatePiety = async (deityName: string, value: number) => {
+    const updatePiety = async (value: number) => {
         if (!stats) return;
-        await characterApi.updatePiety(stats.id, stats.piety_json || {}, deityName, value);
+        await characterApi.updatePiety(stats.id, value);
+    };
+
+    const updateAbilityScore = async (ability: string, value: number) => {
+        if (!stats) return;
+        await characterApi.updateAbilityScore(stats.id, ability, value);
+    };
+
+    const updateClassLevel = async (className: string, level: number) => {
+        if (!stats) return;
+        await characterApi.updateClassLevel(stats.id, stats.levels || {}, className, level);
+    };
+
+    const updateMaxHP = async (maxHP: number) => {
+        if (!stats) return;
+        await characterApi.updateMaxHP(stats.id, maxHP);
     };
 
     return {
@@ -88,6 +103,9 @@ export function useCharacterStats(targetUserId?: string) {
         updateGold,
         updateFactionRenown,
         selectDeity,
-        updatePiety
+        updatePiety,
+        updateAbilityScore,
+        updateClassLevel,
+        updateMaxHP
     };
 }

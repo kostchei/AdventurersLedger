@@ -51,20 +51,21 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                                     user: userId,
                                     hp: 10,
                                     max_hp: 10,
-                                    stats_json: {
-                                        strength: 10,
-                                        dexterity: 10,
-                                        constitution: 10,
-                                        intelligence: 10,
-                                        wisdom: 10,
-                                        charisma: 10,
-                                    },
+                                    strength: 10,
+                                    dexterity: 10,
+                                    constitution: 10,
+                                    intelligence: 10,
+                                    wisdom: 10,
+                                    charisma: 10,
                                     gold: 100,
                                     xp: 0,
                                     conditions: [],
                                     factions: {},
-                                    active_deity: null,
-                                    piety_json: {},
+                                    piety_deity: null,
+                                    piety_score: 0,
+                                    magic_items: [],
+                                    attuned_items: [],
+                                    levels: {},
                                 });
                                 // refresh happens via subscription
                             } catch (err) {
@@ -184,7 +185,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
             {/* Ability Scores Section */}
             <section>
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Attributes</h3>
-                <AbilityScoreGrid stats={stats.stats_json} />
+                <AbilityScoreGrid stats={stats} />
             </section>
         </div>
     );

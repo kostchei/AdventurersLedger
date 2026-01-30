@@ -28,13 +28,21 @@ export interface UserStats extends PBBaseRecord {
   user: string;
   hp: number;
   max_hp: number;
-  stats_json: StatsJson;
+  strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
   gold: number;
   xp: number;
   conditions: string[];
   factions: Record<string, number>;
-  active_deity: string | null;
-  piety_json: Record<string, number>;
+  piety_deity: string | null;
+  piety_score: number;
+  magic_items: string[];
+  attuned_items: string[];
+  levels: Record<string, number>;
 }
 
 /**

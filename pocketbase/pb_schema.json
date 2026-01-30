@@ -1009,6 +1009,16 @@
       },
       {
         "hidden": false,
+        "id": "json_levels",
+        "maxSize": 0,
+        "name": "levels",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "json"
+      },
+      {
+        "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
         "onCreate": true,

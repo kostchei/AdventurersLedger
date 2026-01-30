@@ -66,6 +66,7 @@ export interface FogOfWar extends PBBaseRecord {
  * Defines map layers and dungeon clearing progress
  */
 export interface WorldState extends PBBaseRecord {
+  campaign: string;
   layer_id: string;
   map_url: string;
   cleared_dungeons_list: string[];

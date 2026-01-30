@@ -29,8 +29,10 @@ jobs:
           app_location: "/frontend"
           api_location: ""
           output_location: "dist"
+          app_build_command: "npm install && npm run build"
         env:
           VITE_PB_URL: "https://api.talekeeper.org"
+          NODE_VERSION: "22.22.0"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

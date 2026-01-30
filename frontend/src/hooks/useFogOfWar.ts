@@ -26,7 +26,7 @@ export function useFogOfWar(currentZ: number = 0) {
         const fetchInitialHexes = async () => {
             try {
                 const records = await pb.collection('fog_of_war').getFullList({
-                    filter: `user = "${user.id}" && z = ${currentZ}`,
+                    filter: `user_id = "${user.id}" && z = ${currentZ}`,
                 });
 
                 const newSet = new Set<string>();
@@ -46,7 +46,7 @@ export function useFogOfWar(currentZ: number = 0) {
 
         // Subscribe to new reveals
         pb.collection('fog_of_war').subscribe('*', (e) => {
-            if (e.action === 'create' && e.record.user === user.id && e.record.z === currentZ) {
+            if (e.action === 'create' && e.record.user_id === user.id && e.record.z === currentZ) {
                 setRevealedHexes((prev) => {
                     const next = new Set(prev);
                     next.add(getHexKey(e.record.q, e.record.r, e.record.z));
@@ -67,7 +67,7 @@ export function useFogOfWar(currentZ: number = 0) {
 
         try {
             await pb.collection('fog_of_war').create({
-                user: user.id,
+                user_id: user.id,
                 q, r, z
             });
             // The subscription will handle updating the local set if it's on the current layer

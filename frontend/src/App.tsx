@@ -43,7 +43,7 @@ function App() {
               }
             />
             <Route
-              path="/campaign/:campaignId/stats"
+              path="/campaign/:campaignId/stats/:userId?"
               element={
                 <ProtectedRoute>
                   <CharacterStatsPage />

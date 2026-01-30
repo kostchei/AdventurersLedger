@@ -1,15 +1,28 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { campaignApi } from '../lib/campaigns';
+import { pb } from '../lib/pb';
 import CharacterStats from '../components/CharacterStats';
 import FactionRenown from '../components/FactionRenown';
 import DivinePiety from '../components/DivinePiety';
 import { useAuthStore } from '../store/authStore';
 
 export default function CharacterStatsPage() {
-    const { campaignId } = useParams<{ campaignId: string }>();
+    const { campaignId, userId: targetUserId } = useParams<{ campaignId: string; userId?: string }>();
     const navigate = useNavigate();
-    const { user } = useAuthStore();
+    const { user: currentUser } = useAuthStore();
+
+    // Fetch target user info if it's not the current user
+    const { data: targetUser, isLoading: isUserLoading } = useQuery({
+        queryKey: ['user', targetUserId],
+        queryFn: async () => {
+            if (!targetUserId) return null;
+            return pb.collection('users').getOne(targetUserId);
+        },
+        enabled: !!targetUserId && targetUserId !== currentUser?.id,
+    });
+
+    const displayUser = targetUserId === currentUser?.id || !targetUserId ? currentUser : targetUser;
 
     const { data: campaign, isLoading: isCampaignLoading } = useQuery({
         queryKey: ['campaign', campaignId],
@@ -17,9 +30,10 @@ export default function CharacterStatsPage() {
         enabled: !!campaignId,
     });
 
-    const isDM = user?.id === campaign?.dmId;
+    const isDM = currentUser?.id === campaign?.dmId;
+    const isTargetingSelf = !targetUserId || targetUserId === currentUser?.id;
 
-    if (isCampaignLoading) {
+    if (isCampaignLoading || (targetUserId && targetUserId !== currentUser?.id && isUserLoading)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-950">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
@@ -48,7 +62,7 @@ export default function CharacterStatsPage() {
 
                 <div className="flex items-center gap-3">
                     <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">
-                        Adventurer
+                        {displayUser?.id === campaign?.dmId ? 'Chronicler' : 'Adventurer'}
                     </div>
                 </div>
             </header>
@@ -60,22 +74,31 @@ export default function CharacterStatsPage() {
 
                     <div className="relative z-10">
                         <div className="flex items-end gap-6 mb-12">
-                            <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-4xl shadow-inner">
-                                👤
+                            <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-4xl shadow-inner relative overflow-hidden group">
+                                {displayUser?.avatarUrl ? (
+                                    <img src={displayUser.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                    '👤'
+                                )}
                             </div>
                             <div className="flex-1">
                                 <h2 className="text-3xl font-black tracking-tight text-white mb-1">
-                                    {user?.name || 'Unknown Legend'}
+                                    {displayUser?.name || 'Unknown Legend'}
                                 </h2>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Human Warrior</span>
+                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Heritage & Path Unknown</span>
                                     <span className="h-1 w-1 rounded-full bg-slate-700"></span>
-                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Level 5</span>
+                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Level 1</span>
                                 </div>
                             </div>
+                            {!isTargetingSelf && (
+                                <div className="text-[10px] font-black text-amber-500 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                                    Inspecting Member
+                                </div>
+                            )}
                         </div>
 
-                        <CharacterStats isDM={isDM} />
+                        <CharacterStats isDM={isDM} userId={targetUserId || currentUser?.id} />
 
                         {/* Renown & Factions Section */}
                         <div className="mt-12 pt-8 border-t border-white/5">

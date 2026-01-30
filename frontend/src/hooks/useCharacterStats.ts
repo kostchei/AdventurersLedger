@@ -3,17 +3,18 @@ import { useAuthStore } from '../store/authStore';
 import { characterApi } from '../lib/characterApi';
 import type { UserStats } from '../types/pocketbase';
 
-export function useCharacterStats() {
-    const { user } = useAuthStore();
+export function useCharacterStats(targetUserId?: string) {
+    const { user: currentUser } = useAuthStore();
+    const effectiveUserId = targetUserId || currentUser?.id;
     const [stats, setStats] = useState<UserStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     const fetchStats = useCallback(async () => {
-        if (!user) return;
+        if (!effectiveUserId) return;
         try {
             setLoading(true);
-            const data = await characterApi.getByUserId(user.id);
+            const data = await characterApi.getByUserId(effectiveUserId);
             setStats(data);
             setError(null);
         } catch (err) {
@@ -22,19 +23,19 @@ export function useCharacterStats() {
         } finally {
             setLoading(false);
         }
-    }, [user]);
+    }, [effectiveUserId]);
 
     useEffect(() => {
         fetchStats();
 
-        if (!user) return;
+        if (!effectiveUserId) return;
 
         // Subscribe to real-time updates using the generic subscriber
         let unsubscribe: (() => void) | undefined;
 
         const setupSubscription = async () => {
             unsubscribe = await characterApi.subscribeAll((e) => {
-                if (e.record.user_id === user.id) {
+                if (e.record.user_id === effectiveUserId) {
                     setStats(e.record);
                 }
             });
@@ -45,7 +46,7 @@ export function useCharacterStats() {
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [user, fetchStats]);
+    }, [effectiveUserId, fetchStats]);
 
     const updateHP = async (amount: number) => {
         if (!stats) return;

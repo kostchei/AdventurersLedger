@@ -1,4 +1,5 @@
 {
+  "trailingSlash": "auto",
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
@@ -18,8 +19,14 @@
       ]
     }
   ],
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  },
   "globalHeaders": {
-    "content-security-policy": "default-src 'self' https://api.talekeeper.org https://*.run.app https://storage.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://storage.googleapis.com; connect-src 'self' https://api.talekeeper.org wss://api.talekeeper.org https://accounts.google.com https://*.run.app https://storage.googleapis.com; font-src 'self' data:;"
+    "content-security-policy": "default-src 'self' https://*.talekeeper.org http://localhost:8090 https://*.run.app https://storage.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https: https://*.talekeeper.org http://localhost:8090 https://*.run.app https://storage.googleapis.com; connect-src 'self' https://*.talekeeper.org http://localhost:8090 ws://localhost:8090 wss://api.talekeeper.org https://accounts.google.com https://*.run.app https://storage.googleapis.com;"
   },
   "mimeTypes": {
     ".json": "application/json",

@@ -1,14 +1,16 @@
 import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useCharacterStats } from '../hooks/useCharacterStats';
+import { characterApi } from '../lib/characterApi';
 import HPBar from './character/HPBar';
 import AbilityScoreGrid from './character/AbilityScoreGrid';
 
 interface CharacterStatsProps {
     isDM?: boolean;
+    userId?: string;
 }
 
-export default function CharacterStats({ isDM = false }: CharacterStatsProps) {
-    const { stats, loading, error, updateHP, updateGold, addXP } = useCharacterStats();
+export default function CharacterStats({ isDM = false, userId }: CharacterStatsProps) {
+    const { stats, loading, error, updateHP, updateGold, addXP } = useCharacterStats(userId);
     const [editingStat, setEditingStat] = useState<'gold' | 'xp' | null>(null);
     const [editValue, setEditValue] = useState('');
 
@@ -35,8 +37,46 @@ export default function CharacterStats({ isDM = false }: CharacterStatsProps) {
 
     if (!stats) {
         return (
-            <div className="text-slate-500 text-sm italic text-center py-4 bg-slate-900/20 rounded-lg">
-                No ledger entry found for this character.
+            <div className="text-center py-8 bg-slate-900/20 rounded-2xl border border-dashed border-white/5 px-6">
+                <div className="text-3xl mb-4 opacity-20">📭</div>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-6">
+                    No ledger entry exists for this adventurer.
+                </p>
+                {isDM && (
+                    <button
+                        onClick={async () => {
+                            if (!userId) return;
+                            try {
+                                await characterApi.create({
+                                    user_id: userId,
+                                    hp: 10,
+                                    max_hp: 10,
+                                    stats_json: {
+                                        strength: 10,
+                                        dexterity: 10,
+                                        constitution: 10,
+                                        intelligence: 10,
+                                        wisdom: 10,
+                                        charisma: 10,
+                                    },
+                                    gold: 100,
+                                    xp: 0,
+                                    conditions: [],
+                                    factions: {},
+                                    active_deity: null,
+                                    piety_json: {},
+                                });
+                                // refresh happens via subscription
+                            } catch (err) {
+                                console.error('Failed to create ledger:', err);
+                                alert('Failed to create ledger record.');
+                            }
+                        }}
+                        className="px-6 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-indigo-500/20 transition-all"
+                    >
+                        Initialize Ledger
+                    </button>
+                )}
             </div>
         );
     }

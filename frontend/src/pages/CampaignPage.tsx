@@ -52,7 +52,7 @@ export default function CampaignPage() {
     enabled: !!campaignId,
   });
 
-  useQuery<CampaignMember[]>({
+  const { data: members } = useQuery<CampaignMember[]>({
     queryKey: ['campaign', campaignId, 'members'],
     queryFn: () => campaignApi.getCampaignMembers(campaignId!),
     enabled: !!campaignId,
@@ -237,10 +237,10 @@ export default function CampaignPage() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Map Viewer or Landing Dashboard */}
-        <div className="flex-1 relative overflow-auto bg-black">
+        <div className="flex-1 relative overflow-auto bg-slate-950">
           {!enteredWorld ? (
-            <div className="absolute inset-0 flex items-center justify-center p-8 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900 to-black">
-              <div className="max-w-2xl w-full">
+            <div className="absolute inset-0 flex items-center justify-center p-8 bg-gradient-to-b from-slate-900 via-slate-950 to-black overflow-y-auto">
+              <div className="max-w-4xl w-full py-12">
                 <div className="text-center mb-12">
                   <div className="inline-block p-4 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6 animate-pulse">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -288,13 +288,13 @@ export default function CampaignPage() {
                   {isDM && (
                     <button
                       onClick={() => setIsMapManagerOpen(true)}
-                      className="group md:col-span-2 relative bg-slate-900/50 border border-white/5 p-8 rounded-2xl hover:bg-slate-800/80 transition-all hover:border-amber-500/30 hover:shadow-[0_0_30px_-10px_rgba(245,158,11,0.2)] text-left active:scale-[0.98]"
+                      className="group relative bg-slate-900/50 border border-white/5 p-8 rounded-2xl hover:bg-slate-800/80 transition-all hover:border-amber-500/30 hover:shadow-[0_0_30px_-10px_rgba(245,158,11,0.2)] text-left active:scale-[0.98]"
                     >
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="mb-4 text-3xl opacity-50 group-hover:opacity-100 transition-opacity">🛠️</div>
                           <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2">Manage Cartography</h3>
-                          <p className="text-slate-500 text-xs leading-relaxed truncate">Administer map assets, upload new perspectives, or purge ancient records.</p>
+                          <p className="text-slate-500 text-xs leading-relaxed">Modify map assets or purge ancient records.</p>
                         </div>
                         <div className="text-amber-500 text-[10px] font-black uppercase tracking-widest border border-amber-500/30 px-3 py-1 rounded-full group-hover:bg-amber-500/10 transition-colors">
                           DM Tools
@@ -304,7 +304,45 @@ export default function CampaignPage() {
                   )}
                 </div>
 
-                <div className="mt-12 text-center">
+                {/* Party Management / Member List */}
+                <div className="mt-12 pt-12 border-t border-white/5">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">
+                      {isDM ? 'Manage the Fellowship' : 'The Fellowship'}
+                    </h3>
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                      {members?.length || 0} Members Present
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {members?.map((member) => (
+                      <button
+                        key={member.id}
+                        onClick={() => navigate(`/campaign/${campaignId}/stats/${member.userId}`)}
+                        className="group flex items-center gap-4 bg-slate-900/40 border border-white/5 p-4 rounded-xl hover:bg-slate-800/60 transition-all hover:border-indigo-500/30 text-left"
+                      >
+                        <div className="h-10 w-10 rounded-lg bg-slate-800 border border-white/5 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">
+                          {member.user?.avatarUrl ? (
+                            <img src={member.user.avatarUrl} alt="" className="w-full h-full rounded-lg object-cover" />
+                          ) : (
+                            '👤'
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-white truncate group-hover:text-indigo-400 transition-colors">
+                            {member.user?.name || 'Unknown Adventurer'}
+                          </p>
+                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter truncate">
+                            {member.role === 'GM' ? 'Chronicler' : 'Adventurer'}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-12 text-center opacity-40">
                   <p className="text-[10px] text-slate-700 font-bold uppercase tracking-[0.2em] italic">
                     "The Ledger tracks all, but the journey is yours to define."
                   </p>

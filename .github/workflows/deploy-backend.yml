@@ -19,7 +19,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          source: "pocketbase/pb_schema.json,pocketbase/pb_migrations/*"
+          source: "pocketbase/pb_migrations/*"
           target: "/tmp/pb_deploy"
           strip_components: 1
 
@@ -37,7 +37,6 @@ jobs:
             # 2. Move files from tmp to actual location
             echo "Moving files..."
             sudo mkdir -p /opt/pocketbase/pb_migrations
-            sudo cp /tmp/pb_deploy/pb_schema.json /opt/pocketbase/pb_schema.json
             sudo cp -r /tmp/pb_deploy/pb_migrations/* /opt/pocketbase/pb_migrations/ 2>/dev/null || true
             
             # 3. Fix permissions

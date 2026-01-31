@@ -61,7 +61,6 @@ export default function HexMapViewer({
     map.imageHeight,
     map.hexRows,
     map.hexOrientation,
-    map.hexSize,
   ]);
 
   // Load map image
@@ -77,8 +76,9 @@ export default function HexMapViewer({
       setImageLoaded(true);
     };
     img.src = map.imageUrl;
-    setImageLoaded(false);
-    setImageLoadError(null);
+    // Reset state for new image load
+        setImageLoaded(false);
+        setImageLoadError(null);
   }, [map.imageUrl]);
 
   // State to trigger the interactive layer render
@@ -118,7 +118,8 @@ export default function HexMapViewer({
     }
 
     baseCanvasRef.current = baseCanvas;
-    triggerInteractiveRender();
+    // Trigger interactive layer re-render after base canvas is ready
+        triggerInteractiveRender();
   }, [hexGrid, imageLoaded, isDM, map.imageWidth, map.imageHeight, map.hexColumns, map.hexRows, currentZ]);
 
   // Render interactive layer (hover, party)

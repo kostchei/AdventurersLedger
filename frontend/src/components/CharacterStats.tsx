@@ -3,6 +3,9 @@ import { useCharacterStats } from '../hooks/useCharacterStats';
 import { characterApi } from '../lib/characterApi';
 import HPBar from './character/HPBar';
 import AbilityScoreGrid from './character/AbilityScoreGrid';
+import ConditionBadge from './character/ConditionBadge';
+import ConditionSelector from './character/ConditionSelector';
+import ClassLevelEditor from './character/ClassLevelEditor';
 
 interface CharacterStatsProps {
     isDM?: boolean;
@@ -10,7 +13,18 @@ interface CharacterStatsProps {
 }
 
 export default function CharacterStats({ isDM = false, userId }: CharacterStatsProps) {
-    const { stats, loading, error, updateHP, updateGold, addXP } = useCharacterStats(userId);
+    const {
+        stats,
+        loading,
+        error,
+        updateHP,
+        updateGold,
+        addXP,
+        updateAbilityScore,
+        updateClassLevel,
+        addCondition,
+        removeCondition
+    } = useCharacterStats(userId);
     const [editingStat, setEditingStat] = useState<'gold' | 'xp' | null>(null);
     const [editValue, setEditValue] = useState('');
 
@@ -102,6 +116,8 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         setEditingStat(null);
     };
 
+    const conditions = stats.conditions || [];
+
     return (
         <div className="space-y-6">
             {/* Vitality Section */}
@@ -165,27 +181,50 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                 </div>
             </div>
 
-            {/* Conditions Section */}
-            {stats.conditions && stats.conditions.length > 0 && (
+            {/* Conditions Section - Always show if GM or has conditions */}
+            {(conditions.length > 0 || isDM) && (
                 <section>
                     <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Active Afflictions</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                        {stats.conditions.map((condition: string) => (
-                            <span
+                    <div className="flex flex-wrap gap-1.5 items-start">
+                        {conditions.map((condition: string) => (
+                            <ConditionBadge
                                 key={condition}
-                                className="px-2 py-1 bg-red-900/20 text-red-400 border border-red-900/40 rounded-md text-[9px] font-black uppercase tracking-wider"
-                            >
-                                {condition}
-                            </span>
+                                condition={condition}
+                                isDM={isDM}
+                                onRemove={() => removeCondition(condition)}
+                            />
                         ))}
+                        {isDM && (
+                            <ConditionSelector
+                                currentConditions={conditions}
+                                onAddCondition={addCondition}
+                            />
+                        )}
                     </div>
+                    {conditions.length === 0 && !isDM && (
+                        <p className="text-[10px] text-slate-600 italic">No active conditions</p>
+                    )}
                 </section>
             )}
+
+            {/* Class Levels Section */}
+            <section>
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Class Levels</h3>
+                <ClassLevelEditor
+                    levels={stats.levels || {}}
+                    isDM={isDM}
+                    onUpdate={updateClassLevel}
+                />
+            </section>
 
             {/* Ability Scores Section */}
             <section>
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Attributes</h3>
-                <AbilityScoreGrid stats={stats} />
+                <AbilityScoreGrid
+                    stats={stats}
+                    isDM={isDM}
+                    onUpdate={updateAbilityScore}
+                />
             </section>
         </div>
     );

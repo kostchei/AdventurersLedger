@@ -12,6 +12,7 @@ describe('DM Workflow Integration', () => {
     const playerEmail = `player_${Date.now()}@test.com`;
     const playerPass = 'password123456';
     let playerId: string;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let campaignId: string;
 
     it('Async check: Server Health', async () => {

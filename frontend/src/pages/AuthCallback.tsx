@@ -12,7 +12,7 @@ export default function AuthCallback() {
     const errorParam = searchParams.get('error');
 
     if (errorParam) {
-      setError('Authentication failed. Please try again.');
+            setError('Authentication failed. Please try again.');
       setTimeout(() => navigate('/login'), 3000);
       return;
     }
@@ -27,7 +27,7 @@ export default function AuthCallback() {
         if (isAuthenticated) {
           navigate('/dashboard');
         } else {
-          setError('Authentication timed out. Please try again.');
+                    setError('Authentication timed out. Please try again.');
           setTimeout(() => navigate('/login'), 2000);
         }
       }, 1000);

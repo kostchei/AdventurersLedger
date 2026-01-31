@@ -14,16 +14,19 @@ interface AuthState {
 }
 
 // Helper to map PocketBase record to our User interface
-const mapPBUser = (record: PBUser | any): User | null => {
+const mapPBUser = (record: PBUser | unknown): User | null => {
   if (!record) return null;
 
+  // Cast to PBUser after null check - the record comes from PocketBase authStore
+  const pbRecord = record as PBUser;
+
   return {
-    id: record.id,
-    email: record.email,
-    name: record.name || record.username || 'Adventurer',
-    avatarUrl: pb.files.getURL(record, record.avatar),
-    global_role: record.global_role,
-    createdAt: record.created,
+    id: pbRecord.id,
+    email: pbRecord.email,
+    name: pbRecord.name || pbRecord.username || 'Adventurer',
+    avatarUrl: pb.files.getURL(pbRecord, pbRecord.avatar),
+    global_role: pbRecord.global_role,
+    createdAt: pbRecord.created,
   };
 };
 

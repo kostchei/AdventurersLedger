@@ -20,7 +20,8 @@ export function useServerStatus() {
     }, []);
 
     useEffect(() => {
-        checkStatus();
+        // Initial server check on mount
+                checkStatus();
 
         // Initial check
         let timeoutId: ReturnType<typeof setTimeout>;

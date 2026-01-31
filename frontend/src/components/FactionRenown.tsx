@@ -42,7 +42,13 @@ export default function FactionRenown({ isDM }: FactionRenownProps) {
             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-1">Active Allegiances</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {FACTIONS.map(faction => {
+                {[...FACTIONS].sort((a, b) => {
+                    const renownA = factions[a] || 0;
+                    const renownB = factions[b] || 0;
+                    // Sort by renown descending, then alphabetically for ties
+                    if (renownA !== renownB) return renownB - renownA;
+                    return a.localeCompare(b);
+                }).map(faction => {
                     const renown = factions[faction] || 0;
                     const rank = getRank(renown);
 

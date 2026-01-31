@@ -88,6 +88,16 @@ export function useCharacterStats(targetUserId?: string) {
         await characterApi.updateClassLevel(stats.id, stats.levels || {}, className, level);
     };
 
+    const addCondition = async (condition: string) => {
+        if (!stats) return;
+        await characterApi.addCondition(stats.id, stats.conditions || [], condition);
+    };
+
+    const removeCondition = async (condition: string) => {
+        if (!stats) return;
+        await characterApi.removeCondition(stats.id, stats.conditions || [], condition);
+    };
+
     const updateMaxHP = async (maxHP: number) => {
         if (!stats) return;
         await characterApi.updateMaxHP(stats.id, maxHP);
@@ -106,6 +116,8 @@ export function useCharacterStats(targetUserId?: string) {
         updatePiety,
         updateAbilityScore,
         updateClassLevel,
+        addCondition,
+        removeCondition,
         updateMaxHP
     };
 }

@@ -228,16 +228,21 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
 
             onUploadSuccess();
             onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Upload failed:', err);
 
             // Try to get the most specific message possible
-            let displayMsg = err.message || 'Failed to upload map layer.';
+            let displayMsg = 'Failed to upload map layer.';
+
+            if (err instanceof Error) {
+                displayMsg = err.message;
+            }
 
             // If it's a PocketBase error with data
-            if (err.data && typeof err.data === 'object' && err.data.data) {
-                const fieldErrors = Object.entries(err.data.data)
-                    .map(([key, val]: [string, any]) => `${key}: ${val.message || val}`)
+            const pbError = err as { data?: { data?: Record<string, { message?: string }> } };
+            if (pbError.data && typeof pbError.data === 'object' && pbError.data.data) {
+                const fieldErrors = Object.entries(pbError.data.data)
+                    .map(([key, val]) => `${key}: ${val.message || String(val)}`)
                     .join(', ');
 
                 if (fieldErrors) {

@@ -26,9 +26,10 @@ describe('Global Roles Schema Integration', () => {
             testUserId = user.id;
             expect(user).toBeDefined();
             expect(user.global_role).toBe('USER');
-        } catch (e: any) {
-            console.warn('Registration failed:', e.data || e.message);
-            if (e.status === 403 || e.status === 400) {
+        } catch (e: unknown) {
+            const pbError = e as { data?: unknown; message?: string; status?: number };
+            console.warn('Registration failed:', pbError.data || pbError.message);
+            if (pbError.status === 403 || pbError.status === 400) {
                 throw new Error('Cannot register test user. Is registration open?');
             }
             throw e;

@@ -37,6 +37,7 @@ jobs:
             # 2. Move files from tmp to actual location
             echo "Moving files..."
             sudo mkdir -p /opt/pocketbase/pb_migrations
+            sudo rm -rf /opt/pocketbase/pb_migrations/*
             sudo cp -r /tmp/pb_deploy/pb_migrations/* /opt/pocketbase/pb_migrations/ 2>/dev/null || true
             
             # 3. Fix permissions

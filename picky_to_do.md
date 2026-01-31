@@ -8,3 +8,4 @@ Also need a place to store items
 and feats or class features chosen, 
 spells learned,
 bastion features
+and these things need to be editable by the GM and displayed to the player unless blank- ie don't show spells to the player if they have none

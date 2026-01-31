@@ -92,10 +92,42 @@ export const characterApi = {
         return userStatsApi.update(id, { levels: newLevels });
     },
 
-    /**
-     * Update max HP
-     */
     updateMaxHP: async (id: string, maxHP: number) => {
         return userStatsApi.update(id, { max_hp: maxHP });
+    },
+
+    /**
+     * Update character details
+     */
+    updateDetails: async (id: string, details: { character_name?: string, class_name?: string, species?: string, background?: string }) => {
+        return userStatsApi.update(id, details);
+    },
+
+    /**
+     * Update inventory list
+     */
+    updateInventory: async (id: string, inventory: string[]) => {
+        return userStatsApi.update(id, { inventory });
+    },
+
+    /**
+     * Update spells list
+     */
+    updateSpells: async (id: string, spells: string[]) => {
+        return userStatsApi.update(id, { spells });
+    },
+
+    /**
+     * Update feats list
+     */
+    updateFeats: async (id: string, feats: string[]) => {
+        return userStatsApi.update(id, { feats });
+    },
+
+    /**
+     * Update bastion features list
+     */
+    updateBastion: async (id: string, bastion: string[]) => {
+        return userStatsApi.update(id, { bastion });
     }
 };

@@ -5,6 +5,7 @@ import AbilityScoreGrid from './character/AbilityScoreGrid';
 import ConditionBadge from './character/ConditionBadge';
 import ConditionSelector from './character/ConditionSelector';
 import ClassLevelEditor from './character/ClassLevelEditor';
+import StringListEditor from './character/StringListEditor';
 
 interface CharacterStatsProps {
     isDM?: boolean;
@@ -21,7 +22,12 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         updateAbilityScore,
         updateClassLevel,
         addCondition,
-        removeCondition
+        removeCondition,
+        updateDetails,
+        updateSpells,
+        updateFeats,
+        updateBastion,
+        updateInventory
     } = useCharacterStats(userId);
     const [editingStat, setEditingStat] = useState<'gold' | 'xp' | null>(null);
     const [editValue, setEditValue] = useState('');
@@ -87,7 +93,6 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                                     feats: [],
                                     bastion: []
                                 });
-                                // refresh happens via subscription
                             } catch (err) {
                                 console.error('Failed to create ledger:', err);
                                 alert('Failed to create ledger record.');
@@ -122,33 +127,76 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         setEditingStat(null);
     };
 
+    const handleDetailUpdate = (field: 'character_name' | 'class_name' | 'species' | 'background', value: string) => {
+        if (!stats) return;
+        updateDetails({
+            [field]: value
+        });
+    };
+
     const conditions = stats.conditions || [];
 
     return (
         <div className="space-y-6">
-            {/* Character Details Section (New) */}
+            {/* Character Details Section */}
             <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                     <div>
                         <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Character Name</label>
-                        <div className="text-white font-medium">{stats.character_name || "Unknown"}</div>
+                        {isDM ? (
+                            <input
+                                type="text"
+                                defaultValue={stats.character_name}
+                                onBlur={(e) => handleDetailUpdate('character_name', e.target.value)}
+                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                            />
+                        ) : (
+                            <div className="text-white font-medium">{stats.character_name || "Unknown"}</div>
+                        )}
                     </div>
                     <div>
                         <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Class</label>
-                        <div className="text-white font-medium">{stats.class_name || "Commoner"}</div>
+                        {isDM ? (
+                            <input
+                                type="text"
+                                defaultValue={stats.class_name}
+                                onBlur={(e) => handleDetailUpdate('class_name', e.target.value)}
+                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                            />
+                        ) : (
+                            <div className="text-white font-medium">{stats.class_name || "Commoner"}</div>
+                        )}
                     </div>
                     <div>
                         <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Species</label>
-                        <div className="text-white font-medium">{stats.species || "Human"}</div>
+                        {isDM ? (
+                            <input
+                                type="text"
+                                defaultValue={stats.species}
+                                onBlur={(e) => handleDetailUpdate('species', e.target.value)}
+                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                            />
+                        ) : (
+                            <div className="text-white font-medium">{stats.species || "Human"}</div>
+                        )}
                     </div>
                     <div>
                         <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Background</label>
-                        <div className="text-white font-medium">{stats.background || "None"}</div>
+                        {isDM ? (
+                            <input
+                                type="text"
+                                defaultValue={stats.background}
+                                onBlur={(e) => handleDetailUpdate('background', e.target.value)}
+                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                            />
+                        ) : (
+                            <div className="text-white font-medium">{stats.background || "None"}</div>
+                        )}
                     </div>
                 </div>
             </section>
 
-            {/* Vitality (Text Only as requested) */}
+            {/* Vitality */}
             <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm flex justify-between items-center">
                 <div>
                     <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 leading-none">Hit Points</div>
@@ -233,28 +281,40 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
             )}
 
             {/* Feats & Features */}
-            <section>
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Feats & Features</h3>
-                <div className="p-3 bg-slate-800/20 rounded-lg text-sm text-slate-400 italic text-center border border-slate-800/40">
-                    {stats.feats?.length ? stats.feats.join(', ') : "No feats recorded"}
-                </div>
-            </section>
+            <StringListEditor
+                title="Feats & Features"
+                items={stats.feats || []}
+                onUpdate={(items) => updateFeats && updateFeats(items)}
+                isDM={isDM}
+                placeholder="Add feat..."
+            />
 
             {/* Spells */}
-            <section>
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Spells</h3>
-                <div className="p-3 bg-slate-800/20 rounded-lg text-sm text-slate-400 italic text-center border border-slate-800/40">
-                    {stats.spells?.length ? stats.spells.join(', ') : "No spells recorded"}
-                </div>
-            </section>
+            <StringListEditor
+                title="Spells"
+                items={stats.spells || []}
+                onUpdate={(items) => updateSpells && updateSpells(items)}
+                isDM={isDM}
+                placeholder="Add spell..."
+            />
 
             {/* Bastion */}
-            <section>
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Bastion</h3>
-                <div className="p-3 bg-slate-800/20 rounded-lg text-sm text-slate-400 italic text-center border border-slate-800/40">
-                    {stats.bastion?.length ? stats.bastion.join(', ') : "No bastion features"}
-                </div>
-            </section>
+            <StringListEditor
+                title="Bastion"
+                items={stats.bastion || []}
+                onUpdate={(items) => updateBastion && updateBastion(items)}
+                isDM={isDM}
+                placeholder="Add bastion feature..."
+            />
+
+            {/* Inventory */}
+            <StringListEditor
+                title="Inventory"
+                items={stats.inventory || []}
+                onUpdate={(items) => updateInventory && updateInventory(items)}
+                isDM={isDM}
+                placeholder="Add item..."
+            />
 
             {/* Class Levels Section */}
             <section>

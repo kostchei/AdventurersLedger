@@ -5,6 +5,9 @@ This document outlines the "GitOps" workflow for managing PocketBase schema chan
 ## The Problem
 Updates to PocketBase are painful because manual schema changes on the server are error-prone and tedious to merge.
 
+> [!TIP]
+> **New Method Available**: For complex schema resets or strict validation fixes, see `POCKETBASE_MIGRATION_GUIDE.md` and use the `pocketbase/import_schema.js` script. The flow below describes the standard automated migration using `pb_migrations` files.
+
 ## The Solution
 We treat the database schema as code. 
 1.  **Local Development**: You make changes in your local PocketBase Admin UI.

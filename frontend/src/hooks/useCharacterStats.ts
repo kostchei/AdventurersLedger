@@ -103,6 +103,33 @@ export function useCharacterStats(targetUserId?: string) {
         await characterApi.updateMaxHP(stats.id, maxHP);
     };
 
+
+
+    const updateDetails = async (details: { character_name?: string, class_name?: string, species?: string, background?: string }) => {
+        if (!stats) return;
+        await characterApi.updateDetails(stats.id, details);
+    };
+
+    const updateSpells = async (spells: string[]) => {
+        if (!stats) return;
+        await characterApi.updateSpells(stats.id, spells);
+    };
+
+    const updateFeats = async (feats: string[]) => {
+        if (!stats) return;
+        await characterApi.updateFeats(stats.id, feats);
+    };
+
+    const updateBastion = async (bastion: string[]) => {
+        if (!stats) return;
+        await characterApi.updateBastion(stats.id, bastion);
+    };
+
+    const updateInventory = async (inventory: string[]) => {
+        if (!stats) return;
+        await characterApi.updateInventory(stats.id, inventory);
+    };
+
     return {
         stats,
         loading,
@@ -118,6 +145,11 @@ export function useCharacterStats(targetUserId?: string) {
         updateClassLevel,
         addCondition,
         removeCondition,
-        updateMaxHP
+        updateMaxHP,
+        updateDetails,
+        updateSpells,
+        updateFeats,
+        updateBastion,
+        updateInventory
     };
 }

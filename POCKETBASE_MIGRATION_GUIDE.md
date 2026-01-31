@@ -49,6 +49,27 @@ grep "@request.data" pb_schema.json
 ```
 If either returns a result, the import **will fail**.
 
+## The "New Way" (Automated Script)
+
+Since v0.23 is so strict, we have created a script `pocketbase/import_schema.js` that handles the complexity for you.
+
+### What it Does
+1. **Cleanup**: Deletes existing custom collections (optional safety step).
+2. **Pass 1 (Structure)**: Creates/Updates collections *without* rules. This avoids "Circular Dependency" errors where a rule references a collection that doesn't exist yet.
+3. **Pass 2 (Rules)**: Updates all collections to include their API rules.
+4. **Seeding**: Ensures the default admin/GM user exists.
+
+### How to Run It
+This is now the recommended way to reset or update your local schema from `pb_schema.json`.
+
+```bash
+cd pocketbase
+node import_schema.js
+```
+
+> [!NOTE]
+> This script requires the `pocketbase` JS SDK. If you get a "module not found" error, ensure `frontend/node_modules` are installed or run `npm i` in a place where the script can find the SDK. The script currently looks in `../frontend/node_modules/pocketbase/dist/pocketbase.cjs.js`.
+
 ---
 
 ## Summary of the "Golden" Merge Strategy
@@ -57,3 +78,4 @@ When merging TaleKeeper custom collections into a vanilla server:
 2. Manually append your custom fields to `users` using the **verbose** format.
 3. Add custom collections using pre-defined **verbose templates** for each field type (`text`, `number`, `relation`, etc.).
 4. Explicitly run a "cleanup" pass on all rules to ensure dot-notation and `@request.body` compliance.
+5. **BETTER YET**: Use `import_schema.js` which automates this logic.

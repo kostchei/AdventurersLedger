@@ -1,7 +1,6 @@
 import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useCharacterStats } from '../hooks/useCharacterStats';
 import { characterApi } from '../lib/characterApi';
-import HPBar from './character/HPBar';
 import AbilityScoreGrid from './character/AbilityScoreGrid';
 import ConditionBadge from './character/ConditionBadge';
 import ConditionSelector from './character/ConditionSelector';
@@ -17,7 +16,6 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         stats,
         loading,
         error,
-        updateHP,
         updateGold,
         addXP,
         updateAbilityScore,
@@ -71,7 +69,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                                     intelligence: 10,
                                     wisdom: 10,
                                     charisma: 10,
-                                    gold: 100,
+                                    gold: 150, // Default 150gp as requested
                                     xp: 0,
                                     conditions: [],
                                     factions: {},
@@ -81,6 +79,13 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                                     attuned_items: [],
                                     levels: {},
                                     inventory: [],
+                                    character_name: "Unnamed Hero",
+                                    class_name: "Commoner",
+                                    species: "Human",
+                                    background: "None",
+                                    spells: [],
+                                    feats: [],
+                                    bastion: []
                                 });
                                 // refresh happens via subscription
                             } catch (err) {
@@ -121,14 +126,36 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
 
     return (
         <div className="space-y-6">
-            {/* Vitality Section */}
-            <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm">
-                <HPBar
-                    hp={stats.hp}
-                    maxHp={stats.max_hp}
-                    isDM={isDM}
-                    onHPChange={(newHP: number) => updateHP(newHP - stats.hp)}
-                />
+            {/* Character Details Section (New) */}
+            <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Character Name</label>
+                        <div className="text-white font-medium">{stats.character_name || "Unknown"}</div>
+                    </div>
+                    <div>
+                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Class</label>
+                        <div className="text-white font-medium">{stats.class_name || "Commoner"}</div>
+                    </div>
+                    <div>
+                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Species</label>
+                        <div className="text-white font-medium">{stats.species || "Human"}</div>
+                    </div>
+                    <div>
+                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Background</label>
+                        <div className="text-white font-medium">{stats.background || "None"}</div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Vitality (Text Only as requested) */}
+            <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm flex justify-between items-center">
+                <div>
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 leading-none">Hit Points</div>
+                    <div className="text-2xl font-bold text-red-400">
+                        {stats.hp} <span className="text-slate-600 text-lg">/ {stats.max_hp}</span>
+                    </div>
+                </div>
             </section>
 
             {/* Economy & Experience Section */}
@@ -138,7 +165,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                     onClick={() => startEditing('gold', stats.gold)}
                     className={`bg-slate-800/20 border border-slate-800/40 p-3 rounded-lg text-center transition-all ${isDM ? 'cursor-pointer hover:border-amber-500/50 hover:bg-slate-800/30 active:scale-95' : ''}`}
                 >
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5 leading-none">Fortune</div>
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5 leading-none">Gold Pieces</div>
                     {editingStat === 'gold' ? (
                         <input
                             autoFocus
@@ -162,7 +189,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                     onClick={() => startEditing('xp', stats.xp)}
                     className={`bg-slate-800/20 border border-slate-800/40 p-3 rounded-lg text-center transition-all ${isDM ? 'cursor-pointer hover:border-primary-500/50 hover:bg-slate-800/30 active:scale-95' : ''}`}
                 >
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5 leading-none">Journey</div>
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5 leading-none">XP / Level</div>
                     {editingStat === 'xp' ? (
                         <input
                             autoFocus
@@ -182,7 +209,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                 </div>
             </div>
 
-            {/* Conditions Section - Always show if GM or has conditions */}
+            {/* Conditions Section */}
             {(conditions.length > 0 || isDM) && (
                 <section>
                     <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Active Afflictions</h3>
@@ -202,11 +229,32 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                             />
                         )}
                     </div>
-                    {conditions.length === 0 && !isDM && (
-                        <p className="text-[10px] text-slate-600 italic">No active conditions</p>
-                    )}
                 </section>
             )}
+
+            {/* Feats & Features */}
+            <section>
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Feats & Features</h3>
+                <div className="p-3 bg-slate-800/20 rounded-lg text-sm text-slate-400 italic text-center border border-slate-800/40">
+                    {stats.feats?.length ? stats.feats.join(', ') : "No feats recorded"}
+                </div>
+            </section>
+
+            {/* Spells */}
+            <section>
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Spells</h3>
+                <div className="p-3 bg-slate-800/20 rounded-lg text-sm text-slate-400 italic text-center border border-slate-800/40">
+                    {stats.spells?.length ? stats.spells.join(', ') : "No spells recorded"}
+                </div>
+            </section>
+
+            {/* Bastion */}
+            <section>
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Bastion</h3>
+                <div className="p-3 bg-slate-800/20 rounded-lg text-sm text-slate-400 italic text-center border border-slate-800/40">
+                    {stats.bastion?.length ? stats.bastion.join(', ') : "No bastion features"}
+                </div>
+            </section>
 
             {/* Class Levels Section */}
             <section>

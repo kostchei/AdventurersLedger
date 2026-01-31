@@ -44,6 +44,13 @@ export interface UserStats extends PBBaseRecord {
   attuned_items: string[];
   levels: Record<string, number>;
   inventory: string[];
+  character_name: string;
+  class_name: string;
+  species: string;
+  background: string;
+  spells: string[];
+  feats: string[];
+  bastion: string[];
 }
 
 /**

@@ -11,27 +11,44 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - uses: actions/checkout@v4
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          source: "pocketbase/pb_schema.json,pocketbase/pb_migrations/*"
+          target: "/tmp/pb_deploy"
+          strip_components: 1
+
+      - name: Apply Changes & Restart
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            # 1. Navigate to your app directory on the server
-            # If you followed the 'Simple Edition' guide, this might be your home dir
-            cd /home/pocketbase/AdventurersLedger
-            
-            # 1.5 Create a backup of the DB before applying migrations
-            mkdir -p backups
-            [ -f pocketbase/pb_data/data.db ] && cp pocketbase/pb_data/data.db backups/data.db.bak.$(date +%F_%H-%M-%S)
-            
-            # 2. Pull latest changes
-            git pull origin main
+            # 1. Backup DB
+            echo "Creating backup..."
+            sudo cp /opt/pocketbase/pb_data/data.db /opt/pocketbase/pb_data/data.db.bak.$(date +%F_%H-%M-%S) || true
 
-            # 3. Restart PocketBase to apply migrations
-            # Note: Requires sudo. See POCKETBASE_CICD.md for permission setup.
+            # 2. Move files from tmp to actual location
+            echo "Moving files..."
+            sudo mkdir -p /opt/pocketbase/pb_migrations
+            sudo cp /tmp/pb_deploy/pb_schema.json /opt/pocketbase/pb_schema.json
+            sudo cp -r /tmp/pb_deploy/pb_migrations/* /opt/pocketbase/pb_migrations/ 2>/dev/null || true
+            
+            # 3. Fix permissions
+            sudo chown -R pocketbase:pocketbase /opt/pocketbase
+
+            # 4. Restart service
+            echo "Restarting service..."
             sudo systemctl restart pocketbase
             
-            # 4. Optional: Check status
+            # 5. Check status
             sudo systemctl status pocketbase --no-pager
+            
+            # Cleanup
+            rm -rf /tmp/pb_deploy

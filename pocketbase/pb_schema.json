@@ -1019,6 +1019,16 @@
       },
       {
         "hidden": false,
+        "id": "json_inventory",
+        "maxSize": 0,
+        "name": "inventory",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "json"
+      },
+      {
+        "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
         "onCreate": true,

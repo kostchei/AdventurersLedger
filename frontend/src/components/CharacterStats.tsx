@@ -80,6 +80,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                                     magic_items: [],
                                     attuned_items: [],
                                     levels: {},
+                                    inventory: [],
                                 });
                                 // refresh happens via subscription
                             } catch (err) {

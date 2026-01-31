@@ -43,6 +43,7 @@ export interface UserStats extends PBBaseRecord {
   magic_items: string[];
   attuned_items: string[];
   levels: Record<string, number>;
+  inventory: string[];
 }
 
 /**

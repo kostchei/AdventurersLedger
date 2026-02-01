@@ -1,17 +1,23 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate((app) => {
-  const collection = app.findCollectionByNameOrId("_pb_users_auth_")
+migrate((db) => {
+  try {
+    const dao = new Dao(db);
+    const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-  // update collection data
-  unmarshal({
-    "oauth2": {
-      "enabled": true
-    }
-  }, collection)
+    // update collection data
+    unmarshal({
+      "oauth2": {
+        "enabled": true
+      }
+    }, collection)
 
-  return app.save(collection)
-}, (app) => {
-  const collection = app.findCollectionByNameOrId("_pb_users_auth_")
+    return dao.saveCollection(collection)
+  } catch (e) {
+    console.log("Migration 1768912680 failed (skipped): " + e);
+  }
+}, (db) => {
+  const dao = new Dao(db);
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
   // update collection data
   unmarshal({
@@ -20,5 +26,5 @@ migrate((app) => {
     }
   }, collection)
 
-  return app.save(collection)
+  return dao.saveCollection(collection)
 })

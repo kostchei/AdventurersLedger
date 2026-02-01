@@ -1,8 +1,9 @@
 
 
-migrate((app) => {
+migrate((db) => {
     try {
-        const collection = app.findCollectionByNameOrId("users_stats");
+        const dao = new Dao(db);
+        const collection = dao.findCollectionByNameOrId("users_stats");
 
         // Re-define absolute field list to ensure consistency and add new ones
         const fields = [
@@ -334,15 +335,16 @@ migrate((app) => {
             "fields": fields
         }, collection);
 
-        return app.save(collection);
+        return dao.saveCollection(collection);
     } catch (e) {
         console.log("Migration 1769944800 failed: " + e);
     }
-}, (app) => {
+}, (db) => {
     try {
-        const collection = app.findCollectionByNameOrId("users_stats");
+        const dao = new Dao(db);
+        const collection = dao.findCollectionByNameOrId("users_stats");
         // revert logic omitted for safety
-        return app.save(collection);
+        return dao.saveCollection(collection);
     } catch (e) {
         console.log("Revert 1769944800 failed: " + e);
     }

@@ -121,7 +121,7 @@ export default function CampaignPage() {
         gold: 0,
         conditions: [],
         factions: {},
-        piety_deity: null,
+        piety_deity: "",
         piety_score: 0,
         levels: {},
         spells: [],
@@ -131,9 +131,10 @@ export default function CampaignPage() {
       });
       await refetchCharacters();
       navigate(`/campaign/${campaignId}/stats/${newChar.user}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create character:', error);
-      alert('Failed to summon new hero.');
+      console.error('Error details:', error?.data);
+      alert(`Failed to summon new hero: ${error?.message || 'Unknown error'} (${JSON.stringify(error?.data || {})})`);
     } finally {
       setCreatingChar(false);
     }

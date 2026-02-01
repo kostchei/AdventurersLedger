@@ -48,9 +48,9 @@ export function useCharacterStats(targetUserId?: string) {
         };
     }, [effectiveUserId, fetchStats]);
 
-    const updateHP = async (amount: number) => {
+    const updateHP = async (newHP: number) => {
         if (!stats) return;
-        await characterApi.updateHP(stats.id, stats.hp + amount, stats.max_hp);
+        await characterApi.updateHP(stats.id, newHP, stats.max_hp);
     };
 
     const addXP = async (amount: number) => {

@@ -6,6 +6,7 @@ import ConditionBadge from './character/ConditionBadge';
 import ConditionSelector from './character/ConditionSelector';
 import ClassLevelEditor from './character/ClassLevelEditor';
 import StringListEditor from './character/StringListEditor';
+import HPBar from './character/HPBar';
 
 interface CharacterStatsProps {
     isDM?: boolean;
@@ -17,6 +18,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         stats,
         loading,
         error,
+        updateHP,
         updateGold,
         addXP,
         updateAbilityScore,
@@ -198,12 +200,13 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
 
             {/* Vitality */}
             <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm flex justify-between items-center">
-                <div>
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 leading-none">Hit Points</div>
-                    <div className="text-2xl font-bold text-red-400">
-                        {stats.hp} <span className="text-slate-600 text-lg">/ {stats.max_hp}</span>
-                    </div>
-                </div>
+                <HPBar
+                    hp={stats.hp}
+                    maxHp={stats.max_hp}
+                    isDM={isDM}
+                    onHPChange={updateHP}
+                    showLabel={true}
+                />
             </section>
 
             {/* Economy & Experience Section */}

@@ -29,6 +29,13 @@ export const userStatsApi = {
     return records.items[0] ?? null;
   },
 
+  getAll: async (): Promise<UserStats[]> => {
+    return pb.collection('users_stats').getFullList<UserStats>({
+      sort: 'character_name',
+      expand: 'user',
+    });
+  },
+
   getOne: async (id: string): Promise<UserStats> => {
     return pb.collection('users_stats').getOne<UserStats>(id);
   },

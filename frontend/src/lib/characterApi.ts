@@ -15,6 +15,13 @@ export const characterApi = {
     },
 
     /**
+     * Get all characters in the campaign/system
+     */
+    getAllCharacters: async () => {
+        return userStatsApi.getAll();
+    },
+
+    /**
      * Add XP to the character
      */
     addXP: async (id: string, currentXP: number, amount: number) => {

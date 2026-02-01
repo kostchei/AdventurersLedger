@@ -1,4 +1,5 @@
 
+
 migrate((app) => {
     const collection = app.findCollectionByNameOrId("users_stats");
 
@@ -205,6 +206,126 @@ migrate((app) => {
             "required": false,
             "system": false,
             "type": "json"
+        },
+        // --- ATTRIBUTES ---
+        {
+            "hidden": false,
+            "id": "num_str",
+            "max": null,
+            "min": null,
+            "name": "strength",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "hidden": false,
+            "id": "num_dex",
+            "max": null,
+            "min": null,
+            "name": "dexterity",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "hidden": false,
+            "id": "num_con",
+            "max": null,
+            "min": null,
+            "name": "constitution",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "hidden": false,
+            "id": "num_int",
+            "max": null,
+            "min": null,
+            "name": "intelligence",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "hidden": false,
+            "id": "num_wis",
+            "max": null,
+            "min": null,
+            "name": "wisdom",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "hidden": false,
+            "id": "num_cha",
+            "max": null,
+            "min": null,
+            "name": "charisma",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        // --- EXTRA RPG FIELDS ---
+        {
+            "hidden": false,
+            "id": "json_factions",
+            "maxSize": 0,
+            "name": "factions",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "json"
+        },
+        {
+            "hidden": false,
+            "id": "json_levels",
+            "maxSize": 0,
+            "name": "levels",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "json"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text_piety_deity",
+            "max": 0,
+            "min": 0,
+            "name": "piety_deity",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "num_piety_score",
+            "max": null,
+            "min": null,
+            "name": "piety_score",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
         }
     ];
 

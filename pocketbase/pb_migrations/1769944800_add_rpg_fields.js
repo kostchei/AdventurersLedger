@@ -3,7 +3,17 @@
 migrate((db) => {
     try {
         const dao = new Dao(db);
-        const collection = dao.findCollectionByNameOrId("users_stats");
+        let collection;
+        try {
+            collection = dao.findCollectionByNameOrId("users_stats");
+        } catch (e) {
+            // Create if missing to avoid crashing subsequent migrations
+            collection = new Collection({
+                name: "users_stats",
+                type: "base",
+                schema: []
+            });
+        }
 
         // Re-define absolute field list to ensure consistency and add new ones
         const fields = [

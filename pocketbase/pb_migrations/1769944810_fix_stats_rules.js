@@ -2,7 +2,13 @@
 migrate((db) => {
     try {
         const dao = new Dao(db);
-        const collection = dao.findCollectionByNameOrId("users_stats");
+        let collection;
+        try {
+            collection = dao.findCollectionByNameOrId("users_stats");
+        } catch (e) {
+            console.log("Collection 'users_stats' not found, skipping rules update.");
+            return;
+        }
 
         // allow authenticated users to create (needed for initial character creation)
         // and ensure they can only create for themselves

@@ -43,6 +43,8 @@ pocketbase/bin/
 pocketbase/pb_data/
 pocketbase/pb_public/
 pocketbase/cloudflared/
+pocketbase.exe
+*.zip
 
 # Secrets
 Secrets/

@@ -7,11 +7,9 @@ migrate((db) => {
         try {
             collection = dao.findCollectionByNameOrId("users_stats");
         } catch (e) {
-            // Create if missing to avoid crashing subsequent migrations
             collection = new Collection({
                 name: "users_stats",
                 type: "base",
-                schema: []
             });
         }
 
@@ -341,9 +339,8 @@ migrate((db) => {
             }
         ];
 
-        unmarshal({
-            "fields": fields
-        }, collection);
+        // Use portable schema assignment
+        collection.schema = fields;
 
         return dao.saveCollection(collection);
     } catch (e) {
@@ -353,7 +350,6 @@ migrate((db) => {
     try {
         const dao = new Dao(db);
         const collection = dao.findCollectionByNameOrId("users_stats");
-        // revert logic omitted for safety
         return dao.saveCollection(collection);
     } catch (e) {
         console.log("Revert 1769944800 failed: " + e);

@@ -31,18 +31,17 @@ migrate((db) => {
         // Log error but allow startup to continue
         console.log("Migration 1769944810 failed: " + e);
     }
-}, (app) => {
+}, (db) => {
     try {
-        const collection = app.findCollectionByNameOrId("users_stats");
-
-        // Revert to stricter rules (Admin only) or previous state
+        const dao = new Dao(db);
+        const collection = dao.findCollectionByNameOrId("users_stats");
+        // Revert to stricter rules
         collection.createRule = null;
         collection.listRule = null;
         collection.viewRule = null;
         collection.updateRule = null;
         collection.deleteRule = null;
-
-        return app.dao().saveCollection(collection);
+        return dao.saveCollection(collection);
     } catch (e) {
         console.log("Revert 1769944810 failed: " + e);
     }

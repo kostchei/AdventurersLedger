@@ -99,24 +99,7 @@ migrate((db) => {
         // If it exists, we update it.
 
         // Construct schema array for Collection object
-        collection.schema = fields.map(f => {
-            return {
-                name: f.name,
-                type: f.type,
-                required: f.required || false,
-                options: f.options || {}
-            };
-        });
-
-        if (collection) {
-            // We are in update mode? The logic above puts it in variable.
-            // NOTE: logic is: try `find` -> catch `new`. So `collection` is always set.
-            // But if it was FOUND, we didn't add the schema fields in the catch block!
-
-            // We MUST ensure fields exist even if found.
-            // This is tricky without `unmarshal` helper.
-            // Let's assume for this specific debug run, we ARE creating it (since data wiped).
-        }
+        collection.schema = fields;
 
         return dao.saveCollection(collection);
 

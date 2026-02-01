@@ -2,9 +2,17 @@
 migrate((db) => {
     try {
         const dao = new Dao(db);
-        const collection = dao.findCollectionByNameOrId("users_stats");
+        let collection;
+        try {
+            collection = dao.findCollectionByNameOrId("users_stats");
+        } catch (e) {
+            collection = new Collection({
+                name: "users_stats",
+                type: "base",
+            });
+        }
 
-        console.log("Current schema fields count: " + collection.schema.fields().length);
+        console.log("Current schema fields count: " + (collection.schema ? collection.schema.fields().length : 0));
 
         const fieldsData = [
             {

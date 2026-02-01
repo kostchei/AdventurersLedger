@@ -19,7 +19,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          source: "pocketbase/pb_migrations/*"
+          source: "pocketbase/pb_migrations/*,pocketbase/pb_hooks/*"
           target: "/tmp/pb_deploy"
           strip_components: 1
 
@@ -34,11 +34,17 @@ jobs:
             echo "Creating backup..."
             sudo cp /opt/pocketbase/pb_data/data.db /opt/pocketbase/pb_data/data.db.bak.$(date +%F_%H-%M-%S) || true
 
-            # 2. Move files from tmp to actual location
-            echo "Moving files..."
+            # 2. Sync Migrations
+            echo "Syncing migrations..."
             sudo mkdir -p /opt/pocketbase/pb_migrations
             sudo rm -rf /opt/pocketbase/pb_migrations/*
             sudo cp -r /tmp/pb_deploy/pb_migrations/* /opt/pocketbase/pb_migrations/ 2>/dev/null || true
+            
+            # 3. Sync Hooks
+            echo "Syncing hooks..."
+            sudo mkdir -p /opt/pocketbase/pb_hooks
+            sudo rm -rf /opt/pocketbase/pb_hooks/*
+            sudo cp -r /tmp/pb_deploy/pb_hooks/* /opt/pocketbase/pb_hooks/ 2>/dev/null || true
             
             # 3. Fix permissions
             sudo chown -R pocketbase:pocketbase /opt/pocketbase

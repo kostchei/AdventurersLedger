@@ -15,6 +15,13 @@ export const characterApi = {
     },
 
     /**
+     * Get all characters for a specific campaign
+     */
+    getByCampaign: async (campaignId: string) => {
+        return userStatsApi.getByCampaign(campaignId);
+    },
+
+    /**
      * Get all characters in the campaign/system
      */
     getAllCharacters: async () => {

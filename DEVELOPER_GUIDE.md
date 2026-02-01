@@ -36,8 +36,17 @@ We use a "GitOps" flow. **NEVER** edit the production schema manually.
 3.  **Review**: Check the file. Ensure it isn't a delete/create operation if you renamed a field.
 4.  **Commit**: Push to `main`. The CI/CD pipeline will apply it.
 
-**Conflict Resolution:**
-If you encounter a "Migration Mismatch" (timestamp conflict), rename your local migration file to the current timestamp.
+### 2.1 Zero-Downtime Migration Rules (AI & Manual)
+
+To prevent the "Bootstrap Lock" (where the server fails to start because of a bad migration), follow these hard rules for JSVM:
+
+1.  **NO POSH GLOBALS**: Functions like `unmarshal()` are NOT available in the JSVM environment. Use direct assignment: `collection.schema = [ ... ]`.
+2.  **STRICT SIGNATURES**: Always use `migrate((db) => { ... }, (db) => { ... })`. The `(app)` signature is deprecated and can cause panics.
+3.  **TRUST NO ONE**: Wrap all migration logic in a `try-catch` block.
+    *   **FAIL LOUD** in logs: `console.log("Migration failed: " + e)`.
+    *   **FAIL SOFT** in execution: `return null` (instead of throwing). This allows the server to finish booting so the API stays online.
+4.  **RAW OBJECTS PREFERRED**: While `new SchemaField()` exists, raw JSON-like arrays are more portable across PocketBase minor versions (v0.22 vs v0.23).
+5.  **SYSTEM FIELDS ARE SACRED**: Never redefine the `id` field in a manual migration unless you are a PocketBase wizard. Redefining `id` often breaks autogeneration and causes "Cannot be blank" errors on creation.
 
 ## 3. Project Roadmap
 

@@ -19,3 +19,5 @@ All notable changes to the Adventurers Ledger project will be documented in this
 - **Persistence**: Resolved issue where Hit Points, Attributes, and Piety scores would reset or fail to save.
 - **Migration**: Fixed "missing types.d.ts" lint errors in migration files.
 - **Deployment**: Established "Golden Rules" for safe schema updates to preventing production data loss.
+- **Character Creation**: Resolved "400 Bad Request: id: Cannot be blank" error by repairing `users_stats` collection schema and restoring system ID autogeneration.
+- **Downtime Prevention**: Standardized PocketBase migrations to use fail-safe JSVM syntax and added [POCKETBASE_SAFETY_GUIDE.md](./POCKETBASE_SAFETY_GUIDE.md).

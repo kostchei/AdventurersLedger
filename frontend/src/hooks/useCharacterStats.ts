@@ -3,18 +3,22 @@ import { useAuthStore } from '../store/authStore';
 import { characterApi } from '../lib/characterApi';
 import type { UserStats } from '../types/pocketbase';
 
-export function useCharacterStats(targetUserId?: string) {
+export function useCharacterStats(statsId?: string, campaignId?: string, userId?: string) {
     const { user: currentUser } = useAuthStore();
-    const effectiveUserId = targetUserId || currentUser?.id;
+    const effectiveUserId = userId || currentUser?.id;
     const [stats, setStats] = useState<UserStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     const fetchStats = useCallback(async () => {
-        if (!effectiveUserId) return;
         try {
             setLoading(true);
-            const data = await characterApi.getByUserId(effectiveUserId);
+            let data: UserStats | null = null;
+            if (statsId) {
+                data = await characterApi.getOne(statsId);
+            } else if (effectiveUserId) {
+                data = await characterApi.getByUserId(effectiveUserId, campaignId);
+            }
             setStats(data);
             setError(null);
         } catch (err) {
@@ -23,7 +27,7 @@ export function useCharacterStats(targetUserId?: string) {
         } finally {
             setLoading(false);
         }
-    }, [effectiveUserId]);
+    }, [statsId, effectiveUserId, campaignId]);
 
     useEffect(() => {
         fetchStats();
@@ -35,8 +39,14 @@ export function useCharacterStats(targetUserId?: string) {
 
         const setupSubscription = async () => {
             unsubscribe = await characterApi.subscribeAll((e) => {
-                if (e.record.user === effectiveUserId) {
-                    setStats(e.record);
+                if (statsId) {
+                    if (e.record.id === statsId) {
+                        setStats(e.record);
+                    }
+                } else if (effectiveUserId) {
+                    if (e.record.user === effectiveUserId && (campaignId ? e.record.campaign === campaignId : true)) {
+                        setStats(e.record);
+                    }
                 }
             });
         };
@@ -46,7 +56,7 @@ export function useCharacterStats(targetUserId?: string) {
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [effectiveUserId, fetchStats]);
+    }, [statsId, effectiveUserId, campaignId, fetchStats]);
 
     const updateHP = async (newHP: number) => {
         if (!stats) return;

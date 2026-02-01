@@ -86,11 +86,11 @@ export default function CampaignPage() {
     enabled: !!campaignId,
   });
 
-  // Fetch all characters including those not in membership (NPCs etc)
+  // Fetch characters specifically for this campaign
   const { data: allCharacters, refetch: refetchCharacters } = useQuery<UserStats[]>({
     queryKey: ['campaign', campaignId, 'characters'],
     queryFn: async () => {
-      const chars = await characterApi.getAllCharacters();
+      const chars = await characterApi.getByCampaign(campaignId!);
       return chars || [];
     },
     enabled: !!campaignId,
@@ -103,9 +103,9 @@ export default function CampaignPage() {
 
     try {
       setCreatingChar(true);
-      setCreatingChar(true);
       const characterData = {
         user: user.id, // Assign to current user (likely GM) initially
+        campaign: campaignId, // Scope to current campaign
         character_name: "Unnamed Hero",
         class_name: "Commoner",
         species: "Human",
@@ -138,9 +138,9 @@ export default function CampaignPage() {
 
       console.log('Sending Character Creation Payload:', JSON.stringify(characterData, null, 2));
 
-      const newChar = await characterApi.create(characterData);
+      const newChar = await characterApi.create(characterData as any);
       await refetchCharacters();
-      navigate(`/campaign/${campaignId}/stats/${newChar.user}`);
+      navigate(`/campaign/${campaignId}/stats/${newChar.id}`);
     } catch (error: any) {
       console.error('Failed to create character:', error);
       console.error('Error details:', error?.data);
@@ -399,7 +399,7 @@ export default function CampaignPage() {
                     {allCharacters?.map((char) => (
                       <button
                         key={char.id}
-                        onClick={() => navigate(`/campaign/${campaignId}/stats/${char.user}`)}
+                        onClick={() => navigate(`/campaign/${campaignId}/stats/${char.id}`)}
                         className="group flex items-center gap-4 bg-slate-900/40 border border-white/5 p-4 rounded-xl hover:bg-slate-800/60 transition-all hover:border-indigo-500/30 text-left relative overflow-hidden"
                       >
                         {/* Class Color Strip */}

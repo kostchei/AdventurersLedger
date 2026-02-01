@@ -8,21 +8,35 @@ import DivinePiety from '../components/DivinePiety';
 import { useAuthStore } from '../store/authStore';
 
 export default function CharacterStatsPage() {
-    const { campaignId, userId: targetUserId } = useParams<{ campaignId: string; userId?: string }>();
+    const { campaignId, statsId } = useParams<{ campaignId: string; statsId?: string }>();
     const navigate = useNavigate();
     const { user: currentUser } = useAuthStore();
 
-    // Fetch target user info if it's not the current user
+    // Fetch character stats to find out which user it belongs to
+    const { data: stats, isLoading: isStatsLoading } = useQuery({
+        queryKey: ['stats', statsId],
+        queryFn: async () => {
+            if (!statsId) return null;
+            return pb.collection('users_stats').getOne(statsId, {
+                expand: 'user',
+            });
+        },
+        enabled: !!statsId,
+    });
+
+    const targetUserId = stats?.user || null;
+
+    // Fetch target user info if it's not the current user and not expanded already
     const { data: targetUser, isLoading: isUserLoading } = useQuery({
         queryKey: ['user', targetUserId],
         queryFn: async () => {
             if (!targetUserId) return null;
             return pb.collection('users').getOne(targetUserId);
         },
-        enabled: !!targetUserId && targetUserId !== currentUser?.id,
+        enabled: !!targetUserId && targetUserId !== currentUser?.id && !stats?.expand?.user,
     });
 
-    const displayUser = targetUserId === currentUser?.id || !targetUserId ? currentUser : targetUser;
+    const displayUser = stats?.expand?.user || (targetUserId === currentUser?.id || !targetUserId ? currentUser : targetUser);
 
     const { data: campaign, isLoading: isCampaignLoading } = useQuery({
         queryKey: ['campaign', campaignId],
@@ -31,9 +45,9 @@ export default function CharacterStatsPage() {
     });
 
     const isDM = currentUser?.id === campaign?.dmId;
-    const isTargetingSelf = !targetUserId || targetUserId === currentUser?.id;
+    const isTargetingSelf = stats ? stats.user === currentUser?.id : true;
 
-    if (isCampaignLoading || (targetUserId && targetUserId !== currentUser?.id && isUserLoading)) {
+    if (isCampaignLoading || isStatsLoading || (targetUserId && targetUserId !== currentUser?.id && isUserLoading)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-950">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
@@ -98,7 +112,7 @@ export default function CharacterStatsPage() {
                             )}
                         </div>
 
-                        <CharacterStats isDM={isDM} userId={targetUserId || currentUser?.id} />
+                        <CharacterStats isDM={isDM} userId={stats?.user} campaignId={campaignId} statsId={statsId} />
 
                         {/* Renown & Factions Section */}
                         <div className="mt-12 pt-8 border-t border-white/5">

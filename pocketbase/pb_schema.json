@@ -817,7 +817,20 @@
         "minSelect": 0,
         "name": "user",
         "presentable": false,
-        "required": true,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "cascadeDelete": true,
+        "collectionId": "pbc_camp_001",
+        "hidden": false,
+        "id": "rel_campaign_stats",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "campaign",
+        "presentable": false,
+        "required": false,
         "system": false,
         "type": "relation"
       },
@@ -1134,11 +1147,11 @@
         "type": "autodate"
       }
     ],
-    "listRule": "user = @request.auth.id",
-    "viewRule": "user = @request.auth.id",
-    "createRule": "user = @request.auth.id",
-    "updateRule": "user = @request.auth.id",
-    "deleteRule": null,
+    "listRule": "@request.auth.id != '' && (user = @request.auth.id || campaign.dmId = @request.auth.id || campaign.campaign_memberships_via_campaign.user ?= @request.auth.id)",
+    "viewRule": "@request.auth.id != '' && (user = @request.auth.id || campaign.dmId = @request.auth.id || campaign.campaign_memberships_via_campaign.user ?= @request.auth.id)",
+    "createRule": "@request.auth.id != '' && (campaign.dmId = @request.auth.id || (campaign.campaign_memberships_via_campaign.user ?= @request.auth.id && @request.data.user = @request.auth.id))",
+    "updateRule": "@request.auth.id != '' && (user = @request.auth.id || campaign.dmId = @request.auth.id)",
+    "deleteRule": "@request.auth.id != '' && campaign.dmId = @request.auth.id",
     "indexes": []
   },
   {

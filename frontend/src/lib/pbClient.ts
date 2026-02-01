@@ -22,11 +22,23 @@ import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
  * Users Stats Collection API
  */
 export const userStatsApi = {
-  getByUserId: async (userId: string): Promise<UserStats | null> => {
+  getByUserId: async (userId: string, campaignId?: string): Promise<UserStats | null> => {
+    let filter = `user = "${userId}"`;
+    if (campaignId) {
+      filter += ` && campaign = "${campaignId}"`;
+    }
     const records = await pb.collection('users_stats').getList<UserStats>(1, 1, {
-      filter: `user = "${userId}"`,
+      filter: filter,
     });
     return records.items[0] ?? null;
+  },
+
+  getByCampaign: async (campaignId: string): Promise<UserStats[]> => {
+    return pb.collection('users_stats').getFullList<UserStats>({
+      filter: `campaign = "${campaignId}"`,
+      sort: 'character_name',
+      expand: 'user',
+    });
   },
 
   getAll: async (): Promise<UserStats[]> => {

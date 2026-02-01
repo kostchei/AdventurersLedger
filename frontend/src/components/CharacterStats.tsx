@@ -11,9 +11,11 @@ import HPBar from './character/HPBar';
 interface CharacterStatsProps {
     isDM?: boolean;
     userId?: string;
+    campaignId?: string;
+    statsId?: string;
 }
 
-export default function CharacterStats({ isDM = false, userId }: CharacterStatsProps) {
+export default function CharacterStats({ isDM = false, userId, campaignId, statsId }: CharacterStatsProps) {
     const {
         stats,
         loading,
@@ -31,7 +33,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         updateFeats,
         updateBastion,
         updateInventory
-    } = useCharacterStats(userId);
+    } = useCharacterStats(statsId, campaignId, userId);
     const [editingStat, setEditingStat] = useState<'gold' | 'xp' | null>(null);
     const [editValue, setEditValue] = useState('');
 
@@ -70,6 +72,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                             try {
                                 await characterApi.create({
                                     user: userId,
+                                    campaign: campaignId || "", // Scoped to campaign
                                     hp: 10,
                                     max_hp: 10,
                                     strength: 10,

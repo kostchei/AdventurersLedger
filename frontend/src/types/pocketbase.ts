@@ -25,7 +25,8 @@ export interface PBUser extends PBBaseRecord {
  * Stores character statistics, HP, gold, XP, and conditions
  */
 export interface UserStats extends PBBaseRecord {
-  user: string;
+  user?: string;
+  campaign: string;
   hp: number;
   max_hp: number;
   strength: number;

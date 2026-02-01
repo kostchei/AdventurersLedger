@@ -40,8 +40,8 @@ export interface UserStats extends PBBaseRecord {
   factions: Record<string, number>;
   piety_deity: string | null;
   piety_score: number;
-  magic_items: string[];
-  attuned_items: string[];
+  // magic_items: string[];
+  // attuned_items: string[];
   levels: Record<string, number>;
   inventory: string[];
   character_name: string;

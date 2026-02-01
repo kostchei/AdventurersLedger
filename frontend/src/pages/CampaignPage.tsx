@@ -7,9 +7,8 @@ import HexMapViewer from '../components/HexMapViewer';
 import { useAuthStore } from '../store/authStore';
 import WorldState from '../components/WorldState';
 import type { HexCoord } from '../utils/hexGrid';
-import type { CampaignMember, CampaignNomination, MapLayer } from '../types';
-import MapAssetManager from '../components/MapAssetManager';
-import FellowshipManager from '../components/FellowshipManager';
+import type { CampaignNomination, MapLayer, UserStats } from '../types';
+
 
 
 
@@ -21,7 +20,6 @@ export default function CampaignPage() {
   const currentZ = 0;
   const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
   const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
-  const [showFellowship, setShowFellowship] = useState(false); // New state
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
   const [enteredWorld, setEnteredWorld] = useState(false);
   const queryClient = useQueryClient();
@@ -52,11 +50,7 @@ export default function CampaignPage() {
     enabled: !!campaignId,
   });
 
-  const { data: members } = useQuery<CampaignMember[]>({
-    queryKey: ['campaign', campaignId, 'members'],
-    queryFn: () => campaignApi.getCampaignMembers(campaignId!),
-    enabled: !!campaignId,
-  });
+
 
   const { data: nominations } = useQuery<CampaignNomination[]>({
     queryKey: ['campaign', campaignId, 'nominations'],
@@ -89,6 +83,59 @@ export default function CampaignPage() {
     },
     enabled: !!campaignId,
   });
+
+  // Fetch all characters including those not in membership (NPCs etc)
+  const { data: allCharacters, refetch: refetchCharacters } = useQuery<UserStats[]>({
+    queryKey: ['campaign', campaignId, 'characters'],
+    queryFn: async () => {
+      const chars = await characterApi.getAllCharacters();
+      return chars || [];
+    },
+    enabled: !!campaignId,
+  });
+
+  const [creatingChar, setCreatingChar] = useState(false);
+
+  const handleCreateNewCharacter = async () => {
+    if (!user || creatingChar) return;
+
+    try {
+      setCreatingChar(true);
+      const newChar = await characterApi.create({
+        user: user.id, // Assign to current user (likely GM) initially
+        character_name: "Unnamed Hero",
+        class_name: "Commoner",
+        species: "Human",
+        background: "None",
+        hp: 10,
+        max_hp: 10,
+        strength: 10,
+        dexterity: 10,
+        constitution: 10,
+        intelligence: 10,
+        wisdom: 10,
+        charisma: 10,
+        xp: 0,
+        gold: 0,
+        conditions: [],
+        factions: {},
+        piety_deity: null,
+        piety_score: 0,
+        levels: {},
+        spells: [],
+        feats: [],
+        bastion: [],
+        inventory: []
+      });
+      await refetchCharacters();
+      navigate(`/campaign/${campaignId}/stats/${newChar.user}`);
+    } catch (error) {
+      console.error('Failed to create character:', error);
+      alert('Failed to summon new hero.');
+    } finally {
+      setCreatingChar(false);
+    }
+  };
 
   const isRealDM = user?.id === campaign?.dmId;
   const isDM = isRealDM && !viewAsPlayer;
@@ -236,7 +283,7 @@ export default function CampaignPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Map Viewer or Landing Dashboard */}
         <div className="flex-1 relative overflow-auto bg-slate-950">
-          {!enteredWorld && !showFellowship ? (
+          {!enteredWorld ? (
             <div className="absolute inset-0 flex items-center justify-center p-8 bg-gradient-to-b from-slate-900 via-slate-950 to-black overflow-y-auto">
               <div className="max-w-4xl w-full py-12">
                 <div className="text-center mb-12">
@@ -267,20 +314,7 @@ export default function CampaignPage() {
                   </button>
 
                   {/* Manage Fellowship Choice */}
-                  <button
-                    onClick={() => setShowFellowship(true)}
-                    className="group relative bg-slate-900/50 border border-white/5 p-8 rounded-2xl hover:bg-slate-800/80 transition-all hover:border-indigo-500/30 hover:shadow-[0_0_30px_-10px_rgba(99,102,241,0.3)] text-left active:scale-[0.98]"
-                  >
-                    <div className="mb-4 text-3xl opacity-50 group-hover:opacity-100 transition-opacity">🛡️</div>
-                    <h3 className="text-lg font-black text-white uppercase tracking-wider mb-2">Manage Fellowship</h3>
-                    <p className="text-slate-500 text-xs leading-relaxed">Assemble the party, create new heroes, and oversee their vitals.</p>
-                    <div className="mt-6 flex items-center gap-2 text-indigo-400 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                      Open Roster
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </button>
+
 
                   {/* Character Profile Choice */}
                   <button
@@ -318,37 +352,61 @@ export default function CampaignPage() {
                   )}
                 </div>
 
-                {/* Party Management / Member List */}
+                {/* Unified Fellowship Management */}
                 <div className="mt-12 pt-12 border-t border-white/5">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">
-                      {isDM ? 'Active Session Members' : 'The Party'}
+                      {isDM ? 'Manage the Fellowship' : 'The Fellowship'}
                     </h3>
-                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
-                      {members?.length || 0} Members Present
-                    </span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                        {allCharacters?.length || 0} Members Present
+                      </span>
+                      {isDM && (
+                        <button
+                          onClick={handleCreateNewCharacter}
+                          disabled={creatingChar}
+                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg hover:shadow-indigo-500/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                          {creatingChar ? (
+                            <>
+                              <span className="animate-spin">⚔️</span> Summoning...
+                            </>
+                          ) : (
+                            <>
+                              <span>➕</span> Make New Character
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {members?.map((member) => (
+                    {allCharacters?.map((char) => (
                       <button
-                        key={member.id}
-                        onClick={() => navigate(`/campaign/${campaignId}/stats/${member.userId}`)}
-                        className="group flex items-center gap-4 bg-slate-900/40 border border-white/5 p-4 rounded-xl hover:bg-slate-800/60 transition-all hover:border-indigo-500/30 text-left"
+                        key={char.id}
+                        onClick={() => navigate(`/campaign/${campaignId}/stats/${char.user}`)}
+                        className="group flex items-center gap-4 bg-slate-900/40 border border-white/5 p-4 rounded-xl hover:bg-slate-800/60 transition-all hover:border-indigo-500/30 text-left relative overflow-hidden"
                       >
-                        <div className="h-10 w-10 rounded-lg bg-slate-800 border border-white/5 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">
-                          {member.user?.avatarUrl ? (
-                            <img src={member.user.avatarUrl} alt="" className="w-full h-full rounded-lg object-cover" />
+                        {/* Class Color Strip */}
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-purple-600 group-hover:w-1.5 transition-all"></div>
+
+                        <div className="h-10 w-10 rounded-lg bg-slate-800 border border-white/5 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform ml-2">
+                          {/* @ts-ignore - expand type not fully propagated */}
+                          {char.expand?.user?.avatarUrl ? (
+                            /* @ts-ignore */
+                            <img src={char.expand.user.avatarUrl} alt="" className="w-full h-full rounded-lg object-cover" />
                           ) : (
                             '👤'
                           )}
                         </div>
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-white truncate group-hover:text-indigo-400 transition-colors">
-                            {member.user?.name || 'Unknown Adventurer'}
+                            {char.character_name || "Unnamed Hero"}
                           </p>
                           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter truncate">
-                            {member.role === 'GM' ? 'Chronicler' : 'Adventurer'}
+                            Level {Object.values(char.levels || {}).reduce((a, b) => a + b, 0) || 1} {char.class_name}
                           </p>
                         </div>
                       </button>
@@ -362,19 +420,6 @@ export default function CampaignPage() {
                   </p>
                 </div>
               </div>
-            </div>
-          ) : showFellowship ? (
-            <div className="p-8 h-full overflow-y-auto">
-              <button
-                onClick={() => setShowFellowship(false)}
-                className="mb-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                </svg>
-                Return to Mission Control
-              </button>
-              <FellowshipManager campaignId={campaignId!} isDM={isDM} />
             </div>
           ) : activeMap ? (
             <HexMapViewer

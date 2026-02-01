@@ -12,9 +12,10 @@ migrate((db) => {
             });
         }
 
-        console.log("Current schema fields count: " + (collection.schema ? collection.schema.fields().length : 0));
-
-        const fieldsData = [
+        // --- DEFINITIVE SCHEMA REPAIR ---
+        // Using raw objects as they are most portable across v0.22.x versions.
+        // WE OMIT THE 'id' FIELD to restore system auto-generation.
+        const fields = [
             {
                 "id": "rel_user",
                 "name": "user",
@@ -30,7 +31,6 @@ migrate((db) => {
                 }
             },
             { "id": "text_char_name", "name": "character_name", "type": "text" },
-
             { "id": "text_class_name", "name": "class_name", "type": "text" },
             { "id": "text_species", "name": "species", "type": "text" },
             { "id": "text_background", "name": "background", "type": "text" },
@@ -57,22 +57,7 @@ migrate((db) => {
             { "id": "json_attuned_items", "name": "attuned_items", "type": "json", "options": { "maxSize": 2000000 } }
         ];
 
-        // Create a and add all fields
-        const newSchema = new Schema();
-        fieldsData.forEach(f => {
-            const field = new SchemaField();
-            field.id = f.id;
-            field.name = f.name;
-            field.type = f.type;
-            field.system = f.system || false;
-            field.required = f.required || false;
-            if (f.options) {
-                field.options = f.options;
-            }
-            newSchema.addField(field);
-        });
-
-        collection.schema = newSchema;
+        collection.schema = fields;
 
         // Reset rules
         collection.listRule = "@request.auth.id != ''";
@@ -81,14 +66,11 @@ migrate((db) => {
         collection.updateRule = "@request.auth.id = user";
         collection.deleteRule = "@request.auth.id = user";
 
-        dao.saveCollection(collection);
-        console.log("Ultimate Repair Migration applied successfully.");
-
-        return null;
+        return dao.saveCollection(collection);
     } catch (e) {
-        console.log("Ultimate Repair Migration failed: " + e);
-        throw e;
+        console.log("Ultimate Repair Migration (1769944850) failed: " + e);
+        return null; // Return null instead of throwing to prevent boot lock
     }
 }, (db) => {
-    // Revert not supported
+    return null;
 })

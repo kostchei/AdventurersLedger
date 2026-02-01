@@ -78,17 +78,17 @@ migrate((db) => {
             { name: "intelligence", type: "number", options: { max: 30 } },
             { name: "wisdom", type: "number", options: { max: 30 } },
             { name: "charisma", type: "number", options: { max: 30 } },
-            { name: "conditions", type: "json" },
-            { name: "factions", type: "json" },
-            { name: "levels", type: "json" },
+            { name: "conditions", type: "json", options: { maxSize: 2000000 } },
+            { name: "factions", type: "json", options: { maxSize: 2000000 } },
+            { name: "levels", type: "json", options: { maxSize: 2000000 } },
             { name: "piety_deity", type: "text" },
             { name: "piety_score", type: "number" },
-            { name: "spells", type: "json" },
-            { name: "feats", type: "json" },
-            { name: "bastion", type: "json" },
-            { name: "inventory", type: "json" },
-            { name: "magic_items", type: "json" },
-            { name: "attuned_items", type: "json" }
+            { name: "spells", type: "json", options: { maxSize: 2000000 } },
+            { name: "feats", type: "json", options: { maxSize: 2000000 } },
+            { name: "bastion", type: "json", options: { maxSize: 2000000 } },
+            { name: "inventory", type: "json", options: { maxSize: 2000000 } },
+            { name: "magic_items", type: "json", options: { maxSize: 2000000 } },
+            { name: "attuned_items", type: "json", options: { maxSize: 2000000 } }
         ];
 
         // PocketBase expects string IDs for existing fields?

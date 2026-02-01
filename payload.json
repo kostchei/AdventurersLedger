@@ -1,0 +1,40 @@
+﻿{
+    "dexterity":  10,
+    "strength":  10,
+    "piety_deity":  "",
+    "hp":  10,
+    "class_name":  "Commoner",
+    "inventory":  [
+
+                  ],
+    "gold":  0,
+    "character_name":  "Unnamed Hero",
+    "intelligence":  10,
+    "constitution":  10,
+    "max_hp":  10,
+    "spells":  [
+
+               ],
+    "user":  "olenmzcw0khtq4m",
+    "background":  "None",
+    "species":  "Human",
+    "feats":  [
+
+              ],
+    "bastion":  [
+
+                ],
+    "levels":  {
+
+               },
+    "wisdom":  10,
+    "piety_score":  0,
+    "charisma":  10,
+    "xp":  0,
+    "conditions":  [
+
+                   ],
+    "factions":  {
+
+                 }
+}

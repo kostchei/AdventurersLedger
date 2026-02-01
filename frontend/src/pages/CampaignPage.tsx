@@ -103,7 +103,8 @@ export default function CampaignPage() {
 
     try {
       setCreatingChar(true);
-      const newChar = await characterApi.create({
+      setCreatingChar(true);
+      const characterData = {
         user: user.id, // Assign to current user (likely GM) initially
         character_name: "Unnamed Hero",
         class_name: "Commoner",
@@ -128,7 +129,16 @@ export default function CampaignPage() {
         feats: [],
         bastion: [],
         inventory: []
-      });
+      };
+
+      // Paranoid check: Ensure 'id' is not present
+      if ('id' in characterData) {
+        delete (characterData as any).id;
+      }
+
+      console.log('Sending Character Creation Payload:', JSON.stringify(characterData, null, 2));
+
+      const newChar = await characterApi.create(characterData);
       await refetchCharacters();
       navigate(`/campaign/${campaignId}/stats/${newChar.user}`);
     } catch (error: any) {

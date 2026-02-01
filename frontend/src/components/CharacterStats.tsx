@@ -19,6 +19,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
         loading,
         error,
         updateHP,
+        updateMaxHP,
         updateGold,
         addXP,
         updateAbilityScore,
@@ -205,6 +206,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                     maxHp={stats.max_hp}
                     isDM={isDM}
                     onHPChange={updateHP}
+                    onMaxHPChange={updateMaxHP}
                     showLabel={true}
                 />
             </section>

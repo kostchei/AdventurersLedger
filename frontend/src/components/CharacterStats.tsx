@@ -84,8 +84,7 @@ export default function CharacterStats({ isDM = false, userId }: CharacterStatsP
                                     factions: {},
                                     piety_deity: null,
                                     piety_score: 0,
-                                    magic_items: [],
-                                    attuned_items: [],
+
                                     levels: {},
                                     inventory: [],
                                     character_name: "Unnamed Hero",

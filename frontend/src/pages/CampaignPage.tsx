@@ -8,6 +8,8 @@ import { useAuthStore } from '../store/authStore';
 import WorldState from '../components/WorldState';
 import type { HexCoord } from '../utils/hexGrid';
 import type { CampaignNomination, MapLayer, UserStats } from '../types';
+import MapAssetManager from '../components/MapAssetManager';
+import { characterApi } from '../lib/characterApi';
 
 
 

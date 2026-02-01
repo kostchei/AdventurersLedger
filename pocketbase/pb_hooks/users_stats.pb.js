@@ -2,48 +2,68 @@
 
 /**
  * Collection Hook for users_stats
- * Sanitizes incoming data before record creation to prevent validation errors
+ * Sanitizes incoming data before record creation to prevent validation errors.
+ * Compatible with PocketBase v0.22+ JSVM
  */
 onRecordBeforeCreateRequest((e) => {
-    // Only apply to users_stats collection
+    // Already filtered by the second argument of onRecordBeforeCreateRequest,
+    // but good to have for absolute certainty.
     if (e.collection.name !== 'users_stats') {
         return;
     }
 
-    // Remove 'id' field if it exists (common source of "Cannot be blank" errors)
-    if (e.data['id'] !== undefined) {
-        delete e.data['id'];
-    }
+    // If 'id' is present in the request data but empty, it triggers "Cannot be blank".
+    // We can't easily 'delete' from the record object like a plain JS object,
+    // but we can check if it's dirty and clear it if it's problematic.
+    // However, the most robust way in a hook is to just let PocketBase handle it
+    // if we don't explicitly need a specific ID.
 
-    // Ensure required fields have safe defaults
+    // Instead of complex ID manipulation, let's just focus on ensuring 
+    // all fields are present and valid, which usually fixes these types of cascade errors.
+
     const defaults = {
-        character_name: e.data.character_name || 'Unnamed Hero',
-        class_name: e.data.class_name || 'Commoner',
-        species: e.data.species || 'Human',
-        background: e.data.background || 'None',
-        hp: e.data.hp ?? 10,
-        max_hp: e.data.max_hp ?? 10,
-        strength: e.data.strength ?? 10,
-        dexterity: e.data.dexterity ?? 10,
-        constitution: e.data.constitution ?? 10,
-        intelligence: e.data.intelligence ?? 10,
-        wisdom: e.data.wisdom ?? 10,
-        charisma: e.data.charisma ?? 10,
-        xp: e.data.xp ?? 0,
-        gold: e.data.gold ?? 0,
-        conditions: e.data.conditions || [],
-        factions: e.data.factions || {},
-        piety_deity: e.data.piety_deity || '',
-        piety_score: e.data.piety_score ?? 0,
-        levels: e.data.levels || {},
-        spells: e.data.spells || [],
-        feats: e.data.feats || [],
-        bastion: e.data.bastion || [],
-        inventory: e.data.inventory || []
+        character_name: "Unnamed Hero",
+        class_name: "Commoner",
+        species: "Human",
+        background: "None",
+        hp: 10,
+        max_hp: 10,
+        strength: 10,
+        dexterity: 10,
+        constitution: 10,
+        intelligence: 10,
+        wisdom: 10,
+        charisma: 10,
+        xp: 0,
+        gold: 0,
+        conditions: [],
+        factions: {},
+        piety_deity: "",
+        piety_score: 0,
+        levels: {},
+        spells: [],
+        feats: [],
+        bastion: [],
+        inventory: []
     };
 
-    // Merge defaults with provided data
-    Object.assign(e.data, defaults);
+    // Use e.record.get() and e.record.set() for v0.22+
+    for (let key in defaults) {
+        let val = e.record.get(key);
+        // If the value is "empty" (null, undefined, or empty string for text fields), apply default
+        if (val === null || val === undefined || val === "") {
+            e.record.set(key, defaults[key]);
+        }
+    }
 
-    console.log('users_stats creation sanitized:', e.data);
+    // Special handling for the user field - it MUST be present
+    if (!e.record.get("user")) {
+        // If we're in an auth context, default to the current user
+        const authRecord = e.httpContext.get("authRecord");
+        if (authRecord) {
+            e.record.set("user", authRecord.id);
+        }
+    }
+
+    console.log('users_stats record sanitized for user:', e.record.get("user"));
 }, "users_stats");

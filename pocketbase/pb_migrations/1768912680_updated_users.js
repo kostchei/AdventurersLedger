@@ -5,11 +5,10 @@ migrate((db) => {
     const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
     // update collection data
-    unmarshal({
-      "oauth2": {
-        "enabled": true
-      }
-    }, collection)
+    // unmarshal({ "oauth2": { "enabled": true } }, collection)
+    const oauth2 = collection.oauth2 || {};
+    oauth2.enabled = true;
+    collection.oauth2 = oauth2;
 
     return dao.saveCollection(collection)
   } catch (e) {
@@ -20,11 +19,9 @@ migrate((db) => {
   const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
   // update collection data
-  unmarshal({
-    "oauth2": {
-      "enabled": false
-    }
-  }, collection)
+  const oauth2 = collection.oauth2 || {};
+  oauth2.enabled = false;
+  collection.oauth2 = oauth2;
 
   return dao.saveCollection(collection)
 })

@@ -86,14 +86,14 @@ export default function CampaignPage() {
     enabled: !!campaignId,
   });
 
-  // Fetch characters specifically for this campaign
+  // Fetch all characters (ignore campaign scoping for now)
   const { data: allCharacters, refetch: refetchCharacters } = useQuery<UserStats[]>({
-    queryKey: ['campaign', campaignId, 'characters'],
+    queryKey: ['characters', 'all'],
     queryFn: async () => {
-      const chars = await characterApi.getByCampaign(campaignId!);
+      const chars = await characterApi.getAllCharacters();
       return chars || [];
     },
-    enabled: !!campaignId,
+    enabled: true,
   });
 
   const [creatingChar, setCreatingChar] = useState(false);

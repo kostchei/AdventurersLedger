@@ -1147,8 +1147,8 @@
         "type": "autodate"
       }
     ],
-    "listRule": "@request.auth.id != '' && (user = @request.auth.id || campaign.dmId = @request.auth.id || campaign.campaign_memberships_via_campaign.user ?= @request.auth.id)",
-    "viewRule": "@request.auth.id != '' && (user = @request.auth.id || campaign.dmId = @request.auth.id || campaign.campaign_memberships_via_campaign.user ?= @request.auth.id)",
+    "listRule": "@request.auth.id != ''",
+    "viewRule": "@request.auth.id != ''",
     "createRule": "@request.auth.id != '' && (campaign.dmId = @request.auth.id || (campaign.campaign_memberships_via_campaign.user ?= @request.auth.id && @request.data.user = @request.auth.id))",
     "updateRule": "@request.auth.id != '' && (user = @request.auth.id || campaign.dmId = @request.auth.id)",
     "deleteRule": "@request.auth.id != '' && campaign.dmId = @request.auth.id",

@@ -24,8 +24,8 @@ npm run dev
 
 ## 2. Database Schema Guidelines (CRITICAL)
 
-**PocketBase v0.23+ Strictness:**
-The modern PocketBase version is extremely strict about schema definitions.
+**PocketBase v0.26+ Strictness:**
+The modern PocketBase version (v0.23+) is extremely strict about schema definitions and JSVM usage.
 -   **All Fields Required**: When defining schema in JS migration files, you MUST provide all field properties (`autogeneratePattern`, `hidden`, `min`, `max`, etc.) even if they are empty/default. Sparse definitions will cause "Invalid collections configuration" errors.
 -   **Type Safety**: Always add `/// <reference path="../pb_data/types.d.ts" />` at the top of migration files (for editor support).
 
@@ -36,17 +36,21 @@ We use a "GitOps" flow. **NEVER** edit the production schema manually.
 3.  **Review**: Check the file. Ensure it isn't a delete/create operation if you renamed a field.
 4.  **Commit**: Push to `main`. The CI/CD pipeline will apply it.
 
-### 2.1 Zero-Downtime Migration Rules (AI & Manual)
+### 2.1 Zero-Downtime Migration Rules (v0.26 Compatibility)
 
-To prevent the "Bootstrap Lock" (where the server fails to start because of a bad migration), follow these hard rules for JSVM:
+Following the "Great Migration" in v0.23, the JSVM API changed significantly:
 
-1.  **NO POSH GLOBALS**: Functions like `unmarshal()` are NOT available in the JSVM environment. Use direct assignment: `collection.schema = [ ... ]`.
-2.  **STRICT SIGNATURES**: Always use `migrate((db) => { ... }, (db) => { ... })`. The `(app)` signature is deprecated and can cause panics.
-3.  **TRUST NO ONE**: Wrap all migration logic in a `try-catch` block.
+1.  **NO POSH GLOBALS**: Classes like `Dao`, `Collection`, and `SchemaField` are NOT available globally. Do not use `new Dao(db)`.
+2.  **STRICT SIGNATURES**: Always use `migrate((app) => { ... }, (app) => { ... })`. The `(db)` signature is legacy and will crash v0.26.
+3.  **APP API OVER DAO**: Perform all operations through the `app` instance:
+    *   `app.findCollectionByNameOrId("name")`
+    *   `app.saveCollection(col)`
+    *   `app.onRecordBeforeCreateRequest(...)` for hooks.
+4.  **FIELDS API**: Use `collection.fields.add({ ... })` or `collection.fields.getByName("name")` instead of raw array manipulation of `collection.schema`.
+5.  **TRUST NO ONE**: Wrap all migration logic in a `try-catch` block.
     *   **FAIL LOUD** in logs: `console.log("Migration failed: " + e)`.
-    *   **FAIL SOFT** in execution: `return null` (instead of throwing). This allows the server to finish booting so the API stays online.
-4.  **RAW OBJECTS PREFERRED**: While `new SchemaField()` exists, raw JSON-like arrays are more portable across PocketBase minor versions (v0.22 vs v0.23).
-5.  **SYSTEM FIELDS ARE SACRED**: Never redefine the `id` field in a manual migration unless you are a PocketBase wizard. Redefining `id` often breaks autogeneration and causes "Cannot be blank" errors on creation.
+    *   **FAIL SOFT** in execution: `return null` (instead of throwing). This prevents "Bootstrap Lock".
+6.  **SYSTEM FIELDS ARE SACRED**: Never redefine the `id` field. PocketBase v0.23+ handles system fields automatically.
 
 ## 3. Project Roadmap
 

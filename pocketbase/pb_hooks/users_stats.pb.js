@@ -5,7 +5,7 @@
  * Sanitizes incoming data before record creation to prevent validation errors.
  * Refactored for PocketBase v0.26 compatibility.
  */
-app.onRecordBeforeCreateRequest((e) => {
+onRecordCreateRequest((e) => {
     const defaults = {
         character_name: "Unnamed Hero",
         class_name: "Commoners",

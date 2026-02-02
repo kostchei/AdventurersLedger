@@ -6,6 +6,7 @@ import CharacterStats from '../components/CharacterStats';
 import FactionRenown from '../components/FactionRenown';
 import DivinePiety from '../components/DivinePiety';
 import { useAuthStore } from '../store/authStore';
+import type { PBUser, UserStats } from '../types';
 
 export default function CharacterStatsPage() {
     const { campaignId, statsId } = useParams<{ campaignId: string; statsId?: string }>();
@@ -13,11 +14,13 @@ export default function CharacterStatsPage() {
     const { user: currentUser } = useAuthStore();
 
     // Fetch character stats to find out which user it belongs to
-    const { data: stats, isLoading: isStatsLoading } = useQuery({
+    type UserStatsRecord = UserStats & { expand?: { user?: PBUser } };
+
+    const { data: stats, isLoading: isStatsLoading } = useQuery<UserStatsRecord | null>({
         queryKey: ['stats', statsId],
         queryFn: async () => {
             if (!statsId) return null;
-            return pb.collection('users_stats').getOne(statsId, {
+            return pb.collection('users_stats').getOne<UserStatsRecord>(statsId, {
                 expand: 'user',
             });
         },
@@ -37,6 +40,16 @@ export default function CharacterStatsPage() {
     });
 
     const displayUser = stats?.expand?.user || (targetUserId === currentUser?.id || !targetUserId ? currentUser : targetUser);
+    const displayAvatarUrl = (() => {
+        if (!displayUser) return null;
+        if ('avatarUrl' in displayUser && displayUser.avatarUrl) {
+            return displayUser.avatarUrl;
+        }
+        if ('avatar' in displayUser && displayUser.avatar) {
+            return pb.files.getURL(displayUser, displayUser.avatar);
+        }
+        return null;
+    })();
 
     const { data: campaign, isLoading: isCampaignLoading } = useQuery({
         queryKey: ['campaign', campaignId],
@@ -96,8 +109,8 @@ export default function CharacterStatsPage() {
                     <div className="relative z-10">
                         <div className="flex items-end gap-6 mb-12">
                             <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-4xl shadow-inner relative overflow-hidden group">
-                                {displayUser?.avatarUrl ? (
-                                    <img src={displayUser.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                {displayAvatarUrl ? (
+                                    <img src={displayAvatarUrl} alt="" className="w-full h-full object-cover" />
                                 ) : (
                                     '👤'
                                 )}

@@ -19,17 +19,17 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "unsafe
 app.include_router(auth_router)
 app.include_router(characters.router)
 
-# Get absolute path to frontend directory
-# Assuming main.py is in /backend/ and frontend is in /frontend/
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
+DIST_DIR = os.path.join(FRONTEND_DIR, "dist")
+USE_DIST = os.path.isdir(DIST_DIR)
 
-# Mount static files
-app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+ASSETS_DIR = os.path.join(DIST_DIR, "assets") if USE_DIST else None
 
 @app.get("/")
 async def read_root():
-    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+    base_dir = DIST_DIR if USE_DIST else FRONTEND_DIR
+    return FileResponse(os.path.join(base_dir, "index.html"))
 
 @app.get("/create-character")
 async def create_character_page():
@@ -42,3 +42,13 @@ async def character_sheet_page(character_id: int):
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "version": "0.1.0"}
+
+# Static mounts should come last so API routes win.
+if USE_DIST:
+    if ASSETS_DIR and os.path.isdir(ASSETS_DIR):
+        app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
+    # Serve the built SPA (and static assets like /vite.svg).
+    app.mount("/", StaticFiles(directory=DIST_DIR, html=True), name="frontend")
+else:
+    # Dev fallback: serve raw frontend files (requires Vite for modules).
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")

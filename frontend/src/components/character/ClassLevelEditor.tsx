@@ -7,7 +7,7 @@ interface ClassLevelEditorProps {
 }
 
 const DND_CLASSES = [
-    'Artificer', 'Barbarian', 'Bard', 'Cleric', 'Druid',
+    'Barbarian', 'Bard', 'Cleric', 'Druid',
     'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue',
     'Sorcerer', 'Warlock', 'Wizard'
 ];

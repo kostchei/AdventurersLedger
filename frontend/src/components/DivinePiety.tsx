@@ -25,7 +25,7 @@ const DEITIES: Deity[] = [
     { name: "Deneir", domain: "Writing", plane: "Elysium (Amoria)", worshipers: "Sages, scribes, students, teachers" },
     { name: "Eilistraee", domain: "Song and moonlight", plane: "Arborea (Arvandor)", worshipers: "Bladesingers, elves, performing artists" },
     { name: "Eldath", domain: "Peace", plane: "Elysium (Eronia)", worshipers: "Druids, pacifists, the dying" },
-    { name: "Gond", domain: "Craft", plane: "The Outlands", worshipers: "Artificers, crafters, engineers, inventors" },
+    { name: "Gond", domain: "Craft", plane: "The Outlands", worshipers: "Crafters, engineers, inventors" },
     { name: "Helm", domain: "Watchfulness", plane: "Mechanus", worshipers: "Explorers, Fighters, guards, Paladins" },
     { name: "Ilmater", domain: "Endurance", plane: "Bytopia (Shurrock)", worshipers: "Monks, the oppressed, the poor" },
     { name: "Kelemvor", domain: "Dead", plane: "Astral Plane (Fugue Plane)", worshipers: "Funeral workers, the dying" },

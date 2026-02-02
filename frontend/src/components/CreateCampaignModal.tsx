@@ -31,13 +31,13 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <h2 className="text-2xl font-bold text-white mb-4">Create New Campaign</h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="adnd-surface rounded-2xl p-6 w-full max-w-md mx-4">
+        <h2 className="text-2xl adnd-display text-[#2c1d0f] mb-4">Create New Campaign</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium adnd-muted mb-2">
               Campaign Name *
             </label>
             <input
@@ -51,7 +51,7 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium adnd-muted mb-2">
               Description
             </label>
             <textarea
@@ -63,7 +63,7 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
           </div>
 
           {createMutation.isError && (
-            <div className="text-red-500 text-sm">
+            <div className="text-[#b44a3a] text-sm">
               {createMutation.error instanceof Error && createMutation.error.message.includes('403')
                 ? 'You do not have permission to create campaigns.'
                 : 'Failed to create campaign. Please try again.'}
@@ -74,7 +74,7 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-secondary"
+              className="btn btn-secondary hover:bg-[#e7d3aa]"
               disabled={createMutation.isPending}
             >
               Cancel

@@ -12,8 +12,8 @@ export default function WorldState({ campaignId }: WorldStateProps) {
             <div className="space-y-6">
                 {[1, 2, 3].map(i => (
                     <div key={i}>
-                        <div className="animate-pulse h-3 w-20 bg-slate-800/50 rounded mb-3"></div>
-                        <div className="animate-pulse h-16 bg-slate-800/20 rounded-lg"></div>
+                        <div className="animate-pulse h-3 w-20 bg-[#3b2615]/40 rounded mb-3"></div>
+                        <div className="animate-pulse h-16 bg-[#3b2615]/20 rounded-lg"></div>
                     </div>
                 ))}
             </div>
@@ -22,7 +22,7 @@ export default function WorldState({ campaignId }: WorldStateProps) {
 
     if (error) {
         return (
-            <div className="p-4 bg-red-900/10 border border-red-900/30 rounded-lg text-red-500 text-xs text-center font-medium">
+            <div className="p-4 bg-[#6b2a22]/10 border border-[#7a4f24]/50 rounded-lg text-[#b44a3a] text-xs text-center font-medium">
                 The world archives are currently inaccessible.
             </div>
         );
@@ -30,7 +30,7 @@ export default function WorldState({ campaignId }: WorldStateProps) {
 
     if (!campaignId) {
         return (
-            <div className="text-slate-500 text-sm italic text-center py-8 bg-slate-900/20 rounded-lg border border-dashed border-slate-800">
+            <div className="adnd-muted text-sm italic text-center py-8 adnd-panel rounded-lg border border-dashed border-[#7a4f24]/50">
                 No campaign selected.
             </div>
         );
@@ -38,7 +38,7 @@ export default function WorldState({ campaignId }: WorldStateProps) {
 
     if (!state) {
         return (
-            <div className="text-slate-500 text-sm italic text-center py-8 bg-slate-900/20 rounded-lg border border-dashed border-slate-800">
+            <div className="adnd-muted text-sm italic text-center py-8 adnd-panel rounded-lg border border-dashed border-[#7a4f24]/50">
                 The world is currently a blank slate.
             </div>
         );
@@ -49,21 +49,21 @@ export default function WorldState({ campaignId }: WorldStateProps) {
             {/* Dungeon Progress */}
             <section>
                 <div className="flex items-center gap-2 mb-4">
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Epic Conquests</h3>
+                    <h3 className="text-[10px] font-black adnd-muted uppercase tracking-widest leading-none">Epic Conquests</h3>
                 </div>
                 <div className="space-y-2.5">
                     {state.cleared_dungeons_list.length > 0 ? (
                         state.cleared_dungeons_list.map(dungeon => (
                             <div
                                 key={dungeon}
-                                className="flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/10 p-2.5 rounded-lg group hover:bg-emerald-500/10 transition-colors"
+                                className="flex items-center gap-3 adnd-box-soft border border-[#7a4f24]/60 p-2.5 rounded-lg group hover:border-[#d8b46c] transition-colors"
                             >
-                                <span className="text-emerald-500 text-lg leading-none select-none">◈</span>
-                                <span className="text-sm font-medium text-emerald-200/80 group-hover:text-emerald-200 transition-colors">{dungeon}</span>
+                                <span className="text-[#e7c37a] text-lg leading-none select-none">◈</span>
+                                <span className="text-sm font-medium adnd-ink-light transition-colors">{dungeon}</span>
                             </div>
                         ))
                     ) : (
-                        <div className="text-xs text-slate-600 italic px-2">No legendary locales reclaimed yet.</div>
+                        <div className="text-xs adnd-muted italic px-2">No legendary locales reclaimed yet.</div>
                     )}
                 </div>
             </section>
@@ -73,14 +73,14 @@ export default function WorldState({ campaignId }: WorldStateProps) {
 
             <div className="relative">
                 <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div className="w-full border-t border-slate-800/50"></div>
+                    <div className="w-full border-t border-[#7a4f24]/40"></div>
                 </div>
                 <div className="relative flex justify-center text-[10px] font-black uppercase tracking-tighter">
-                    <span className="bg-gray-900 px-2 text-slate-700">Archives</span>
+                    <span className="bg-[#efe0bf] px-2 adnd-muted">Archives</span>
                 </div>
             </div>
 
-            <p className="text-[10px] text-slate-600 italic text-center leading-relaxed px-4">
+            <p className="text-[10px] adnd-muted italic text-center leading-relaxed px-4">
                 "The world is changed. I feel it in the water. I feel it in the earth. I smell it in the air."
             </p>
         </div>

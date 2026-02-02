@@ -1,5 +1,16 @@
 import { userStatsApi } from './pbClient';
 import { PB_URL, pb } from './pb';
+import type { UserStats } from '../types';
+
+type CreateCharacterErrorPayload = {
+    message?: string;
+    data?: Record<string, unknown>;
+};
+
+type CharacterApiError = Error & {
+    data?: Record<string, unknown>;
+    status?: number;
+};
 
 /**
  * High-level API for character stats operations, extending the base pbClient API
@@ -32,7 +43,7 @@ export const characterApi = {
     /**
      * Create a character via the custom server endpoint (robust path).
      */
-    createForCampaign: async (campaignId: string) => {
+    createForCampaign: async (campaignId: string): Promise<UserStats> => {
         if (!pb.authStore.token) {
             throw new Error('Not authenticated.');
         }
@@ -46,16 +57,16 @@ export const characterApi = {
             body: JSON.stringify({ campaign: campaignId }),
         });
 
-        const data = await response.json().catch(() => ({}));
+        const data = await response.json().catch(() => ({})) as CreateCharacterErrorPayload & Partial<UserStats>;
         if (!response.ok) {
             const message = data?.message || 'Failed to create character.';
-            const error = new Error(message) as any;
+            const error: CharacterApiError = new Error(message);
             error.data = data?.data || {};
             error.status = response.status;
             throw error;
         }
 
-        return data;
+        return data as UserStats;
     },
 
     /**

@@ -212,15 +212,15 @@ export default function HexMapViewer({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading map layer {currentZ}...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#7a4f24] mx-auto mb-4"></div>
+          <p className="adnd-muted">Loading map layer {currentZ}...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full overflow-auto bg-gray-950">
+    <div className="relative w-full h-full overflow-auto bg-[#efe0bf]">
       <canvas
         ref={canvasRef}
         width={map.imageWidth}
@@ -233,21 +233,21 @@ export default function HexMapViewer({
       />
 
       {imageLoadError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gray-900 border border-red-500/50 p-6 rounded-xl max-w-md text-center shadow-2xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="adnd-surface p-6 rounded-xl max-w-md text-center shadow-2xl">
             <div className="text-4xl mb-3">⚠️</div>
-            <h3 className="text-xl font-bold text-white mb-2">Map Load Failed</h3>
-            <p className="text-gray-400 text-sm mb-4">{imageLoadError}</p>
-            <p className="text-xs text-gray-500 italic">Verify the map URL in the database or try re-uploading the asset.</p>
+            <h3 className="text-xl adnd-display text-[#2c1d0f] mb-2">Map Load Failed</h3>
+            <p className="adnd-muted text-sm mb-4">{imageLoadError}</p>
+            <p className="text-xs adnd-muted italic">Verify the map URL in the database or try re-uploading the asset.</p>
           </div>
         </div>
       )}
 
       {isDM && hoveredHex && (
-        <div className="absolute top-4 left-4 bg-gray-900 border border-gray-700 text-white px-4 py-3 rounded-lg shadow-xl text-sm backdrop-blur-md bg-opacity-80">
-          <div className="font-bold border-b border-gray-700 pb-1 mb-1">Hex Coordinates</div>
+        <div className="absolute top-4 left-4 adnd-box px-4 py-3 rounded-lg shadow-xl text-sm backdrop-blur-md bg-opacity-80">
+          <div className="font-bold border-b border-[#7a4f24]/60 pb-1 mb-1 adnd-ink-light">Hex Coordinates</div>
           q: {hoveredHex.q}, r: {hoveredHex.r}, z: {currentZ}
-          {onHexClick && <div className="text-xs text-primary-400 mt-2 font-medium">Click to Move Party</div>}
+          {onHexClick && <div className="text-xs text-[#7a4f24] mt-2 font-medium">Click to Move Party</div>}
         </div>
       )}
     </div>

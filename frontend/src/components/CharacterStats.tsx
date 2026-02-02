@@ -52,7 +52,7 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
 
     if (error) {
         return (
-            <div className="p-4 bg-red-900/10 border border-red-900/30 rounded-lg text-red-500 text-xs text-center font-medium">
+            <div className="p-4 bg-[#6b2a22]/10 border border-[#7a4f24]/50 rounded-lg text-[#b44a3a] text-xs text-center font-medium">
                 Failed to channel character data.
             </div>
         );

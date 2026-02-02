@@ -257,24 +257,24 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="p-6 border-b border-gray-800">
-                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <span className="text-amber-500">🗺️</span> Upload Map
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <div className="adnd-surface rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
+                <div className="p-6 border-b border-[#7a4f24]/40 bg-[#efe0bf]">
+                    <h2 className="text-xl adnd-display text-[#2c1d0f] flex items-center gap-2">
+                        <span className="text-[#7a4f24]">🗺️</span> Upload Map
                     </h2>
-                    <p className="text-gray-400 text-sm mt-1">Upload a map to expand your campaign world.</p>
+                    <p className="adnd-muted text-sm mt-1">Upload a map to expand your campaign world.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {error && (
-                        <div className="p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-400 text-sm">
+                        <div className="p-3 bg-[#6b2a22]/20 border border-[#7a4f24]/60 rounded-lg text-[#b44a3a] text-sm">
                             {error}
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Map Image</label>
+                        <label className="block text-sm font-medium adnd-muted mb-1">Map Image</label>
                         <input
                             type="file"
                             ref={fileInputRef}
@@ -284,32 +284,32 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                         />
                         <div
                             onClick={() => fileInputRef.current?.click()}
-                            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${file ? 'border-amber-500/50 bg-amber-500/5' : 'border-gray-700 hover:border-gray-600'
+                            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${file ? 'border-[#7a4f24]/80 bg-[#f0dcb4]' : 'border-[#7a4f24]/40 hover:border-[#7a4f24]'
                                 }`}
                         >
                             {file ? (
                                 <div className="space-y-1">
-                                    <p className="text-white font-medium">{file.name}</p>
-                                    <p className="text-gray-500 text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                                    <p className="adnd-ink font-medium">{file.name}</p>
+                                    <p className="adnd-muted text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                                     {dimensions && (
-                                        <p className="text-amber-500 text-xs font-mono">{dimensions.width}x{dimensions.height}px</p>
+                                        <p className="text-[#7a4f24] text-xs font-mono">{dimensions.width}x{dimensions.height}px</p>
                                     )}
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    <p className="text-gray-300">Click to select a file</p>
-                                    <p className="text-gray-500 text-xs">PNG, WebP, or JPEG (max 20MB)</p>
+                                    <p className="adnd-ink">Click to select a file</p>
+                                    <p className="adnd-muted text-xs">PNG, WebP, or JPEG (max 20MB)</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {dimensions && previewUrl && (
-                        <div className="space-y-4 rounded-xl border border-gray-800 bg-slate-900/40 p-4">
+                        <div className="space-y-4 rounded-xl border border-[#7a4f24]/60 bg-[#f0dcb4] p-4">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 className="text-sm font-semibold text-white">Step 1 · Calibrate the scale</h3>
-                                    <p className="text-xs text-slate-400">
+                                    <h3 className="text-sm font-semibold adnd-ink">Step 1 · Calibrate the scale</h3>
+                                    <p className="text-xs adnd-muted">
                                         Click the two ends of the horizontal scale bar (the 100/500 mile markers) so
                                         we can calculate pixels per mile.
                                     </p>
@@ -317,7 +317,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                                 <button
                                     type="button"
                                     onClick={resetCalibration}
-                                    className="text-[10px] uppercase tracking-widest text-indigo-400 transition-opacity hover:opacity-80"
+                                    className="text-[10px] uppercase tracking-widest text-[#7a4f24] transition-opacity hover:opacity-80"
                                 >
                                     Reset line
                                 </button>
@@ -326,7 +326,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                             <div
                                 ref={previewRef}
                                 onClick={handleCalibrationClick}
-                                className="relative flex items-center justify-center rounded-lg border border-gray-700 bg-black/70 p-2 text-xs text-white/60 transition-colors hover:border-white/40 hover:bg-black/90 cursor-crosshair"
+                                className="relative flex items-center justify-center rounded-lg border border-[#7a4f24]/70 bg-[#24160c] p-2 text-xs text-[#f3e5c5]/70 transition-colors hover:border-[#d8b46c] cursor-crosshair"
                                 style={{ minHeight: '220px' }}
                             >
                                 <img
@@ -367,7 +367,7 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                                         )}
                                     </svg>
                                 )}
-                                <div className="absolute bottom-3 left-3 text-[11px] text-white/70">
+                                <div className="absolute bottom-3 left-3 text-[11px] text-[#f3e5c5]/80">
                                     {!calibrationPoints.start
                                         ? 'Click the first endpoint'
                                         : !calibrationPoints.end
@@ -378,30 +378,30 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
 
                             <div className="grid grid-cols-2 gap-3 text-[11px]">
                                 <label className="space-y-1 text-left">
-                                    <span className="text-xs text-slate-400">Measured miles for the line</span>
+                                    <span className="text-xs adnd-muted">Measured miles for the line</span>
                                     <input
                                         type="number"
                                         min={1}
                                         step={1}
                                         value={scaleMilesInput}
                                         onChange={(e) => setScaleMilesInput(e.target.value)}
-                                        className="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white"
+                                        className="w-full adnd-input rounded px-3 py-2 text-sm"
                                     />
                                 </label>
                                 <label className="space-y-1 text-left">
-                                    <span className="text-xs text-slate-400">Target hex width (across flats)</span>
+                                    <span className="text-xs adnd-muted">Target hex width (across flats)</span>
                                     <input
                                         type="number"
                                         min={1}
                                         step={0.5}
                                         value={milesPerHexInput}
                                         onChange={(e) => setMilesPerHexInput(e.target.value)}
-                                        className="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white"
+                                        className="w-full adnd-input rounded px-3 py-2 text-sm"
                                     />
                                 </label>
                             </div>
 
-                            <div className="flex flex-wrap gap-3 text-[11px] text-slate-300">
+                            <div className="flex flex-wrap gap-3 text-[11px] adnd-muted">
                                 <span>Pixels/mile: {pixelsPerMile ? pixelsPerMile.toFixed(2) : '—'}</span>
                                 <span>Hex radius (px): {hexSizePx ? hexSizePx.toFixed(1) : '—'}</span>
                                 <span>Columns: {derivedLayout?.columns ?? '—'}</span>
@@ -415,14 +415,14 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
+                            className="flex-1 px-4 py-2 border border-[#7a4f24]/60 text-[#2c1d0f] rounded-lg hover:bg-[#e7d3aa] transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!file || isUploading || !isCalibrated}
-                            className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
+                            className="flex-1 px-4 py-2 bg-[#3b2615] text-[#f3e5c5] rounded-lg hover:bg-[#4b311a] disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
                         >
                             {isUploading ? 'Uploading...' : 'Upload Map'}
                         </button>

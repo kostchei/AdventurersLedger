@@ -35,20 +35,20 @@ export default function AuthCallback() {
   }, [searchParams, isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <div className="card max-w-md w-full mx-4 text-center">
+    <div className="min-h-screen flex items-center justify-center adnd-page">
+      <div className="adnd-surface max-w-md w-full mx-4 text-center rounded-2xl p-8">
         {error ? (
           <>
-            <div className="text-red-500 text-5xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-white mb-2">Authentication Error</h2>
-            <p className="text-gray-400">{error}</p>
-            <p className="text-sm text-gray-500 mt-4">Redirecting to login...</p>
+            <div className="text-[#b44a3a] text-5xl mb-4">⚠️</div>
+            <h2 className="text-2xl adnd-display text-[#2c1d0f] mb-2">Authentication Error</h2>
+            <p className="adnd-muted">{error}</p>
+            <p className="text-sm adnd-muted mt-4">Redirecting to login...</p>
           </>
         ) : (
           <>
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-500 mx-auto mb-4"></div>
-            <h2 className="text-2xl font-bold text-white mb-2">Completing Sign In</h2>
-            <p className="text-gray-400">Please wait while we log you in...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#7a4f24] mx-auto mb-4"></div>
+            <h2 className="text-2xl adnd-display text-[#2c1d0f] mb-2">Completing Sign In</h2>
+            <p className="adnd-muted">Please wait while we log you in...</p>
           </>
         )}
       </div>

@@ -41,9 +41,13 @@ prisma/migrations/
 # PocketBase
 pocketbase/bin/
 pocketbase/pb_data/
+pocketbase/pb_data_*/
 pocketbase/pb_public/
 pocketbase/cloudflared/
+pocketbase/downloaded_backups/
 pocketbase.exe
+pocketbase/pocketbase_*.exe
+pocketbase/pocketbase_*/
 *.zip
 
 # Secrets
@@ -53,6 +57,7 @@ secrets/
 # Temporary files
 tmp/
 temp/
+temp_auth.json
 
 # OAuth migrations with credentials
 pocketbase/pb_migrations/*oauth*.js

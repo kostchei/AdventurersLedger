@@ -103,42 +103,11 @@ export default function CampaignPage() {
 
     try {
       setCreatingChar(true);
-      const characterData = {
-        user: user.id, // Assign to current user (likely GM) initially
-        campaign: campaignId, // Scope to current campaign
-        character_name: "Unnamed Hero",
-        class_name: "Commoner",
-        species: "Human",
-        background: "None",
-        hp: 10,
-        max_hp: 10,
-        strength: 10,
-        dexterity: 10,
-        constitution: 10,
-        intelligence: 10,
-        wisdom: 10,
-        charisma: 10,
-        xp: 0,
-        gold: 0,
-        conditions: [],
-        factions: {},
-        piety_deity: "",
-        piety_score: 0,
-        levels: {},
-        spells: [],
-        feats: [],
-        bastion: [],
-        inventory: []
-      };
-
-      // Paranoid check: Ensure 'id' is not present
-      if ('id' in characterData) {
-        delete (characterData as any).id;
+      if (!campaignId) {
+        throw new Error('Missing campaign id.');
       }
 
-      console.log('Sending Character Creation Payload:', JSON.stringify(characterData, null, 2));
-
-      const newChar = await characterApi.create(characterData as any);
+      const newChar = await characterApi.createForCampaign(campaignId);
       await refetchCharacters();
       navigate(`/campaign/${campaignId}/stats/${newChar.id}`);
     } catch (error: any) {

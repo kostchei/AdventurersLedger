@@ -19,7 +19,7 @@ This document is the single source of truth for the TaleKeeper infrastructure, d
              │ Encrypted Tunnel
              ↓
 ┌─────────────────────────┐
-│  PocketBase (GCP VM)    │ ← localhost:8090
+│  PocketBase (GCP VM)    │ ← remote
 │  e2-micro Always Free   │
 └─────────────────────────┘
 ```

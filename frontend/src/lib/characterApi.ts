@@ -1,4 +1,5 @@
 import { userStatsApi } from './pbClient';
+import { PB_URL, pb } from './pb';
 
 /**
  * High-level API for character stats operations, extending the base pbClient API
@@ -26,6 +27,35 @@ export const characterApi = {
      */
     getAllCharacters: async () => {
         return userStatsApi.getAll();
+    },
+
+    /**
+     * Create a character via the custom server endpoint (robust path).
+     */
+    createForCampaign: async (campaignId: string) => {
+        if (!pb.authStore.token) {
+            throw new Error('Not authenticated.');
+        }
+
+        const response = await fetch(`${PB_URL}/api/characters/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': pb.authStore.token,
+            },
+            body: JSON.stringify({ campaign: campaignId }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            const message = data?.message || 'Failed to create character.';
+            const error = new Error(message) as any;
+            error.data = data?.data || {};
+            error.status = response.status;
+            throw error;
+        }
+
+        return data;
     },
 
     /**

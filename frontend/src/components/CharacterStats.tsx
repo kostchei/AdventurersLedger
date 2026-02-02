@@ -68,36 +68,11 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                 {isDM && (
                     <button
                         onClick={async () => {
-                            if (!userId) return;
                             try {
-                                await characterApi.create({
-                                    user: userId,
-                                    campaign: campaignId || "", // Scoped to campaign
-                                    hp: 10,
-                                    max_hp: 10,
-                                    strength: 10,
-                                    dexterity: 10,
-                                    constitution: 10,
-                                    intelligence: 10,
-                                    wisdom: 10,
-                                    charisma: 10,
-                                    gold: 150, // Default 150gp as requested
-                                    xp: 0,
-                                    conditions: [],
-                                    factions: {},
-                                    piety_deity: null,
-                                    piety_score: 0,
-
-                                    levels: {},
-                                    inventory: [],
-                                    character_name: "Unnamed Hero",
-                                    class_name: "Commoner",
-                                    species: "Human",
-                                    background: "None",
-                                    spells: [],
-                                    feats: [],
-                                    bastion: []
-                                });
+                                if (!campaignId) {
+                                    throw new Error('Missing campaign id.');
+                                }
+                                await characterApi.createForCampaign(campaignId);
                             } catch (err) {
                                 console.error('Failed to create ledger:', err);
                                 alert('Failed to create ledger record.');

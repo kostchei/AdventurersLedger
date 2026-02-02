@@ -14,15 +14,15 @@ const FACTIONS = [
 ];
 
 const getRank = (renown: number) => {
-    if (renown >= 50) return { title: 'Exalted', color: 'text-amber-400' };
-    if (renown >= 40) return { title: 'Commander', color: 'text-indigo-400' };
-    if (renown >= 30) return { title: 'Leader', color: 'text-emerald-400' };
-    if (renown >= 25) return { title: 'Veteran', color: 'text-blue-400' };
-    if (renown >= 15) return { title: 'Senior Agent', color: 'text-slate-300' };
-    if (renown >= 10) return { title: 'Agent', color: 'text-slate-400' };
-    if (renown >= 5) return { title: 'Operative', color: 'text-slate-500' };
-    if (renown >= 3) return { title: 'Associate', color: 'text-slate-600' };
-    return { title: 'Stranger', color: 'text-slate-700' };
+    if (renown >= 50) return { title: 'Exalted', color: 'text-[#e7c37a]' };
+    if (renown >= 40) return { title: 'Commander', color: 'text-[#d4bf93]' };
+    if (renown >= 30) return { title: 'Leader', color: 'text-[#c9a361]' };
+    if (renown >= 25) return { title: 'Veteran', color: 'text-[#b68a50]' };
+    if (renown >= 15) return { title: 'Senior Agent', color: 'text-[#d4bf93]' };
+    if (renown >= 10) return { title: 'Agent', color: 'text-[#c9b087]' };
+    if (renown >= 5) return { title: 'Operative', color: 'text-[#b5986a]' };
+    if (renown >= 3) return { title: 'Associate', color: 'text-[#a48256]' };
+    return { title: 'Stranger', color: 'text-[#8a6a43]' };
 };
 
 export default function FactionRenown({ isDM }: FactionRenownProps) {
@@ -39,9 +39,9 @@ export default function FactionRenown({ isDM }: FactionRenownProps) {
 
     return (
         <div className="space-y-6">
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-1">Active Allegiances</h3>
+            <h3 className="text-[10px] font-black adnd-muted uppercase tracking-[0.2em] mb-4 px-1">Active Allegiances</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 adnd-scrollbar">
                 {[...FACTIONS].sort((a, b) => {
                     const renownA = factions[a] || 0;
                     const renownB = factions[b] || 0;
@@ -55,31 +55,31 @@ export default function FactionRenown({ isDM }: FactionRenownProps) {
                     return (
                         <div
                             key={faction}
-                            className={`p-4 rounded-2xl border transition-all ${renown > 0 ? 'bg-slate-800/40 border-indigo-500/30 shadow-lg shadow-indigo-500/5' : 'bg-slate-900/40 border-white/5 opacity-60 hover:opacity-100'}`}
+                            className={`p-4 rounded-2xl border transition-all ${renown > 0 ? 'adnd-box border-[#7a4f24] shadow-lg shadow-[#2a1b10]/30' : 'adnd-box-soft border-[#5c3b1d] opacity-70 hover:opacity-100'}`}
                         >
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-[10px] font-black text-white uppercase tracking-wider truncate mb-0.5">{faction}</p>
+                                    <p className="text-[10px] font-black adnd-ink-light uppercase tracking-wider truncate mb-0.5">{faction}</p>
                                     <p className={`text-[8px] font-bold uppercase tracking-widest ${rank.color}`}>{rank.title}</p>
                                 </div>
                                 <div className="text-right ml-4">
-                                    <div className="text-lg font-black text-indigo-400 font-mono leading-none">{renown}</div>
-                                    <div className="text-[8px] text-slate-600 font-black uppercase tracking-tighter">Renown</div>
+                                    <div className="text-lg font-black text-[#e7c37a] font-mono leading-none">{renown}</div>
+                                    <div className="text-[8px] adnd-muted-light font-black uppercase tracking-tighter">Renown</div>
                                 </div>
                             </div>
 
                             {isDM && (
-                                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-center gap-4">
+                                <div className="mt-4 pt-3 border-t border-[#5c3b1d]/60 flex items-center justify-center gap-4">
                                     <button
                                         onClick={() => handleUpdate(faction, -1)}
-                                        className="h-6 w-6 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 transition-all font-bold"
+                                        className="h-6 w-6 rounded-lg bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#6b2a22] transition-all font-bold"
                                     >
                                         -
                                     </button>
-                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Adjust</span>
+                                    <span className="text-[8px] font-black adnd-muted-light uppercase tracking-widest">Adjust</span>
                                     <button
                                         onClick={() => handleUpdate(faction, 1)}
-                                        className="h-6 w-6 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all font-bold"
+                                        className="h-6 w-6 rounded-lg bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#3b3a22] transition-all font-bold"
                                     >
                                         +
                                     </button>
@@ -90,7 +90,7 @@ export default function FactionRenown({ isDM }: FactionRenownProps) {
                 })}
             </div>
 
-            <p className="text-[10px] text-slate-600 italic text-center px-4 leading-relaxed mt-4">
+            <p className="text-[10px] adnd-muted italic text-center px-4 leading-relaxed mt-4">
                 Your deeds across the realm earn you influence among these powerful organizations. 10 Renown marks you as a local hero.
             </p>
         </div>

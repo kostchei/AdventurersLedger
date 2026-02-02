@@ -65,10 +65,10 @@ const AbilityScoreGrid: React.FC<AbilityScoreGridProps> = ({ stats, compact = fa
                 <div
                     key={ability.label}
                     onClick={() => startEditing(ability)}
-                    className={`flex flex-col items-center bg-slate-950/40 border border-slate-800/50 p-2 rounded-lg transition-colors hover:border-slate-700 ${isDM && onUpdate ? 'cursor-pointer hover:bg-slate-900/60 active:scale-95' : ''}`}
+                    className={`flex flex-col items-center adnd-box-soft border border-[#6b4a2b]/40 p-2 rounded-lg transition-colors ${isDM && onUpdate ? 'cursor-pointer hover:border-[#d8b46c] active:scale-95' : ''}`}
                     title={isDM ? `Click to edit ${ability.full}` : ability.full}
                 >
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest leading-none mb-1">
+                    <span className="text-[9px] adnd-muted-light font-black uppercase tracking-widest leading-none mb-1">
                         {ability.label}
                     </span>
                     {editingAbility === ability.key ? (
@@ -81,13 +81,13 @@ const AbilityScoreGrid: React.FC<AbilityScoreGridProps> = ({ stats, compact = fa
                             onChange={(e) => setEditValue(e.target.value)}
                             onBlur={handleSubmit}
                             onKeyDown={handleKeyDown}
-                            className="w-12 bg-slate-900 border border-primary-500 rounded px-1 text-sm text-center text-primary-400 font-mono focus:outline-none"
+                            className="w-12 adnd-input-dark rounded px-1 text-sm text-center font-mono focus:outline-none"
                             onClick={(e) => e.stopPropagation()}
                         />
                     ) : (
                         <div className="flex items-baseline gap-1">
-                            <span className="text-sm font-bold text-slate-200">{ability.value}</span>
-                            <span className="text-[10px] font-mono text-primary-500 font-bold bg-primary-500/10 px-1 rounded">
+                            <span className="text-sm font-bold adnd-ink-light">{ability.value}</span>
+                            <span className="text-[10px] font-mono text-[#e7c37a] font-bold bg-[#3b2615] px-1 rounded">
                                 {calculateModifier(ability.value)}
                             </span>
                         </div>

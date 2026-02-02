@@ -20,6 +20,10 @@ export default {
           900: '#7f1d1d',
         },
       },
+      fontFamily: {
+        adnd: ['"IM Fell English"', 'Garamond', 'Times New Roman', 'serif'],
+        adndDisplay: ['"Cinzel"', '"IM Fell English"', 'Garamond', 'serif'],
+      },
     },
   },
   plugins: [],

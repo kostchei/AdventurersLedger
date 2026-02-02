@@ -19,9 +19,9 @@ const HPBar: React.FC<HPBarProps> = ({ hp, maxHp, showLabel = true, isDM = false
     const hpPercent = Math.max(0, Math.min(100, (hp / maxHp) * 100));
 
     const getBarColor = () => {
-        if (hpPercent < 25) return 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]';
-        if (hpPercent < 50) return 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
-        return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
+        if (hpPercent < 25) return 'bg-[#8b3a2c] shadow-[0_0_10px_rgba(139,58,44,0.45)]';
+        if (hpPercent < 50) return 'bg-[#b06a2c] shadow-[0_0_10px_rgba(176,106,44,0.35)]';
+        return 'bg-[#7a4f24] shadow-[0_0_10px_rgba(122,79,36,0.35)]';
     };
 
     const handleSubmit = () => {
@@ -65,7 +65,7 @@ const HPBar: React.FC<HPBarProps> = ({ hp, maxHp, showLabel = true, isDM = false
         <div className="w-full">
             {showLabel && (
                 <div className="flex justify-between items-end mb-2">
-                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Vitality</span>
+                    <span className="text-[10px] font-black adnd-muted uppercase tracking-widest">Vitality</span>
                     <div className="flex items-center gap-1">
                         {/* Current HP */}
                         {isEditing ? (
@@ -79,20 +79,20 @@ const HPBar: React.FC<HPBarProps> = ({ hp, maxHp, showLabel = true, isDM = false
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onBlur={handleSubmit}
                                     onKeyDown={handleKeyDown}
-                                    className="w-12 bg-slate-900 border border-emerald-500 rounded px-1 text-sm text-center text-emerald-400 font-mono focus:outline-none"
+                                    className="w-12 adnd-input-dark rounded px-1 text-sm text-center font-mono focus:outline-none"
                                 />
                             </div>
                         ) : (
                             <span
                                 onClick={() => { if (isDM && onHPChange) { setIsEditing(true); setIsEditingMax(false); setEditValue(hp.toString()); } }}
-                                className={`text-sm font-mono text-white font-bold ${isDM && onHPChange ? 'cursor-pointer hover:text-emerald-400 transition-colors' : ''}`}
+                                className={`text-sm font-mono adnd-ink-light font-bold ${isDM && onHPChange ? 'cursor-pointer hover:text-[#d8b46c] transition-colors' : ''}`}
                                 title={isDM && onHPChange ? 'Click to edit Current HP' : undefined}
                             >
                                 {hp}
                             </span>
                         )}
 
-                        <span className="text-slate-500 mx-0.5">/</span>
+                        <span className="adnd-muted-light mx-0.5">/</span>
 
                         {/* Max HP */}
                         {isEditingMax ? (
@@ -105,30 +105,30 @@ const HPBar: React.FC<HPBarProps> = ({ hp, maxHp, showLabel = true, isDM = false
                                     onChange={(e) => setEditMaxValue(e.target.value)}
                                     onBlur={handleMaxSubmit}
                                     onKeyDown={handleMaxKeyDown}
-                                    className="w-12 bg-slate-900 border border-emerald-500 rounded px-1 text-sm text-center text-white font-mono focus:outline-none"
+                                    className="w-12 adnd-input-dark rounded px-1 text-sm text-center font-mono focus:outline-none"
                                 />
                             </div>
                         ) : (
                             <span
                                 onClick={() => { if (isDM && onMaxHPChange) { setIsEditingMax(true); setIsEditing(false); setEditMaxValue(maxHp.toString()); } }}
-                                className={`text-sm font-mono text-white font-bold ${isDM && onMaxHPChange ? 'cursor-pointer hover:text-emerald-400 transition-colors' : ''}`}
+                                className={`text-sm font-mono adnd-ink-light font-bold ${isDM && onMaxHPChange ? 'cursor-pointer hover:text-[#d8b46c] transition-colors' : ''}`}
                                 title={isDM && onMaxHPChange ? 'Click to edit Max HP' : undefined}
                             >
                                 {maxHp}
                             </span>
                         )}
-                        <span className="text-[10px] text-slate-500 ml-1">HP</span>
+                        <span className="text-[10px] adnd-muted-light ml-1">HP</span>
                     </div>
                 </div>
             )}
-            <div className="h-2.5 w-full bg-slate-900/80 rounded-full overflow-hidden border border-slate-950/50 p-[1px]">
+            <div className="h-2.5 w-full bg-[#120b06] rounded-full overflow-hidden border border-[#4b311a] p-[1px]">
                 <div
                     className={`h-full transition-all duration-700 ease-out rounded-full ${getBarColor()}`}
                     style={{ width: `${hpPercent}%` }}
                 ></div>
             </div>
             {hpPercent < 15 && (
-                <div className="mt-1 text-[9px] text-red-500 font-bold uppercase tracking-tighter animate-pulse">
+                <div className="mt-1 text-[9px] text-[#b44a3a] font-bold uppercase tracking-tighter animate-pulse">
                     Critical Condition
                 </div>
             )}

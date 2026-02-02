@@ -37,20 +37,20 @@ export default function StringListEditor({
     };
 
     return (
-        <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm">
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">{title}</h3>
+        <section className="adnd-box rounded-xl p-4">
+            <h3 className="text-[10px] font-black adnd-muted-light uppercase tracking-widest mb-3 leading-none">{title}</h3>
 
             <div className="flex flex-wrap gap-2 mb-3">
                 {(items || []).map((item, index) => (
                     <span
                         key={`${item}-${index}`}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 border border-slate-700 rounded-md text-sm text-slate-300"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1b1109] border border-[#6b4a2b]/60 rounded-md text-sm text-[#f3e5c5]"
                     >
                         {item}
                         {isDM && (
                             <button
                                 onClick={() => handleRemove(index)}
-                                className="text-slate-500 hover:text-red-400 focus:outline-none"
+                                className="text-[#c9a361] hover:text-[#e7c37a] focus:outline-none"
                                 aria-label="Remove item"
                             >
                                 ×
@@ -60,7 +60,7 @@ export default function StringListEditor({
                 ))}
 
                 {(!items || items.length === 0) && (
-                    <p className="text-[10px] text-slate-600 italic py-1">{emptyMessage}</p>
+                    <p className="text-[10px] adnd-muted-light italic py-1">{emptyMessage}</p>
                 )}
             </div>
 
@@ -72,11 +72,11 @@ export default function StringListEditor({
                         onChange={(e) => setNewItem(e.target.value)}
                         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleAdd()}
                         placeholder={placeholder}
-                        className="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50"
+                        className="flex-1 adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
                     />
                     <button
                         onClick={handleAdd}
-                        className="px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-bold rounded border border-indigo-500/20 transition-all"
+                        className="px-3 py-1 bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] text-xs font-bold rounded border border-[#7a4f24] transition-all"
                     >
                         ADD
                     </button>

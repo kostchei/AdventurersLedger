@@ -69,46 +69,46 @@ export default function CharacterStatsPage() {
 
     if (isCampaignLoading || isStatsLoading || (targetUserId && targetUserId !== currentUser?.id && isUserLoading)) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            <div className="min-h-screen flex items-center justify-center adnd-page">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#7a4f24]"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 pb-12">
+        <div className="min-h-screen adnd-page font-adnd selection:bg-[#d8b46c]/40 pb-12">
             {/* Header */}
-            <header className="h-16 bg-slate-900/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 sticky top-0 z-20">
+            <header className="h-16 bg-[#e7d3aa]/90 backdrop-blur-sm border-b border-[#3b2a18]/30 flex items-center justify-between px-6 sticky top-0 z-20">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate(`/campaign/${campaignId}`)}
-                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
+                        className="p-2 rounded-lg transition-colors text-[#6b4a2b] hover:text-[#2c1d0f] hover:bg-[#efe0bf]"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                         </svg>
                     </button>
                     <div>
-                        <h1 className="text-sm font-black uppercase tracking-[0.2em]">{campaign?.name}</h1>
-                        <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">Character Profile</p>
+                        <h1 className="text-sm adnd-display text-[#2c1d0f] uppercase tracking-[0.3em]">{campaign?.name}</h1>
+                        <p className="text-[10px] text-[#6b4a2b] font-bold uppercase tracking-[0.25em]">Character Profile</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                    <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest adnd-chip">
                         {displayUser?.id === campaign?.dmId ? 'Chronicler' : 'Adventurer'}
                     </div>
                 </div>
             </header>
 
             <main className="max-w-2xl mx-auto px-6 mt-12">
-                <div className="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                <div className="adnd-surface rounded-3xl p-8 relative overflow-hidden">
                     {/* Decorative element */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#c79c52]/15 rounded-full blur-3xl -mr-16 -mt-16"></div>
 
                     <div className="relative z-10">
                         <div className="flex items-end gap-6 mb-12">
-                            <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-4xl shadow-inner relative overflow-hidden group">
+                            <div className="h-24 w-24 rounded-2xl bg-[#e8d3a8] border border-[#3b2a18]/30 flex items-center justify-center text-4xl shadow-inner relative overflow-hidden group">
                                 {displayAvatarUrl ? (
                                     <img src={displayAvatarUrl} alt="" className="w-full h-full object-cover" />
                                 ) : (
@@ -116,27 +116,27 @@ export default function CharacterStatsPage() {
                                 )}
                             </div>
                             <div className="flex-1">
-                                <h2 className="text-3xl font-black tracking-tight text-white mb-1">
+                                <h2 className="text-3xl adnd-display text-[#2c1d0f] mb-1">
                                     {displayName}
                                 </h2>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 text-[#6b4a2b]">
                                     {displaySpecies && (
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{displaySpecies}</span>
+                                        <span className="text-xs font-bold uppercase tracking-widest">{displaySpecies}</span>
                                     )}
                                     {displaySpecies && displayClass && (
-                                        <span className="h-1 w-1 rounded-full bg-slate-700"></span>
+                                        <span className="h-1 w-1 rounded-full bg-[#8a5a2b]"></span>
                                     )}
                                     {displayClass && (
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{displayClass}</span>
+                                        <span className="text-xs font-bold uppercase tracking-widest">{displayClass}</span>
                                     )}
                                     {(displaySpecies || displayClass) && (
-                                        <span className="h-1 w-1 rounded-full bg-slate-700"></span>
+                                        <span className="h-1 w-1 rounded-full bg-[#8a5a2b]"></span>
                                     )}
-                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Level {displayLevel}</span>
+                                    <span className="text-xs font-black text-[#7a4f24] uppercase tracking-widest">Level {displayLevel}</span>
                                 </div>
                             </div>
                             {!isTargetingSelf && (
-                                <div className="text-[10px] font-black text-amber-500 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                                <div className="text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest adnd-chip">
                                     Inspecting Member
                                 </div>
                             )}
@@ -145,7 +145,7 @@ export default function CharacterStatsPage() {
                         <CharacterStats isDM={isDM} userId={stats?.user} campaignId={campaignId} statsId={statsId} />
 
                         {/* Renown & Factions Section */}
-                        <div className="mt-12 pt-8 border-t border-white/5">
+                        <div className="mt-12 pt-8 border-t adnd-divider">
                             <FactionRenown isDM={isDM} />
                         </div>
 
@@ -157,7 +157,7 @@ export default function CharacterStatsPage() {
                 <div className="mt-8 text-center">
                     <button
                         onClick={() => navigate(`/campaign/${campaignId}`)}
-                        className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-colors"
+                        className="text-[10px] font-black uppercase tracking-[0.3em] text-[#6b4a2b] hover:text-[#2c1d0f] transition-colors"
                     >
                         Return to Map View
                     </button>

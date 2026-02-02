@@ -40,12 +40,12 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
     if (loading) {
         return (
             <div className="space-y-6">
-                <div className="animate-pulse h-16 bg-slate-800/50 rounded-xl"></div>
+                <div className="animate-pulse h-16 bg-[#3b2615]/50 rounded-xl"></div>
                 <div className="grid grid-cols-2 gap-3">
-                    <div className="animate-pulse h-14 bg-slate-800/30 rounded-lg"></div>
-                    <div className="animate-pulse h-14 bg-slate-800/30 rounded-lg"></div>
+                    <div className="animate-pulse h-14 bg-[#3b2615]/40 rounded-lg"></div>
+                    <div className="animate-pulse h-14 bg-[#3b2615]/40 rounded-lg"></div>
                 </div>
-                <div className="animate-pulse h-24 bg-slate-800/20 rounded-lg"></div>
+                <div className="animate-pulse h-24 bg-[#3b2615]/30 rounded-lg"></div>
             </div>
         );
     }
@@ -60,9 +60,9 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
 
     if (!stats) {
         return (
-            <div className="text-center py-8 bg-slate-900/20 rounded-2xl border border-dashed border-white/5 px-6">
-                <div className="text-3xl mb-4 opacity-20">📭</div>
-                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-6">
+            <div className="text-center py-8 adnd-panel rounded-2xl border border-dashed border-[#7a4f24]/60 px-6">
+                <div className="text-3xl mb-4 opacity-30">📭</div>
+                <p className="adnd-muted text-xs font-bold uppercase tracking-widest mb-6">
                     No ledger entry exists for this adventurer.
                 </p>
                 {isDM && (
@@ -78,7 +78,7 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                                 alert('Failed to create ledger record.');
                             }
                         }}
-                        className="px-6 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-indigo-500/20 transition-all"
+                        className="px-6 py-2 bg-[#efe0bf] hover:bg-[#e7d3aa] text-[#2c1d0f] text-[10px] font-black uppercase tracking-widest rounded-xl border border-[#7a4f24]/50 transition-all"
                     >
                         Initialize Ledger
                     </button>
@@ -119,65 +119,65 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
     return (
         <div className="space-y-6">
             {/* Character Details Section */}
-            <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm space-y-3">
+            <section className="adnd-box rounded-xl p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                     <div>
-                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Character Name</label>
+                        <label className="text-[10px] adnd-muted-light uppercase font-black tracking-widest leading-none">Character Name</label>
                         {isDM ? (
                             <input
                                 type="text"
                                 defaultValue={stats.character_name}
                                 onBlur={(e) => handleDetailUpdate('character_name', e.target.value)}
-                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                                className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
                             />
                         ) : (
-                            <div className="text-white font-medium">{stats.character_name || "Unknown"}</div>
+                            <div className="adnd-ink-light font-medium">{stats.character_name || "Unknown"}</div>
                         )}
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Class</label>
+                        <label className="text-[10px] adnd-muted-light uppercase font-black tracking-widest leading-none">Class</label>
                         {isDM ? (
                             <input
                                 type="text"
                                 defaultValue={stats.class_name}
                                 onBlur={(e) => handleDetailUpdate('class_name', e.target.value)}
-                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                                className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
                             />
                         ) : (
-                            <div className="text-white font-medium">{stats.class_name || "Commoner"}</div>
+                            <div className="adnd-ink-light font-medium">{stats.class_name || "Commoner"}</div>
                         )}
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Species</label>
+                        <label className="text-[10px] adnd-muted-light uppercase font-black tracking-widest leading-none">Species</label>
                         {isDM ? (
                             <input
                                 type="text"
                                 defaultValue={stats.species}
                                 onBlur={(e) => handleDetailUpdate('species', e.target.value)}
-                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                                className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
                             />
                         ) : (
-                            <div className="text-white font-medium">{stats.species || "Human"}</div>
+                            <div className="adnd-ink-light font-medium">{stats.species || "Human"}</div>
                         )}
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">Background</label>
+                        <label className="text-[10px] adnd-muted-light uppercase font-black tracking-widest leading-none">Background</label>
                         {isDM ? (
                             <input
                                 type="text"
                                 defaultValue={stats.background}
                                 onBlur={(e) => handleDetailUpdate('background', e.target.value)}
-                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-white font-medium text-sm focus:outline-none focus:border-indigo-500"
+                                className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
                             />
                         ) : (
-                            <div className="text-white font-medium">{stats.background || "None"}</div>
+                            <div className="adnd-ink-light font-medium">{stats.background || "None"}</div>
                         )}
                     </div>
                 </div>
             </section>
 
             {/* Vitality */}
-            <section className="bg-slate-800/30 border border-slate-800/50 rounded-xl p-4 shadow-sm backdrop-blur-sm flex justify-between items-center">
+            <section className="adnd-box rounded-xl p-4 flex justify-between items-center">
                 <HPBar
                     hp={stats.hp}
                     maxHp={stats.max_hp}
@@ -193,9 +193,9 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                 {/* Gold Card */}
                 <div
                     onClick={() => startEditing('gold', stats.gold)}
-                    className={`bg-slate-800/20 border border-slate-800/40 p-3 rounded-lg text-center transition-all ${isDM ? 'cursor-pointer hover:border-amber-500/50 hover:bg-slate-800/30 active:scale-95' : ''}`}
+                    className={`adnd-box rounded-lg p-3 text-center transition-all ${isDM ? 'cursor-pointer hover:border-[#d8b46c] active:scale-95' : ''}`}
                 >
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5 leading-none">Gold Pieces</div>
+                    <div className="text-[10px] adnd-muted-light uppercase font-black tracking-widest mb-1.5 leading-none">Gold Pieces</div>
                     {editingStat === 'gold' ? (
                         <input
                             autoFocus
@@ -204,12 +204,12 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                             onChange={(e: ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                             onBlur={handleStatSubmit}
                             onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleStatSubmit()}
-                            className="w-full bg-slate-900 border border-amber-500 rounded px-1 text-sm text-center text-amber-400 font-mono focus:outline-none"
+                            className="w-full adnd-input-dark rounded px-1 text-sm text-center font-mono focus:outline-none"
                         />
                     ) : (
-                        <div className="text-amber-400 font-mono text-xl font-bold flex items-baseline justify-center gap-1">
+                        <div className="text-[#e7c37a] font-mono text-xl font-bold flex items-baseline justify-center gap-1">
                             {stats.gold}
-                            <span className="text-[10px] text-amber-500/60 uppercase font-black">gp</span>
+                            <span className="text-[10px] text-[#c9a361] uppercase font-black">gp</span>
                         </div>
                     )}
                 </div>
@@ -217,9 +217,9 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                 {/* XP Card */}
                 <div
                     onClick={() => startEditing('xp', stats.xp)}
-                    className={`bg-slate-800/20 border border-slate-800/40 p-3 rounded-lg text-center transition-all ${isDM ? 'cursor-pointer hover:border-primary-500/50 hover:bg-slate-800/30 active:scale-95' : ''}`}
+                    className={`adnd-box rounded-lg p-3 text-center transition-all ${isDM ? 'cursor-pointer hover:border-[#d8b46c] active:scale-95' : ''}`}
                 >
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5 leading-none">XP / Level</div>
+                    <div className="text-[10px] adnd-muted-light uppercase font-black tracking-widest mb-1.5 leading-none">XP / Level</div>
                     {editingStat === 'xp' ? (
                         <input
                             autoFocus
@@ -228,12 +228,12 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                             onChange={(e: ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                             onBlur={handleStatSubmit}
                             onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleStatSubmit()}
-                            className="w-full bg-slate-900 border border-primary-500 rounded px-1 text-sm text-center text-primary-400 font-mono focus:outline-none"
+                            className="w-full adnd-input-dark rounded px-1 text-sm text-center font-mono focus:outline-none"
                         />
                     ) : (
-                        <div className="text-primary-400 font-mono text-xl font-bold flex items-baseline justify-center gap-1">
+                        <div className="text-[#d99a5a] font-mono text-xl font-bold flex items-baseline justify-center gap-1">
                             {stats.xp}
-                            <span className="text-[10px] text-primary-500/60 uppercase font-black">xp</span>
+                            <span className="text-[10px] text-[#c08143] uppercase font-black">xp</span>
                         </div>
                     )}
                 </div>
@@ -242,7 +242,7 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
             {/* Conditions Section */}
             {(conditions.length > 0 || isDM) && (
                 <section>
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Active Afflictions</h3>
+                    <h3 className="text-[10px] font-black adnd-muted uppercase tracking-widest mb-3 leading-none">Active Afflictions</h3>
                     <div className="flex flex-wrap gap-1.5 items-start">
                         {conditions.map((condition: string) => (
                             <ConditionBadge
@@ -300,7 +300,7 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
 
             {/* Class Levels Section */}
             <section>
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Class Levels</h3>
+                <h3 className="text-[10px] font-black adnd-muted uppercase tracking-widest mb-3 leading-none">Class Levels</h3>
                 <ClassLevelEditor
                     levels={stats.levels || {}}
                     isDM={isDM}
@@ -310,7 +310,7 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
 
             {/* Ability Scores Section */}
             <section>
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 leading-none">Attributes</h3>
+                <h3 className="text-[10px] font-black adnd-muted uppercase tracking-widest mb-3 leading-none">Attributes</h3>
                 <AbilityScoreGrid
                     stats={stats}
                     isDM={isDM}

@@ -58,11 +58,11 @@ const DEITIES: Deity[] = [
 ];
 
 const getPietyRank = (score: number) => {
-    if (score >= 50) return { title: 'Champion', color: 'text-amber-400' };
-    if (score >= 25) return { title: 'Disciple', color: 'text-indigo-400' };
-    if (score >= 10) return { title: 'Votary', color: 'text-emerald-400' };
-    if (score >= 3) return { title: 'Devotee', color: 'text-blue-400' };
-    return { title: 'Follower', color: 'text-slate-500' };
+    if (score >= 50) return { title: 'Champion', color: 'text-[#e7c37a]' };
+    if (score >= 25) return { title: 'Disciple', color: 'text-[#d4bf93]' };
+    if (score >= 10) return { title: 'Votary', color: 'text-[#c9a361]' };
+    if (score >= 3) return { title: 'Devotee', color: 'text-[#b68a50]' };
+    return { title: 'Follower', color: 'text-[#a48256]' };
 };
 
 export default function DivinePiety({ isDM }: DivinePietyProps) {
@@ -94,13 +94,13 @@ export default function DivinePiety({ isDM }: DivinePietyProps) {
     };
 
     return (
-        <div className="mt-12 pt-8 border-t border-white/5 space-y-6">
+        <div className="mt-12 pt-8 border-t adnd-divider space-y-6">
             <div className="flex items-center justify-between px-1">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Divine Piety</h3>
+                <h3 className="text-[10px] font-black adnd-muted uppercase tracking-[0.2em]">Divine Piety</h3>
                 {!isSelecting && (
                     <button
                         onClick={() => setIsSelecting(true)}
-                        className="text-[9px] font-black text-indigo-400 uppercase tracking-widest hover:text-indigo-300 transition-colors"
+                        className="text-[9px] font-black text-[#7a4f24] uppercase tracking-widest hover:text-[#2c1d0f] transition-colors"
                     >
                         {activeDeityName ? 'Change Deity' : 'Select Deity'}
                     </button>
@@ -108,7 +108,7 @@ export default function DivinePiety({ isDM }: DivinePietyProps) {
             </div>
 
             {isSelecting ? (
-                <div className="bg-slate-900/60 rounded-3xl border border-white/5 p-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="adnd-box rounded-3xl p-6 animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <input
                             autoFocus
@@ -116,67 +116,67 @@ export default function DivinePiety({ isDM }: DivinePietyProps) {
                             placeholder="Search the heavens..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="bg-transparent border-none text-sm font-bold text-white placeholder:text-slate-600 focus:outline-none w-full"
+                            className="bg-transparent border-none text-sm font-bold adnd-ink-light placeholder:text-[#a48256] focus:outline-none w-full"
                         />
-                        <button onClick={() => setIsSelecting(false)} className="text-slate-500 hover:text-white">
+                        <button onClick={() => setIsSelecting(false)} className="text-[#c9a361] hover:text-[#f3e5c5]">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
                         </button>
                     </div>
-                    <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
+                    <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto adnd-scrollbar pr-2">
                         {filteredDeities.map(deity => (
                             <button
                                 key={deity.name}
                                 onClick={() => handleDeitySelect(deity.name)}
-                                className="text-left p-3 rounded-xl bg-slate-800/20 border border-white/5 hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all group"
+                                className="text-left p-3 rounded-xl bg-[#1b1109] border border-[#5c3b1d] hover:border-[#d8b46c] transition-all group"
                             >
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-black text-white uppercase tracking-wider group-hover:text-indigo-400 transition-colors">{deity.name}</span>
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">{deity.domain}</span>
+                                    <span className="text-xs font-black adnd-ink-light uppercase tracking-wider group-hover:text-[#e7c37a] transition-colors">{deity.name}</span>
+                                    <span className="text-[9px] font-bold adnd-muted-light uppercase tracking-tighter">{deity.domain}</span>
                                 </div>
                             </button>
                         ))}
                     </div>
                 </div>
             ) : activeDeity ? (
-                <div className="p-6 bg-slate-900/40 rounded-3xl border border-indigo-500/20 shadow-xl shadow-indigo-500/5 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-700"></div>
+                <div className="p-6 adnd-box rounded-3xl border border-[#7a4f24] shadow-xl shadow-[#2a1b10]/30 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#c79c52]/15 rounded-full blur-2xl -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-700"></div>
 
                     <div className="relative flex items-center justify-between gap-6">
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-xl font-black text-white tracking-tight">{activeDeity.name}</h4>
-                                <span className="h-1 w-1 rounded-full bg-indigo-500/40"></span>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{activeDeity.domain}</span>
+                                <h4 className="text-xl font-black adnd-ink-light tracking-tight">{activeDeity.name}</h4>
+                                <span className="h-1 w-1 rounded-full bg-[#c9a361]"></span>
+                                <span className="text-[10px] font-bold adnd-muted-light uppercase tracking-[0.2em]">{activeDeity.domain}</span>
                             </div>
                             <p className={`text-[10px] font-black uppercase tracking-[0.15em] ${rank.color} mb-3`}>{rank.title}</p>
 
                             <div className="flex flex-wrap gap-x-4 gap-y-1 opacity-50">
-                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Plane: {activeDeity.plane}</span>
+                                <span className="text-[9px] font-bold adnd-muted-light uppercase tracking-widest leading-none">Plane: {activeDeity.plane}</span>
                             </div>
                         </div>
 
                         <div className="text-right">
-                            <div className="text-4xl font-black text-indigo-400 font-mono tracking-tighter leading-none mb-1">{pietyScore}</div>
-                            <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none">Piety Level</div>
+                            <div className="text-4xl font-black text-[#e7c37a] font-mono tracking-tighter leading-none mb-1">{pietyScore}</div>
+                            <div className="text-[9px] font-black adnd-muted-light uppercase tracking-widest leading-none">Piety Level</div>
                         </div>
                     </div>
 
                     {isDM && (
-                        <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-center gap-6">
+                        <div className="mt-6 pt-4 border-t border-[#5c3b1d]/60 flex items-center justify-center gap-6">
                             <button
                                 onClick={() => handlePietyUpdate(-1)}
-                                className="h-8 w-8 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 transition-all"
+                                className="h-8 w-8 rounded-xl bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#6b2a22] transition-all"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
                                 </svg>
                             </button>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Adjust Piety</span>
+                            <span className="text-[10px] font-black adnd-muted-light uppercase tracking-widest">Adjust Piety</span>
                             <button
                                 onClick={() => handlePietyUpdate(1)}
-                                className="h-8 w-8 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all font-bold"
+                                className="h-8 w-8 rounded-xl bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#3b3a22] transition-all font-bold"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
@@ -188,14 +188,14 @@ export default function DivinePiety({ isDM }: DivinePietyProps) {
             ) : (
                 <button
                     onClick={() => setIsSelecting(true)}
-                    className="w-full p-8 bg-slate-900/40 rounded-3xl border border-dashed border-slate-800 flex flex-col items-center justify-center gap-3 group hover:border-indigo-500/50 transition-all"
+                    className="w-full p-8 adnd-panel rounded-3xl border border-dashed border-[#7a4f24]/70 flex flex-col items-center justify-center gap-3 group hover:border-[#2c1d0f] transition-all"
                 >
-                    <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-600 group-hover:text-indigo-400 group-hover:bg-indigo-500/10 transition-all">
+                    <div className="h-10 w-10 rounded-full bg-[#efe0bf] flex items-center justify-center text-[#6b4a2b] group-hover:text-[#2c1d0f] transition-all">
                         ✨
                     </div>
                     <div className="text-center">
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-slate-300 transition-colors">Undevoted Journey</p>
-                        <p className="text-[9px] font-bold text-slate-700 uppercase tracking-widest mt-1">Select a deity to begin your divine path</p>
+                        <p className="text-[10px] font-black adnd-muted uppercase tracking-[0.2em] group-hover:text-[#2c1d0f] transition-colors">Undevoted Journey</p>
+                        <p className="text-[9px] font-bold adnd-muted uppercase tracking-widest mt-1">Select a deity to begin your divine path</p>
                     </div>
                 </button>
             )}

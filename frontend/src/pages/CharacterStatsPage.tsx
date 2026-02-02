@@ -46,6 +46,13 @@ export default function CharacterStatsPage() {
 
     const isDM = currentUser?.id === campaign?.dmId;
     const isTargetingSelf = stats ? stats.user === currentUser?.id : true;
+    const totalLevel = stats?.levels
+        ? Object.values(stats.levels).reduce((sum, value) => sum + value, 0)
+        : 0;
+    const displayLevel = totalLevel > 0 ? totalLevel : 1;
+    const displayName = stats?.character_name || displayUser?.name || 'Adventurer';
+    const displaySpecies = stats?.species || null;
+    const displayClass = stats?.class_name || null;
 
     if (isCampaignLoading || isStatsLoading || (targetUserId && targetUserId !== currentUser?.id && isUserLoading)) {
         return (
@@ -97,12 +104,22 @@ export default function CharacterStatsPage() {
                             </div>
                             <div className="flex-1">
                                 <h2 className="text-3xl font-black tracking-tight text-white mb-1">
-                                    {displayUser?.name || 'Unknown Legend'}
+                                    {displayName}
                                 </h2>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Heritage & Path Unknown</span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-700"></span>
-                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Level 1</span>
+                                    {displaySpecies && (
+                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{displaySpecies}</span>
+                                    )}
+                                    {displaySpecies && displayClass && (
+                                        <span className="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    )}
+                                    {displayClass && (
+                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{displayClass}</span>
+                                    )}
+                                    {(displaySpecies || displayClass) && (
+                                        <span className="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    )}
+                                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Level {displayLevel}</span>
                                 </div>
                             </div>
                             {!isTargetingSelf && (

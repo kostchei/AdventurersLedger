@@ -232,26 +232,7 @@ export default function CampaignPage() {
             </button>
           )}
 
-          <button
-            onClick={() => navigate(`/campaign/${campaignId}/stats`)}
-            className="px-3 py-1.5 bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] text-[10px] font-black uppercase tracking-widest rounded-lg border border-[#7a4f24] transition-all flex items-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-            </svg>
-            Character Profile
-          </button>
-          {isDM && (
-            <button
-              onClick={() => setIsMapManagerOpen(true)}
-              className="px-3 py-1.5 bg-[#efe0bf] hover:bg-[#e7d3aa] text-[#2c1d0f] text-[10px] font-black uppercase tracking-widest rounded-lg border border-[#7a4f24]/60 transition-all flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
-              </svg>
-              Manage Maps
-            </button>
-          )}
+
 
           {enteredWorld && (
             <button
@@ -274,15 +255,6 @@ export default function CampaignPage() {
           {!enteredWorld ? (
             <div className="absolute inset-0 flex items-center justify-center p-8 overflow-y-auto">
               <div className="max-w-4xl w-full adnd-surface rounded-3xl p-10">
-                <div className="text-center mb-12">
-                  <div className="inline-block p-4 rounded-full adnd-chip mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#f3e5c5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                  </div>
-                  <h2 className="text-3xl adnd-display text-[#2c1d0f] uppercase tracking-[0.4em] mb-4">Mission Control</h2>
-                  <p className="adnd-muted text-xs font-bold uppercase tracking-[0.2em]">Select your next stage of adventure</p>
-                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Enter World Choice */}
@@ -326,29 +298,104 @@ export default function CampaignPage() {
                       onClick={() => setIsMapManagerOpen(true)}
                       className="group relative adnd-box p-8 rounded-2xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="mb-4 text-3xl opacity-70 group-hover:opacity-100 transition-opacity">🛠️</div>
-                          <h3 className="text-lg font-black adnd-ink-light uppercase tracking-wider mb-2">Manage Cartography</h3>
-                          <p className="adnd-muted-light text-xs leading-relaxed">Modify map assets or purge ancient records.</p>
-                        </div>
-                        <div className="text-[#e7c37a] text-[10px] font-black uppercase tracking-widest border border-[#7a4f24] px-3 py-1 rounded-full bg-[#24160c] transition-colors">
-                          DM Tools
-                        </div>
+                      <div className="mb-4 text-3xl opacity-70 group-hover:opacity-100 transition-opacity">🛠️</div>
+                      <h3 className="text-lg font-black adnd-ink-light uppercase tracking-wider mb-2">Manage Cartography</h3>
+                      <p className="adnd-muted-light text-xs leading-relaxed">Modify map assets or purge ancient records.</p>
+                      <div className="mt-6 flex items-center gap-2 text-[#e7c37a] text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                        Open Maps
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
                       </div>
                     </button>
                   )}
+
+                  {/* World Log Card */}
+                  <div className="adnd-box p-8 rounded-2xl text-left md:col-span-2">
+                    <div className="mb-4 text-3xl opacity-70">📜</div>
+                    <h3 className="text-lg font-black adnd-ink-light uppercase tracking-wider mb-4">World Log</h3>
+
+                    {/* WorldState */}
+                    <div className="mb-6">
+                      <WorldState campaignId={campaignId || undefined} />
+                    </div>
+
+                    {/* Nominations */}
+                    <div className="border-t border-[#7a4f24]/40 pt-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-xs font-black adnd-muted uppercase tracking-widest">Nominations</h4>
+                        {isDM && (
+                          <button
+                            onClick={handleCopyInviteLink}
+                            className="text-[10px] bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] px-2 py-1 rounded border border-[#7a4f24] transition-all font-black uppercase tracking-tighter"
+                          >
+                            Copy Link
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-3">
+                        {nominations?.length ? (
+                          nominations.map((nomination) => {
+                            const isCurrentNominee = nomination.nominatedPlayerId === user?.id;
+                            const canAct = isCurrentNominee && nomination.status === 'PENDING';
+                            return (
+                              <div
+                                key={nomination.id}
+                                className="adnd-box rounded-xl p-3 shadow-inner"
+                              >
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <p className="text-xs font-bold adnd-ink-light">
+                                      {nomination.nominatedPlayer?.name || nomination.nominatedPlayerId}
+                                    </p>
+                                    <p className="text-[10px] adnd-muted-light uppercase font-bold tracking-tight">
+                                      By {nomination.nominatedBy?.name || nomination.nominatedById}
+                                    </p>
+                                  </div>
+                                  <span
+                                    className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${nomination.status === 'PENDING'
+                                      ? 'bg-[#3b2615] text-[#e7c37a] border-[#7a4f24]'
+                                      : 'bg-[#1b1109] text-[#d4bf93] border-[#5c3b1d]'
+                                      }`}
+                                  >
+                                    {nomination.status}
+                                  </span>
+                                </div>
+                                {canAct && (
+                                  <div className="flex items-center gap-2 mt-3">
+                                    <button
+                                      onClick={() => acceptMutation.mutate(nomination.id)}
+                                      className="px-3 py-1 bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] text-[10px] font-black uppercase rounded-lg border border-[#7a4f24] transition-all flex-1"
+                                    >
+                                      Accept
+                                    </button>
+                                    <button
+                                      onClick={() => declineMutation.mutate(nomination.id)}
+                                      className="px-3 py-1 bg-[#6b2a22]/40 hover:bg-[#6b2a22]/60 text-[#f3e5c5] text-[10px] font-black uppercase rounded-lg border border-[#7a4f24] transition-all flex-1"
+                                    >
+                                      Decline
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="text-[10px] adnd-muted italic text-center py-4 adnd-panel rounded-lg border border-dashed border-[#7a4f24]/50">
+                            No active nominations.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Unified Fellowship Management */}
+                {/* Fellowship Characters */}
                 <div className="mt-12 pt-12 border-t adnd-divider">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-xs font-black adnd-muted uppercase tracking-[0.3em]">
-                      {isDM ? 'Manage the Fellowship' : 'The Fellowship'}
-                    </h3>
+                  <div className="flex items-center justify-end mb-8">
                     <div className="flex items-center gap-4">
                       <span className="text-[10px] font-bold adnd-muted uppercase tracking-widest">
-                        {allCharacters?.length || 0} Members Present
+                        {allCharacters?.length || 0} Members
                       </span>
                       {isDM && (
                         <button
@@ -376,39 +423,33 @@ export default function CampaignPage() {
                         ? pb.files.getURL(char.expand.user, char.expand.user.avatar)
                         : null;
                       return (
-                      <button
-                        key={char.id}
-                        onClick={() => navigate(`/campaign/${campaignId}/stats/${char.id}`)}
-                        className="group flex items-center gap-4 adnd-box p-4 rounded-xl transition-all hover:border-[#d8b46c] text-left relative overflow-hidden"
-                      >
-                        {/* Class Color Strip */}
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#c79c52] to-[#7a4f24] group-hover:w-1.5 transition-all"></div>
+                        <button
+                          key={char.id}
+                          onClick={() => navigate(`/campaign/${campaignId}/stats/${char.id}`)}
+                          className="group flex items-center gap-4 adnd-box p-4 rounded-xl transition-all hover:border-[#d8b46c] text-left relative overflow-hidden"
+                        >
+                          {/* Class Color Strip */}
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#c79c52] to-[#7a4f24] group-hover:w-1.5 transition-all"></div>
 
-                        <div className="h-10 w-10 rounded-lg bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform ml-2">
-                          {avatarUrl ? (
-                            <img src={avatarUrl} alt="" className="w-full h-full rounded-lg object-cover" />
-                          ) : (
-                            '👤'
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold adnd-ink-light truncate transition-colors">
-                            {char.character_name || "Unnamed Hero"}
-                          </p>
-                          <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-tighter truncate">
-                            Level {Object.values(char.levels || {}).reduce((a, b) => a + b, 0) || 1} {char.class_name}
-                          </p>
-                        </div>
-                      </button>
+                          <div className="h-10 w-10 rounded-lg bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform ml-2">
+                            {avatarUrl ? (
+                              <img src={avatarUrl} alt="" className="w-full h-full rounded-lg object-cover" />
+                            ) : (
+                              '👤'
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold adnd-ink-light truncate transition-colors">
+                              {char.character_name || "Unnamed Hero"}
+                            </p>
+                            <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-tighter truncate">
+                              Level {Object.values(char.levels || {}).reduce((a, b) => a + b, 0) || 1} {char.class_name}
+                            </p>
+                          </div>
+                        </button>
                       );
                     })}
                   </div>
-                </div>
-
-                <div className="mt-12 text-center opacity-70">
-                  <p className="text-[10px] adnd-muted font-bold uppercase tracking-[0.2em] italic">
-                    "The Ledger tracks all, but the journey is yours to define."
-                  </p>
                 </div>
               </div>
             </div>
@@ -432,87 +473,6 @@ export default function CampaignPage() {
             </div>
           )}
         </div>
-
-        {/* Sidebar */}
-        <aside className="w-84 adnd-panel border-l border-[#7a4f24]/60 flex flex-col shadow-2xl z-10">
-          <div className="px-6 py-4 border-b border-[#7a4f24]/60 bg-[#efe0bf]">
-            <h3 className="text-[10px] font-black adnd-muted uppercase tracking-[0.2em]">World Log</h3>
-          </div>
-
-          <div className="p-6 space-y-8 overflow-y-auto flex-1 adnd-scrollbar">
-            <section>
-              <WorldState campaignId={campaignId || undefined} />
-            </section>
-
-            <section>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xs font-black adnd-muted uppercase tracking-widest">Nominations</h3>
-                {isDM && (
-                  <button
-                    onClick={handleCopyInviteLink}
-                    className="text-[10px] bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] px-2 py-1 rounded border border-[#7a4f24] transition-all font-black uppercase tracking-tighter"
-                  >
-                    Copy Link
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                {nominations?.length ? (
-                  nominations.map((nomination) => {
-                    const isCurrentNominee = nomination.nominatedPlayerId === user?.id;
-                    const canAct = isCurrentNominee && nomination.status === 'PENDING';
-                    return (
-                      <div
-                        key={nomination.id}
-                        className="adnd-box rounded-xl p-3 shadow-inner"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="text-xs font-bold adnd-ink-light">
-                              {nomination.nominatedPlayer?.name || nomination.nominatedPlayerId}
-                            </p>
-                            <p className="text-[10px] adnd-muted-light uppercase font-bold tracking-tight">
-                              By {nomination.nominatedBy?.name || nomination.nominatedById}
-                            </p>
-                          </div>
-                          <span
-                            className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${nomination.status === 'PENDING'
-                              ? 'bg-[#3b2615] text-[#e7c37a] border-[#7a4f24]'
-                              : 'bg-[#1b1109] text-[#d4bf93] border-[#5c3b1d]'
-                              }`}
-                          >
-                            {nomination.status}
-                          </span>
-                        </div>
-                        {canAct && (
-                          <div className="flex items-center gap-2 mt-3">
-                            <button
-                              onClick={() => acceptMutation.mutate(nomination.id)}
-                              className="px-3 py-1 bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] text-[10px] font-black uppercase rounded-lg border border-[#7a4f24] transition-all flex-1"
-                            >
-                              Accept
-                            </button>
-                            <button
-                              onClick={() => declineMutation.mutate(nomination.id)}
-                              className="px-3 py-1 bg-[#6b2a22]/40 hover:bg-[#6b2a22]/60 text-[#f3e5c5] text-[10px] font-black uppercase rounded-lg border border-[#7a4f24] transition-all flex-1"
-                            >
-                              Decline
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-[10px] adnd-muted italic text-center py-4 adnd-panel rounded-lg border border-dashed border-[#7a4f24]/50">
-                    No active nominations.
-                  </p>
-                )}
-              </div>
-            </section>
-          </div>
-        </aside>
       </div>
 
       {/* Map Manager Modal */}

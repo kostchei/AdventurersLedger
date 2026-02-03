@@ -253,8 +253,8 @@ export default function CampaignPage() {
         {/* Map Viewer or Landing Dashboard */}
         <div className="flex-1 relative overflow-auto">
           {!enteredWorld ? (
-            <div className="absolute inset-0 flex items-center justify-center p-8 overflow-y-auto">
-              <div className="max-w-4xl w-full adnd-surface rounded-3xl p-10">
+            <div className="absolute inset-0 p-8 overflow-y-auto">
+              <div className="max-w-4xl w-full adnd-surface rounded-3xl p-10 mx-auto">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Enter World Choice */}

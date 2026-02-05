@@ -10,6 +10,7 @@ interface CreateCampaignModalProps {
 export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [dndbeyondLink, setDndbeyondLink] = useState('');
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -18,6 +19,7 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setName('');
       setDescription('');
+      setDndbeyondLink('');
       onClose();
     },
   });
@@ -25,7 +27,11 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    createMutation.mutate({ name, description });
+    createMutation.mutate({
+      name,
+      description,
+      dndbeyondLink: dndbeyondLink.trim() || undefined
+    });
   };
 
   if (!isOpen) return null;
@@ -59,6 +65,19 @@ export default function CreateCampaignModal({ isOpen, onClose }: CreateCampaignM
               onChange={(e) => setDescription(e.target.value)}
               className="input min-h-[100px]"
               placeholder="A classic adventure for characters levels 1-5..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium adnd-muted mb-2">
+              D&D Beyond Campaign Link
+            </label>
+            <input
+              type="url"
+              value={dndbeyondLink}
+              onChange={(e) => setDndbeyondLink(e.target.value)}
+              className="input"
+              placeholder="https://www.dndbeyond.com/campaigns/..."
             />
           </div>
 

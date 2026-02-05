@@ -7,6 +7,8 @@ const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 const pb = new PocketBase('http://127.0.0.1:8090');
 
 async function run() {
+    console.warn("\n⚠️  WARNING: Running this script may generate auto-migration files in pb_migrations/.");
+    console.warn("⚠️  PLEASE DELETE THEM before committing if they are not intended!\n");
     console.log("Authenticating...");
     await pb.collection('_superusers').authWithPassword('antigravity@local.host', 'password123456');
     console.log("Auth successful.");

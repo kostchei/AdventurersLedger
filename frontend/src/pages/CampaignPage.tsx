@@ -320,9 +320,11 @@ export default function CampaignPage() {
                       <WorldState campaignId={campaignId || undefined} />
                     </div>
 
-                    {campaign?.dndbeyondLink && (
-                      <div className="border-t border-[#7a4f24]/40 pt-6 mb-6">
-                        <h4 className="text-xs font-black adnd-muted uppercase tracking-widest mb-3">D&D Beyond</h4>
+                    {/* D&D Beyond Section - Always rendered for visibility/debug */}
+                    <div className="border-t border-[#7a4f24]/40 pt-6 mb-6">
+                      <h4 className="text-xs font-black adnd-muted uppercase tracking-widest mb-3">D&D Beyond</h4>
+
+                      {campaign?.dndbeyondLink ? (
                         <a
                           href={campaign.dndbeyondLink}
                           target="_blank"
@@ -341,8 +343,14 @@ export default function CampaignPage() {
                             <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
                           </svg>
                         </a>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="p-4 rounded-xl border border-dashed border-[#7a4f24]/30 bg-[#1b1109]/20 text-center">
+                          <p className="text-xs adnd-muted italic">No D&D Beyond link linked.</p>
+                          {/* Debug info */}
+                          <p className="text-[9px] opacity-30 mt-1">Data: {String(campaign?.dndbeyondLink)}</p>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Nominations */}
                     <div className="border-t border-[#7a4f24]/40 pt-6">

@@ -108,6 +108,7 @@ export interface CampaignRecord extends PBBaseRecord {
   description?: string;
   active_map_id?: string;
   pending_nomination_player_id?: string;
+  dndbeyond_link?: string;
 }
 
 export interface CampaignMembershipRecord extends PBBaseRecord {

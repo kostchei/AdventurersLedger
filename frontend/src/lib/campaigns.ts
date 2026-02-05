@@ -40,6 +40,7 @@ const mapCampaignRecord = (
     membershipStatus: membership?.status,
     isPrimaryDM: membership?.is_primary_dm ?? false,
     pendingNominationPlayerId: record.pending_nomination_player_id ?? null,
+    dndbeyondLink: record.dndbeyond_link ?? null,
   };
 };
 
@@ -138,12 +139,13 @@ export const campaignApi = {
     return mapCampaignRecord(record);
   },
 
-  createCampaign: async (data: { name: string; description?: string }): Promise<Campaign> => {
+  createCampaign: async (data: { name: string; description?: string; dndbeyondLink?: string }): Promise<Campaign> => {
     const userId = requireUser();
     const record = await pb.collection('campaigns').create<CampaignRecord>({
       name: data.name,
       description: data.description,
       dmId: userId,
+      dndbeyond_link: data.dndbeyondLink,
     });
 
     await pb.collection('campaign_memberships').create({
@@ -159,12 +161,13 @@ export const campaignApi = {
 
   updateCampaign: async (
     campaignId: string,
-    data: { name?: string; description?: string; activeMapId?: string }
+    data: { name?: string; description?: string; activeMapId?: string; dndbeyondLink?: string }
   ): Promise<Campaign> => {
     const payload: Record<string, unknown> = {};
     if (data.name) payload.name = data.name;
     if (data.description !== undefined) payload.description = data.description;
     if (data.activeMapId !== undefined) payload.active_map_id = data.activeMapId;
+    if (data.dndbeyondLink !== undefined) payload.dndbeyond_link = data.dndbeyondLink;
 
     const record = await pb.collection('campaigns').update<CampaignRecord>(campaignId, payload);
     return mapCampaignRecord(record);

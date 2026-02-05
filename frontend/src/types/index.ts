@@ -24,6 +24,7 @@ export interface Campaign {
   membershipRole?: 'PLAYER' | 'GM';
   membershipStatus?: 'ACTIVE' | 'PENDING' | 'INACTIVE';
   isPrimaryDM?: boolean;
+  dndbeyondLink?: string | null;
 }
 
 export interface CampaignMember {

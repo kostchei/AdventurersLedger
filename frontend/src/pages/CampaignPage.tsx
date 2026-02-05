@@ -320,6 +320,30 @@ export default function CampaignPage() {
                       <WorldState campaignId={campaignId || undefined} />
                     </div>
 
+                    {campaign?.dndbeyondLink && (
+                      <div className="border-t border-[#7a4f24]/40 pt-6 mb-6">
+                        <h4 className="text-xs font-black adnd-muted uppercase tracking-widest mb-3">D&D Beyond</h4>
+                        <a
+                          href={campaign.dndbeyondLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 adnd-box rounded-xl p-4 hover:border-[#d8b46c] transition-all group"
+                        >
+                          <div className="h-10 w-10 rounded-lg bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">
+                            🎲
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold adnd-ink-light truncate">Join Campaign on D&D Beyond</p>
+                            <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-tighter truncate">{campaign.dndbeyondLink}</p>
+                          </div>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                          </svg>
+                        </a>
+                      </div>
+                    )}
+
                     {/* Nominations */}
                     <div className="border-t border-[#7a4f24]/40 pt-6">
                       <div className="flex justify-between items-center mb-4">

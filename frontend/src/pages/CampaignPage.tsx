@@ -88,14 +88,15 @@ export default function CampaignPage() {
 
   type UserStatsRecord = UserStats & { expand?: { user?: PBUser } };
 
-  // Fetch all characters (ignore campaign scoping for now)
+  // Fetch only the characters for this campaign
   const { data: allCharacters, refetch: refetchCharacters } = useQuery<UserStatsRecord[]>({
-    queryKey: ['characters', 'all'],
+    queryKey: ['characters', campaignId],
     queryFn: async () => {
-      const chars = await characterApi.getAllCharacters();
+      if (!campaignId) return [];
+      const chars = await characterApi.getByCampaign(campaignId);
       return chars || [];
     },
-    enabled: true,
+    enabled: !!campaignId,
   });
 
   const [creatingChar, setCreatingChar] = useState(false);

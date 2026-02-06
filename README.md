@@ -11,13 +11,13 @@ A D&D 5e campaign management and hex exploration application with unique per-pla
 ## ✨ Features
 
 -   **Session-Based Fog of War**: Each player sees only hexes from sessions they attended.
--   **D&D 5e Character Management**: Full character sheet with attributes, piety, factions, and conditions.
+-   **D&D 5e Character Management**: Full character sheet with attributes, piety, factions, and conditions. Players can keep multiple characters per campaign; DMs/GMs can view the campaign roster and manage characters from the UI (including delete).
 -   **Real-time Updates**: Socket.io integration for instant map and stat synchronization.
 -   **Persistent World**: Changes to the world (dungeons cleared, NPCs met) are tracked globally.
 
 ## 🛠️ Tech Stack
 
--   **Frontend**: React 18, Vite, TypeScript, Tailwind CSS
+-   **Frontend**: React, Vite, TypeScript, Tailwind CSS
 -   **Backend**: Node.js/Express (Legacy), PocketBase (Primary Data Store)
 -   **Infrastructure**: Azure Static Web Apps (Frontend), GCP VM (Backend)
 

@@ -36,6 +36,12 @@ We use a "GitOps" flow. **NEVER** edit the production schema manually.
 3.  **Review**: Check the file. Ensure it isn't a delete/create operation if you renamed a field.
 4.  **Commit**: Push to `main`. The CI/CD pipeline will apply it.
 
+### Character Model Rules
+-   `users_stats` records are scoped to a `campaign` and a `user`.
+-   Players may have multiple characters per campaign.
+-   Campaign DMs and global GMs/Admins can view the full roster for the campaign; players can only view their own.
+-   Deletes are allowed for the character owner, the campaign DM, and global GMs/Admins.
+
 ### 2.1 Zero-Downtime Migration Rules (v0.26 Compatibility)
 
 Following the "Great Migration" in v0.23, the JSVM API changed significantly:

@@ -70,18 +70,21 @@ export const userStatsApi = {
       try {
         const records = await pb.collection('users_stats').getList<UserStats>(1, 1, {
           filter: `${baseFilter} && campaign = "${campaignId}"`,
+          sort: '-created',
         });
         return records.items[0] ?? null;
       } catch (err) {
-        if (!shouldRetryWithoutCampaignFilter(err)) {
-          throw err;
-        }
-        console.warn('users_stats: campaign filter unsupported; retrying without campaign scoping.', err);
+        // In the wild we have seen instances where `campaign` isn't in the schema,
+        // causing PocketBase to reject the filter and breaking the whole character page.
+        // Retry without campaign scoping so "My Character" can still open something.
+        const hint = shouldRetryWithoutCampaignFilter(err) ? ' (campaign filter unsupported)' : '';
+        console.warn(`users_stats: campaign-scoped lookup failed${hint}; retrying without campaign scoping.`, err);
       }
     }
 
     const records = await pb.collection('users_stats').getList<UserStats>(1, 1, {
       filter: baseFilter,
+      sort: '-created',
     });
     return records.items[0] ?? null;
   },

@@ -88,17 +88,21 @@ export default function CampaignPage() {
 
   type UserStatsRecord = UserStats & { expand?: { user?: PBUser } };
 
-  // Fetch all characters (ignore campaign scoping for now)
+  // Fetch all characters for this campaign
   const { data: allCharacters, refetch: refetchCharacters } = useQuery<UserStatsRecord[]>({
-    queryKey: ['characters', 'all'],
+    queryKey: ['characters', campaignId],
     queryFn: async () => {
-      const chars = await characterApi.getAllCharacters();
+      if (!campaignId) return [];
+      const chars = await characterApi.getByCampaign(campaignId);
       return chars || [];
     },
-    enabled: true,
+    enabled: !!campaignId,
   });
 
   const [creatingChar, setCreatingChar] = useState(false);
+  const [myCharacterListOpen, setMyCharacterListOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<UserStatsRecord | null>(null);
+  const [deletingChar, setDeletingChar] = useState(false);
 
   const handleCreateNewCharacter = async () => {
     if (!user || creatingChar) return;
@@ -111,6 +115,7 @@ export default function CampaignPage() {
 
       const newChar = await characterApi.createForCampaign(campaignId);
       await refetchCharacters();
+      setMyCharacterListOpen(false);
       navigate(`/campaign/${campaignId}/stats/${newChar.id}`);
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error('Unknown error');
@@ -127,6 +132,38 @@ export default function CampaignPage() {
 
   const isRealDM = user?.id === campaign?.dmId;
   const isDM = isRealDM && !viewAsPlayer;
+  const isCampaignGM = Boolean(isRealDM || user?.global_role === 'GM' || user?.global_role === 'ADMIN');
+  const myCharacters = user ? (allCharacters || []).filter((c) => c.user === user.id) : [];
+  const visibleCharacters = isCampaignGM ? (allCharacters || []) : myCharacters;
+
+  const handleOpenCharacter = (statsId: string) => {
+    if (!campaignId) return;
+    setMyCharacterListOpen(false);
+    navigate(`/campaign/${campaignId}/stats/${statsId}`);
+  };
+
+  const canDeleteCharacter = (char: UserStatsRecord): boolean => {
+    if (!user) return false;
+    return isCampaignGM || char.user === user.id;
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    if (!campaignId) return;
+
+    try {
+      setDeletingChar(true);
+      await characterApi.delete(deleteTarget.id);
+      await refetchCharacters();
+      setDeleteTarget(null);
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error('Unknown error');
+      console.error('Failed to delete character:', error);
+      alert(`Failed to delete character: ${err.message}`);
+    } finally {
+      setDeletingChar(false);
+    }
+  };
 
   // Subscribe to Party Position
   useEffect(() => {
@@ -256,16 +293,16 @@ export default function CampaignPage() {
             <div className="absolute inset-0 p-8 overflow-y-auto">
               <div className="max-w-4xl w-full adnd-surface rounded-3xl p-10 mx-auto">
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Enter World Choice */}
                   <button
                     onClick={() => setEnteredWorld(true)}
-                    className="group relative adnd-panel p-8 rounded-2xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
+                    className="group relative adnd-box p-5 rounded-xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
                   >
-                    <div className="mb-4 text-3xl opacity-70 group-hover:opacity-100 transition-opacity">🌍</div>
-                    <h3 className="text-lg font-black adnd-ink uppercase tracking-wider mb-2">Enter World Map</h3>
-                    <p className="adnd-muted text-xs leading-relaxed">Venture forth into the cartographic realm. (Note: Large maps may take a moment to manifest)</p>
-                    <div className="mt-6 flex items-center gap-2 adnd-muted text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="mb-3 text-2xl opacity-70 group-hover:opacity-100 transition-opacity">🌍</div>
+                    <h3 className="text-base font-black adnd-ink-light uppercase tracking-wider mb-2">Enter World Map</h3>
+                    <p className="adnd-muted-light text-xs leading-relaxed">Venture forth into the cartographic realm. (Note: Large maps may take a moment to manifest)</p>
+                    <div className="mt-4 flex items-center gap-2 adnd-muted-light text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
                       Manifest Realm
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -278,14 +315,14 @@ export default function CampaignPage() {
 
                   {/* Character Profile Choice */}
                   <button
-                    onClick={() => navigate(`/campaign/${campaignId}/stats`)}
-                    className="group relative adnd-panel p-8 rounded-2xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
+                    onClick={() => setMyCharacterListOpen(true)}
+                    className="group relative adnd-box p-5 rounded-xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
                   >
-                    <div className="mb-4 text-3xl opacity-70 group-hover:opacity-100 transition-opacity">📜</div>
-                    <h3 className="text-lg font-black adnd-ink uppercase tracking-wider mb-2">My Character</h3>
-                    <p className="adnd-muted text-xs leading-relaxed">Consult the archives of your deeds, strength, and standing within the factions.</p>
-                    <div className="mt-6 flex items-center gap-2 adnd-muted text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                      Open Chronicle
+                    <div className="mb-3 text-2xl opacity-70 group-hover:opacity-100 transition-opacity">📜</div>
+                    <h3 className="text-base font-black adnd-ink-light uppercase tracking-wider mb-2">My Character</h3>
+                    <p className="adnd-muted-light text-xs leading-relaxed">Consult the archives of your deeds, strength, and standing within the factions.</p>
+                    <div className="mt-4 flex items-center gap-2 adnd-muted-light text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                      {myCharacters.length ? `${myCharacters.length} Chronicle${myCharacters.length === 1 ? '' : 's'}` : 'Open Chronicle'}
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
@@ -295,12 +332,12 @@ export default function CampaignPage() {
                   {isDM && (
                     <button
                       onClick={() => setIsMapManagerOpen(true)}
-                      className="group relative adnd-panel p-8 rounded-2xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
+                      className="group relative adnd-box p-5 rounded-xl transition-all hover:border-[#d8b46c] text-left active:scale-[0.98]"
                     >
-                      <div className="mb-4 text-3xl opacity-70 group-hover:opacity-100 transition-opacity">🛠️</div>
-                      <h3 className="text-lg font-black adnd-ink uppercase tracking-wider mb-2">Manage Cartography</h3>
-                      <p className="adnd-muted text-xs leading-relaxed">Modify map assets or purge ancient records.</p>
-                      <div className="mt-6 flex items-center gap-2 adnd-muted text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="mb-3 text-2xl opacity-70 group-hover:opacity-100 transition-opacity">🛠️</div>
+                      <h3 className="text-base font-black adnd-ink-light uppercase tracking-wider mb-2">Manage Cartography</h3>
+                      <p className="adnd-muted-light text-xs leading-relaxed">Modify map assets or purge ancient records.</p>
+                      <div className="mt-4 flex items-center gap-2 adnd-muted-light text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
                         Open Maps
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -310,9 +347,9 @@ export default function CampaignPage() {
                   )}
 
                   {/* World Log Card */}
-                  <div className="adnd-box p-8 rounded-2xl text-left md:col-span-2">
-                    <div className="mb-4 text-3xl opacity-70">📜</div>
-                    <h3 className="text-lg font-black adnd-ink-light uppercase tracking-wider mb-4">World Log</h3>
+                  <div className="adnd-box p-5 rounded-xl text-left md:col-span-2">
+                    <div className="mb-3 text-2xl opacity-70">📜</div>
+                    <h3 className="text-base font-black adnd-ink-light uppercase tracking-wider mb-4">World Log</h3>
 
                     {/* WorldState */}
                     <div className="mb-6">
@@ -426,41 +463,56 @@ export default function CampaignPage() {
                   <div className="flex items-center justify-end mb-8">
                     <div className="flex items-center gap-4">
                       <span className="text-[10px] font-bold adnd-muted uppercase tracking-widest">
-                        {allCharacters?.length || 0} Members
-                      </span>
-                      {isDM && (
-                        <button
-                          onClick={handleCreateNewCharacter}
-                          disabled={creatingChar}
-                          className="px-3 py-1.5 bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                          {creatingChar ? (
-                            <>
-                              <span className="animate-spin">⚔️</span> Summoning...
-                            </>
-                          ) : (
-                            <>
-                              <span>➕</span> Make New Character
-                            </>
-                          )}
-                        </button>
-                      )}
+                      {visibleCharacters.length} {isCampaignGM ? 'Characters' : 'Chronicles'}
+                    </span>
+                    <button
+                      onClick={handleCreateNewCharacter}
+                      disabled={creatingChar}
+                        className="px-3 py-1.5 bg-[#3b2615] hover:bg-[#4b311a] text-[#f3e5c5] text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {creatingChar ? (
+                          <>
+                            <span className="animate-spin">⚔️</span> Summoning...
+                          </>
+                        ) : (
+                          <>
+                            <span>➕</span> Make New Character
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {allCharacters?.map((char) => {
+                    {visibleCharacters.map((char) => {
                       const avatarUrl = char.expand?.user?.avatar
                         ? pb.files.getURL(char.expand.user, char.expand.user.avatar)
                         : null;
+                      const ownerName = char.expand?.user?.name || char.expand?.user?.username || null;
                       return (
-                        <button
+                        <div
                           key={char.id}
                           onClick={() => navigate(`/campaign/${campaignId}/stats/${char.id}`)}
-                          className="group flex items-center gap-4 adnd-box p-4 rounded-xl transition-all hover:border-[#d8b46c] text-left relative overflow-hidden"
+                          className="group flex items-center gap-4 adnd-box p-4 rounded-xl transition-all hover:border-[#d8b46c] text-left relative overflow-hidden cursor-pointer"
                         >
                           {/* Class Color Strip */}
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#c79c52] to-[#7a4f24] group-hover:w-1.5 transition-all"></div>
+
+                          {canDeleteCharacter(char) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteTarget(char);
+                              }}
+                              className="absolute top-2 right-2 h-8 w-8 rounded-lg bg-[#1b1109]/60 border border-[#7a4f24]/50 flex items-center justify-center text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#6b2a22]/70 transition-all"
+                              title="Delete character"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 100 2h1v10a2 2 0 002 2h6a2 2 0 002-2V6h1a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zm-1 6a1 1 0 012 0v7a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          )}
 
                           <div className="h-10 w-10 rounded-lg bg-[#1b1109] border border-[#7a4f24]/70 flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform ml-2">
                             {avatarUrl ? (
@@ -476,8 +528,13 @@ export default function CampaignPage() {
                             <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-tighter truncate">
                               Level {Object.values(char.levels || {}).reduce((a, b) => a + b, 0) || 1} {char.class_name}
                             </p>
+                            {isCampaignGM && ownerName && (
+                              <p className="text-[9px] adnd-muted-light font-bold uppercase tracking-widest truncate mt-1 opacity-70">
+                                {ownerName}
+                              </p>
+                            )}
                           </div>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -505,6 +562,153 @@ export default function CampaignPage() {
           )}
         </div>
       </div>
+
+      {/* My Characters Modal */}
+      {myCharacterListOpen && (
+        <div className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg adnd-surface rounded-2xl border border-[#7a4f24]/50 shadow-2xl shadow-black/30 overflow-hidden">
+            <div className="p-5 border-b adnd-divider flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-black adnd-ink-light uppercase tracking-[0.25em]">
+                  {isCampaignGM ? 'Campaign Characters' : 'My Characters'}
+                </h3>
+                <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-widest mt-1">
+                  {campaign?.name || 'Campaign'} chronicles tied to your account
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMyCharacterListOpen(false)}
+                className="h-9 w-9 rounded-xl bg-[#1b1109]/40 border border-[#7a4f24]/50 text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#1b1109]/70 transition-all flex items-center justify-center"
+                title="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-5">
+                      {(isCampaignGM ? visibleCharacters : myCharacters).length ? (
+                        <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1 adnd-scrollbar">
+                  {(isCampaignGM ? visibleCharacters : myCharacters).map((char) => {
+                    const level = Object.values(char.levels || {}).reduce((a, b) => a + b, 0) || 1;
+                    const ownerName = char.expand?.user?.name || char.expand?.user?.username || null;
+                    return (
+                      <div
+                        key={char.id}
+                        onClick={() => handleOpenCharacter(char.id)}
+                        className="adnd-box rounded-xl p-4 border border-[#7a4f24]/50 hover:border-[#d8b46c] transition-all cursor-pointer flex items-center justify-between gap-4"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-xs font-black adnd-ink-light uppercase tracking-wider truncate">
+                            {char.character_name || 'Unnamed Hero'}
+                          </p>
+                          <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-widest truncate mt-1">
+                            Level {level} {char.class_name || 'Commoner'}
+                          </p>
+                          {isCampaignGM && ownerName && (
+                            <p className="text-[9px] adnd-muted-light font-bold uppercase tracking-widest truncate mt-1 opacity-70">
+                              {ownerName}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {canDeleteCharacter(char) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteTarget(char);
+                              }}
+                              className="h-9 w-9 rounded-xl bg-[#1b1109]/40 border border-[#7a4f24]/50 text-[#d4bf93] hover:text-[#f3e5c5] hover:bg-[#6b2a22]/60 transition-all flex items-center justify-center"
+                              title="Delete character"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 100 2h1v10a2 2 0 002 2h6a2 2 0 002-2V6h1a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zm-1 6a1 1 0 012 0v7a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          )}
+                          <div className="h-9 w-9 rounded-xl bg-[#1b1109]/40 border border-[#7a4f24]/50 text-[#d4bf93] flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="adnd-panel rounded-2xl border border-dashed border-[#7a4f24]/60 p-6 text-center">
+                  <p className="text-[10px] font-black adnd-muted uppercase tracking-widest">No characters yet</p>
+                  <p className="text-[10px] adnd-muted-light mt-2 leading-relaxed">
+                    Create a new character to begin your chronicle for this campaign.
+                  </p>
+                </div>
+              )}
+
+              <div className="mt-5 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMyCharacterListOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-[#7a4f24]/60 bg-[#1b1109]/20 text-[#d4bf93] text-[10px] font-black uppercase tracking-widest hover:bg-[#1b1109]/40 transition-all"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateNewCharacter}
+                  disabled={creatingChar}
+                  className="px-4 py-2 rounded-xl border border-[#7a4f24]/60 bg-[#efe0bf] text-[#2c1d0f] text-[10px] font-black uppercase tracking-widest hover:bg-[#e7d3aa] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {creatingChar ? 'Summoning...' : 'Create New'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Character Confirmation */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <div className="w-full max-w-md adnd-surface rounded-2xl border border-[#7a4f24]/50 shadow-2xl shadow-black/40 p-6">
+            <h3 className="text-xs font-black adnd-ink-light uppercase tracking-[0.25em]">Delete Character</h3>
+            <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-widest mt-2">
+              This cannot be undone.
+            </p>
+            <div className="mt-4 adnd-box rounded-xl p-4 border border-[#7a4f24]/50">
+              <p className="text-xs font-black adnd-ink-light uppercase tracking-wider truncate">
+                {deleteTarget.character_name || 'Unnamed Hero'}
+              </p>
+              <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-widest truncate mt-1">
+                {deleteTarget.class_name || 'Commoner'}
+              </p>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deletingChar}
+                className="px-4 py-2 rounded-xl border border-[#7a4f24]/60 bg-[#1b1109]/20 text-[#d4bf93] text-[10px] font-black uppercase tracking-widest hover:bg-[#1b1109]/40 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={deletingChar}
+                className="px-4 py-2 rounded-xl border border-[#7a4f24]/60 bg-[#6b2a22]/70 text-[#f3e5c5] text-[10px] font-black uppercase tracking-widest hover:bg-[#6b2a22] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {deletingChar ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Map Manager Modal */}
       {isMapManagerOpen && (

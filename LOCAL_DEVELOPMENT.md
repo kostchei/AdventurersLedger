@@ -65,7 +65,10 @@ The app will be available at `http://localhost:5173`.
 1.  **Start Backend**: Run `./pocketbase.exe serve --http=127.0.0.1:8091`.
     -   Watch for migration logs in the console.
 2.  **Start Frontend**: Run `npm run dev`.
-3.  **Test**: Open the app, log in (create a user if needed via "Sign Up" or Admin UI), and test features like Character Creation.
+3.  **Test**: Open the app, log in (create a user if needed via "Sign Up" or Admin UI), and test:
+    -   Create multiple characters in a campaign (Campaign Hub -> "Make New Character").
+    -   Open the "My Character" tile to view your character list.
+    -   Delete a character from the UI (trash icon) and confirm it disappears.
 
 ## Common Issues
 

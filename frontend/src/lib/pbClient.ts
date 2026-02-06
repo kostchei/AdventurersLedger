@@ -58,6 +58,31 @@ const shouldRetryWithoutCampaignFilter = (err: unknown): boolean => {
   );
 };
 
+const sortByCharacterName = <T extends { character_name?: string; created?: string }>(items: T[]): T[] => {
+  // Prefer case-insensitive name sort, with created as a stable tie-breaker.
+  // Some deployments may not have character_name; in that case, it will sort by created desc.
+  return [...items].sort((a, b) => {
+    const an = (a.character_name || '').trim().toLowerCase();
+    const bn = (b.character_name || '').trim().toLowerCase();
+
+    if (an && bn) {
+      if (an < bn) return -1;
+      if (an > bn) return 1;
+    } else if (an && !bn) {
+      return -1;
+    } else if (!an && bn) {
+      return 1;
+    }
+
+    // Newest first
+    const ac = a.created || '';
+    const bc = b.created || '';
+    if (ac < bc) return 1;
+    if (ac > bc) return -1;
+    return 0;
+  });
+};
+
 /**
  * Users Stats Collection API
  */
@@ -90,18 +115,55 @@ export const userStatsApi = {
   },
 
   getByCampaign: async (campaignId: string): Promise<UserStats[]> => {
-    return pb.collection('users_stats').getFullList<UserStats>({
-      filter: `campaign = "${campaignId}"`,
-      sort: 'character_name',
-      expand: 'user',
-    });
+    // Primary: campaign-scoped list. We sort client-side to avoid 400s when a field is missing
+    // (eg. older installs without character_name).
+    try {
+      const items = await pb.collection('users_stats').getFullList<UserStats>({
+        filter: `campaign = "${campaignId}"`,
+        // Use a safe system sort and do name sorting client-side.
+        sort: '-created',
+        expand: 'user',
+      });
+      return sortByCharacterName(items);
+    } catch (err) {
+      try {
+        const items = await pb.collection('users_stats').getFullList<UserStats>({
+          filter: `campaign = "${campaignId}"`,
+          sort: '-created',
+          expand: 'user',
+        });
+        return sortByCharacterName(items);
+      } catch (err2) {
+        if (shouldRetryWithoutCampaignFilter(err2) || shouldRetryWithoutCampaignFilter(err)) {
+          console.warn('users_stats: campaign filter unsupported; falling back to client-side filtering.', err2);
+          const all = await pb.collection('users_stats').getFullList<UserStats>({
+            sort: '-created',
+            expand: 'user',
+          });
+          const filtered = all.filter((r) => (r as unknown as { campaign?: string }).campaign === campaignId);
+          return sortByCharacterName(filtered);
+        }
+        throw err2;
+      }
+    }
   },
 
   getAll: async (): Promise<UserStats[]> => {
-    return pb.collection('users_stats').getFullList<UserStats>({
-      sort: 'character_name',
-      expand: 'user',
-    });
+    try {
+      const items = await pb.collection('users_stats').getFullList<UserStats>({
+        // Use a safe system sort and do name sorting client-side.
+        sort: '-created',
+        expand: 'user',
+      });
+      return sortByCharacterName(items);
+    } catch {
+      // Last resort: return unsorted (still created desc).
+      const items = await pb.collection('users_stats').getFullList<UserStats>({
+        sort: '-created',
+        expand: 'user',
+      });
+      return items;
+    }
   },
 
   getOne: async (id: string): Promise<UserStats> => {

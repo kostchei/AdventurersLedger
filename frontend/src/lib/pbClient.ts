@@ -115,36 +115,35 @@ export const userStatsApi = {
   },
 
   getByCampaign: async (campaignId: string): Promise<UserStats[]> => {
-    // Primary: campaign-scoped list. We sort client-side to avoid 400s when a field is missing
-    // (eg. older installs without character_name).
+    // Primary: campaign-scoped list. We sort client-side to avoid 400s when a field is missing.
+    //
+    // Important: Some deployments return a generic 400 error without mentioning the missing field name.
+    // In that case we still fall back to client-side filtering to keep "My Character" usable.
     try {
       const items = await pb.collection('users_stats').getFullList<UserStats>({
         filter: `campaign = "${campaignId}"`,
-        // Use a safe system sort and do name sorting client-side.
         sort: '-created',
         expand: 'user',
       });
       return sortByCharacterName(items);
     } catch (err) {
-      try {
-        const items = await pb.collection('users_stats').getFullList<UserStats>({
-          filter: `campaign = "${campaignId}"`,
-          sort: '-created',
-          expand: 'user',
-        });
-        return sortByCharacterName(items);
-      } catch (err2) {
-        if (shouldRetryWithoutCampaignFilter(err2) || shouldRetryWithoutCampaignFilter(err)) {
-          console.warn('users_stats: campaign filter unsupported; falling back to client-side filtering.', err2);
-          const all = await pb.collection('users_stats').getFullList<UserStats>({
-            sort: '-created',
-            expand: 'user',
-          });
-          const filtered = all.filter((r) => (r as unknown as { campaign?: string }).campaign === campaignId);
-          return sortByCharacterName(filtered);
-        }
-        throw err2;
+      const anyErr = err as { status?: number };
+      const isBadRequest = anyErr?.status === 400;
+
+      if (!isBadRequest && !shouldRetryWithoutCampaignFilter(err)) {
+        throw err;
       }
+
+      console.warn('users_stats: campaign-scoped list failed; falling back to client-side filtering.', err);
+
+      // Fall back: fetch all allowed records and filter by campaign locally.
+      // Access rules still apply server-side, so this does not broaden what the user can read.
+      const all = await pb.collection('users_stats').getFullList<UserStats>({
+        sort: '-created',
+        expand: 'user',
+      });
+      const filtered = all.filter((r) => (r as unknown as { campaign?: string }).campaign === campaignId);
+      return sortByCharacterName(filtered);
     }
   },
 

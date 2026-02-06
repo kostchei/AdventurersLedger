@@ -133,8 +133,10 @@ export default function CampaignPage() {
   const isRealDM = user?.id === campaign?.dmId;
   const isDM = isRealDM && !viewAsPlayer;
   const isCampaignGM = Boolean(isRealDM || user?.global_role === 'GM' || user?.global_role === 'ADMIN');
-  const myCharacters = user ? (allCharacters || []).filter((c) => c.user === user.id) : [];
-  const visibleCharacters = isCampaignGM ? (allCharacters || []) : myCharacters;
+  // Always scope to the opened campaign in the UI, even if the backend filter is unavailable.
+  const campaignScoped = (allCharacters || []).filter((c) => !campaignId || c.campaign === campaignId);
+  const myCharacters = user ? campaignScoped.filter((c) => c.user === user.id) : [];
+  const visibleCharacters = isCampaignGM ? campaignScoped : myCharacters;
 
   const handleOpenCharacter = (statsId: string) => {
     if (!campaignId) return;

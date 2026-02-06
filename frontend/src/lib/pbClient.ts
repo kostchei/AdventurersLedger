@@ -18,6 +18,14 @@ import type {
 } from '../types/pocketbase';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 
+const getAuthContext = (): { userId: string | null; isGlobalGM: boolean } => {
+  const model = pb.authStore.model as null | { id?: string; global_role?: string };
+  const userId = typeof model?.id === 'string' ? model.id : null;
+  const role = typeof model?.global_role === 'string' ? model.global_role : '';
+  const isGlobalGM = role === 'GM' || role === 'ADMIN';
+  return { userId, isGlobalGM };
+};
+
 const shouldRetryWithoutCampaignFilter = (err: unknown): boolean => {
   const anyErr = err as {
     status?: number;
@@ -142,7 +150,21 @@ export const userStatsApi = {
         sort: '-created',
         expand: 'user',
       });
-      const filtered = all.filter((r) => (r as unknown as { campaign?: string }).campaign === campaignId);
+
+      // Legacy compatibility: older installs may have characters without a campaign field/value.
+      // In that case, we still show them so "My Character" doesn't appear empty.
+      // - Global GM/ADMIN: show all unscoped characters too.
+      // - Players: only show their own unscoped characters.
+      const { userId, isGlobalGM } = getAuthContext();
+      const filtered = all.filter((r) => {
+        const camp = (r as unknown as { campaign?: string | null }).campaign;
+        if (typeof camp === 'string' && camp.trim() !== '') {
+          return camp === campaignId;
+        }
+        if (isGlobalGM) return true;
+        if (!userId) return false;
+        return (r as unknown as { user?: string | null }).user === userId;
+      });
       return sortByCharacterName(filtered);
     }
   },

@@ -57,16 +57,18 @@ migrate(
       // Defensive rules: always guard on auth id first to avoid 400s for unauthenticated requests.
       // Security model:
       // - Players can see/update/delete their own characters.
+      // - Campaign DM (campaigns.dmId) can see/update/delete all characters in that campaign.
       // - Global GM/ADMIN can see/update/delete all.
       // - The UI additionally scopes lists to the opened campaign.
       const isAuthed = "@request.auth.id != ''";
       const isGlobalGM = "@request.auth.global_role = 'GM' || @request.auth.global_role = 'ADMIN'";
       const isOwner = "user = @request.auth.id";
+      const isCampaignDM = "campaign.dmId = @request.auth.id";
 
-      usersStats.listRule = `${isAuthed} && (${isOwner} || ${isGlobalGM})`;
-      usersStats.viewRule = `${isAuthed} && (${isOwner} || ${isGlobalGM})`;
-      usersStats.updateRule = `${isAuthed} && (${isOwner} || ${isGlobalGM})`;
-      usersStats.deleteRule = `${isAuthed} && (${isOwner} || ${isGlobalGM})`;
+      usersStats.listRule = `${isAuthed} && (${isOwner} || ${isCampaignDM} || ${isGlobalGM})`;
+      usersStats.viewRule = `${isAuthed} && (${isOwner} || ${isCampaignDM} || ${isGlobalGM})`;
+      usersStats.updateRule = `${isAuthed} && (${isOwner} || ${isCampaignDM} || ${isGlobalGM})`;
+      usersStats.deleteRule = `${isAuthed} && (${isOwner} || ${isCampaignDM} || ${isGlobalGM})`;
 
       // Allow any authenticated player to create their own character, but require a campaign.
       // (Campaign membership enforcement happens at the UI/flow level for now.)
@@ -113,4 +115,3 @@ migrate(
     }
   }
 );
-

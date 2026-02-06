@@ -134,7 +134,19 @@ export default function CampaignPage() {
   const isDM = isRealDM && !viewAsPlayer;
   const isCampaignGM = Boolean(isRealDM || user?.global_role === 'GM' || user?.global_role === 'ADMIN');
   // Always scope to the opened campaign in the UI, even if the backend filter is unavailable.
-  const campaignScoped = (allCharacters || []).filter((c) => !campaignId || c.campaign === campaignId);
+  // Legacy: characters created before the `campaign` field existed will have no campaign value.
+  // In that case:
+  // - Campaign GM: show them (can't reliably assign; treat as unscoped).
+  // - Players: show only their own unscoped characters.
+  const campaignScoped = (allCharacters || []).filter((c) => {
+    if (!campaignId) return true;
+    const camp = (c as unknown as { campaign?: string | null }).campaign;
+    if (typeof camp === 'string' && camp.trim() !== '') {
+      return camp === campaignId;
+    }
+    if (isCampaignGM) return true;
+    return Boolean(user && c.user === user.id);
+  });
   const myCharacters = user ? campaignScoped.filter((c) => c.user === user.id) : [];
   const visibleCharacters = isCampaignGM ? campaignScoped : myCharacters;
 

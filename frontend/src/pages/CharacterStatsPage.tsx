@@ -146,11 +146,11 @@ export default function CharacterStatsPage() {
 
                         {/* Renown & Factions Section */}
                         <div className="mt-12 pt-8 border-t adnd-divider">
-                            <FactionRenown isDM={isDM} />
+                            <FactionRenown isDM={isDM} statsId={statsId} campaignId={campaignId} userId={stats?.user} />
                         </div>
 
                         {/* Divine Piety Section */}
-                        <DivinePiety isDM={isDM} />
+                        <DivinePiety isDM={isDM} statsId={statsId} campaignId={campaignId} userId={stats?.user} />
                     </div>
                 </div>
 

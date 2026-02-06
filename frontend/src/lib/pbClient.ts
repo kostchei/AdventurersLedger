@@ -18,17 +18,70 @@ import type {
 } from '../types/pocketbase';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 
+const shouldRetryWithoutCampaignFilter = (err: unknown): boolean => {
+  const anyErr = err as {
+    status?: number;
+    data?: unknown;
+    message?: unknown;
+  };
+
+  // PocketBase uses HTTP 400 for invalid filter expressions / unknown fields.
+  if (anyErr?.status !== 400) return false;
+
+  const asRecord = (v: unknown): Record<string, unknown> | null =>
+    typeof v === 'object' && v !== null ? (v as Record<string, unknown>) : null;
+
+  const data = asRecord(anyErr?.data);
+  const dataMessage = typeof data?.message === 'string' ? data.message : undefined;
+  const innerData = asRecord(data?.data);
+  const innerMessage = typeof innerData?.message === 'string' ? innerData.message : undefined;
+  const msg = String(dataMessage ?? innerMessage ?? anyErr?.message ?? '').toLowerCase();
+
+  const dataStr = (() => {
+    try {
+      return JSON.stringify(anyErr?.data ?? {}).toLowerCase();
+    } catch {
+      return '';
+    }
+  })();
+
+  const haystack = `${msg} ${dataStr}`;
+
+  // Heuristic: schema mismatch where `campaign` doesn't exist (or filter parsing changed).
+  return (
+    haystack.includes('campaign') &&
+    (haystack.includes('unknown') ||
+      haystack.includes('missing') ||
+      haystack.includes('invalid') ||
+      haystack.includes('field') ||
+      haystack.includes('filter'))
+  );
+};
+
 /**
  * Users Stats Collection API
  */
 export const userStatsApi = {
   getByUserId: async (userId: string, campaignId?: string): Promise<UserStats | null> => {
-    let filter = `user = "${userId}"`;
+    const baseFilter = `user = "${userId}"`;
+
+    // Prefer campaign scoping when available; fall back if the backend schema doesn't support it.
     if (campaignId) {
-      filter += ` && campaign = "${campaignId}"`;
+      try {
+        const records = await pb.collection('users_stats').getList<UserStats>(1, 1, {
+          filter: `${baseFilter} && campaign = "${campaignId}"`,
+        });
+        return records.items[0] ?? null;
+      } catch (err) {
+        if (!shouldRetryWithoutCampaignFilter(err)) {
+          throw err;
+        }
+        console.warn('users_stats: campaign filter unsupported; retrying without campaign scoping.', err);
+      }
     }
+
     const records = await pb.collection('users_stats').getList<UserStats>(1, 1, {
-      filter: filter,
+      filter: baseFilter,
     });
     return records.items[0] ?? null;
   },

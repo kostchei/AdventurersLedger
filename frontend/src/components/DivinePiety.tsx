@@ -3,6 +3,9 @@ import { useCharacterStats } from '../hooks/useCharacterStats';
 
 interface DivinePietyProps {
     isDM: boolean;
+    statsId?: string;
+    campaignId?: string;
+    userId?: string;
 }
 
 interface Deity {
@@ -65,8 +68,8 @@ const getPietyRank = (score: number) => {
     return { title: 'Follower', color: 'text-[#a48256]' };
 };
 
-export default function DivinePiety({ isDM }: DivinePietyProps) {
-    const { stats, selectDeity, updatePiety } = useCharacterStats();
+export default function DivinePiety({ isDM, statsId, campaignId, userId }: DivinePietyProps) {
+    const { stats, selectDeity, updatePiety } = useCharacterStats(statsId, campaignId, userId);
     const [isSelecting, setIsSelecting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 

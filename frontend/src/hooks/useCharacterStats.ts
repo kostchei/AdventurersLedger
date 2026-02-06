@@ -44,7 +44,12 @@ export function useCharacterStats(statsId?: string, campaignId?: string, userId?
                         setStats(e.record);
                     }
                 } else if (effectiveUserId) {
-                    if (e.record.user === effectiveUserId && (campaignId ? e.record.campaign === campaignId : true)) {
+                    const recordCampaign = (e.record as unknown as { campaign?: string }).campaign;
+                    const campaignMatches = campaignId
+                        ? (recordCampaign ? recordCampaign === campaignId : true)
+                        : true;
+
+                    if (e.record.user === effectiveUserId && campaignMatches) {
                         setStats(e.record);
                     }
                 }

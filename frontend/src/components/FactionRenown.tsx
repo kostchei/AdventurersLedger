@@ -2,6 +2,9 @@ import { useCharacterStats } from '../hooks/useCharacterStats';
 
 interface FactionRenownProps {
     isDM: boolean;
+    statsId?: string;
+    campaignId?: string;
+    userId?: string;
 }
 
 const FACTIONS = [
@@ -25,8 +28,8 @@ const getRank = (renown: number) => {
     return { title: 'Stranger', color: 'text-[#8a6a43]' };
 };
 
-export default function FactionRenown({ isDM }: FactionRenownProps) {
-    const { stats, updateFactionRenown } = useCharacterStats();
+export default function FactionRenown({ isDM, statsId, campaignId, userId }: FactionRenownProps) {
+    const { stats, updateFactionRenown } = useCharacterStats(statsId, campaignId, userId);
 
     if (!stats) return null;
 

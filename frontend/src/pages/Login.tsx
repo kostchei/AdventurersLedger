@@ -128,7 +128,7 @@ export default function Login() {
 
         <div className="mt-8 text-center">
           <p className="adnd-muted text-xs font-medium uppercase tracking-tighter">
-            System v1.2.4 &bull; Forge v23
+            Readonly Beta v0.2 &bull; Forge v23
           </p>
         </div>
       </div>

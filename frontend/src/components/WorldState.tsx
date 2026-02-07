@@ -7,6 +7,12 @@ interface WorldStateProps {
 export default function WorldState({ campaignId }: WorldStateProps) {
     const { state, loading, error } = useWorldState(campaignId);
 
+    // `world_state` records can be created by different features and may not include all fields.
+    // Always treat missing lists as empty to avoid crashing the campaign page.
+    const clearedDungeons: string[] = Array.isArray((state as unknown as { cleared_dungeons_list?: unknown })?.cleared_dungeons_list)
+        ? ((state as unknown as { cleared_dungeons_list: string[] }).cleared_dungeons_list)
+        : [];
+
     if (loading) {
         return (
             <div className="space-y-6">
@@ -52,8 +58,8 @@ export default function WorldState({ campaignId }: WorldStateProps) {
                     <h3 className="text-[10px] font-black adnd-muted uppercase tracking-widest leading-none">Epic Conquests</h3>
                 </div>
                 <div className="space-y-2.5">
-                    {state.cleared_dungeons_list.length > 0 ? (
-                        state.cleared_dungeons_list.map(dungeon => (
+                    {clearedDungeons.length > 0 ? (
+                        clearedDungeons.map(dungeon => (
                             <div
                                 key={dungeon}
                                 className="flex items-center gap-3 adnd-box-soft border border-[#7a4f24]/60 p-2.5 rounded-lg group hover:border-[#d8b46c] transition-colors"

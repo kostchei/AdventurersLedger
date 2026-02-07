@@ -137,6 +137,14 @@ export interface CampaignNominationRecord extends PBBaseRecord {
   };
 }
 
+
+export interface CampaignLogRecord extends PBBaseRecord {
+  campaign: string;
+  created_by: string;
+  happened_on: string;
+  activity_text: string;
+}
+
 /**
  * Type helpers for PocketBase collection names
  */
@@ -148,7 +156,8 @@ export type PBCollectionName =
   | 'decals'
   | 'campaigns'
   | 'campaign_memberships'
-  | 'campaign_nominations';
+  | 'campaign_nominations'
+  | 'campaign_logs';
 
 /**
  * Map collection names to their record types
@@ -162,6 +171,7 @@ export interface PBCollectionTypes {
   campaigns: CampaignRecord;
   campaign_memberships: CampaignMembershipRecord;
   campaign_nominations: CampaignNominationRecord;
+  campaign_logs: CampaignLogRecord;
 }
 
 /**

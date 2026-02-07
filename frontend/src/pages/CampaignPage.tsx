@@ -10,6 +10,7 @@ import type { HexCoord } from '../utils/hexGrid';
 import type { CampaignNomination, MapLayer, PBUser, UserStats } from '../types';
 import MapAssetManager from '../components/MapAssetManager';
 import { characterApi } from '../lib/characterApi';
+import CampaignLogsTab from '../components/CampaignLogsTab';
 
 
 
@@ -24,6 +25,7 @@ export default function CampaignPage() {
   const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
   const [enteredWorld, setEnteredWorld] = useState(false);
+  const [activeHubTab, setActiveHubTab] = useState<'overview' | 'logs'>('overview');
   const queryClient = useQueryClient();
 
   /* Removed nominationMutation since it was unused */
@@ -307,6 +309,37 @@ export default function CampaignPage() {
             <div className="absolute inset-0 p-8 overflow-y-auto">
               <div className="max-w-4xl w-full adnd-surface rounded-3xl p-10 mx-auto">
 
+                <div className="mb-6 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveHubTab('overview')}
+                    className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${activeHubTab === 'overview'
+                      ? 'bg-[#3b2615] text-[#f3e5c5] border-[#7a4f24]'
+                      : 'bg-[#efe0bf] text-[#6b4a2b] border-[#7a4f24]/60'
+                      }`}
+                  >
+                    Campaign Hub
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveHubTab('logs')}
+                    className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all ${activeHubTab === 'logs'
+                      ? 'bg-[#3b2615] text-[#f3e5c5] border-[#7a4f24]'
+                      : 'bg-[#efe0bf] text-[#6b4a2b] border-[#7a4f24]/60'
+                      }`}
+                  >
+                    Campaign Logs
+                  </button>
+                </div>
+
+                {activeHubTab === 'logs' && (
+                  <div className="mb-6">
+                    <CampaignLogsTab campaignId={campaignId!} userId={user?.id} />
+                  </div>
+                )}
+
+                {activeHubTab === 'overview' && (
+                  <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Enter World Choice */}
                   <button
@@ -553,6 +586,8 @@ export default function CampaignPage() {
                     })}
                   </div>
                 </div>
+                  </>
+                )}
               </div>
             </div>
           ) : activeMap ? (

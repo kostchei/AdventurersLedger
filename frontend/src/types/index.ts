@@ -69,6 +69,17 @@ export interface CampaignNomination {
   };
 }
 
+
+export interface CampaignLog {
+  id: string;
+  campaignId: string;
+  createdBy: string;
+  happenedOn: string;
+  activityText: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Character {
   id: string;
   name: string;

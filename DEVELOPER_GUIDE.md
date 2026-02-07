@@ -36,6 +36,16 @@ We use a "GitOps" flow. **NEVER** edit the production schema manually.
 3.  **Review**: Check the file. Ensure it isn't a delete/create operation if you renamed a field.
 4.  **Commit**: Push to `main`. The CI/CD pipeline will apply it.
 
+
+### Database Deploy Checklist (GitHub Pipeline)
+When your feature needs schema updates (new collection/field/rule), deployment must flow through `pocketbase/pb_migrations`:
+1. Add or update migration files under `pocketbase/pb_migrations/`.
+2. Commit those files to `main` (or merge a PR into `main`).
+3. GitHub Action `.github/workflows/deploy-backend.yml` runs automatically for `pocketbase/**` changes.
+4. The action backs up `data.db`, wipes and replaces server migrations, restarts `pocketbase`, and applies migrations on boot.
+
+> Never rely on manual production admin edits for schema. They are overwritten by the deploy sync.
+
 ### Character Model Rules
 -   `users_stats` records are scoped to a `campaign` and a `user`.
 -   Players may have multiple characters per campaign.

@@ -7,7 +7,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   token: string | null;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: (nextPath?: string) => Promise<void>;
   logout: () => void;
   fetchUser: () => void;
   setUser: (user: User | null) => void;
@@ -50,14 +50,42 @@ export const useAuthStore = create<AuthState>((set) => {
     isLoading: false,
     token: initialToken,
 
-    loginWithGoogle: async () => {
+    loginWithGoogle: async (nextPath = '/dashboard') => {
       set({ isLoading: true });
       try {
-        await pb.collection('users').authWithOAuth2({
-          provider: 'google',
-          scopes: ['profile', 'email'],
-        });
-        // onChange will handle the state update
+        // Redirect-based OAuth flow (no realtime popup). This works well for join links
+        // and avoids browser popup restrictions.
+        const authMethods = await pb.collection('users').listAuthMethods();
+        const providers = authMethods?.oauth2?.providers || [];
+        const google = providers.find((p: any) => p?.name === 'google');
+        if (!google) {
+          throw new Error('Google OAuth is not enabled on the server.');
+        }
+
+        const baseAuthUrl: string | undefined = (google as any)?.authUrl || (google as any)?.authURL;
+        if (!baseAuthUrl) {
+          throw new Error('Google OAuth is not enabled on the server.');
+        }
+
+        const redirectUrl = `${window.location.origin}/auth/callback`;
+
+        // PocketBase returns authUrl with `redirect_uri=` as the last param. Append our redirect URL.
+        const authUrl = `${baseAuthUrl}${encodeURIComponent(redirectUrl)}`;
+
+        sessionStorage.setItem(
+          'tk_oauth',
+          JSON.stringify({
+            provider: 'google',
+            redirectUrl,
+            codeVerifier: (google as any).codeVerifier,
+            expectedState: (google as any).state,
+            nextPath,
+            startedAt: Date.now(),
+          })
+        );
+
+        // Leaving the page; auth will be completed in /auth/callback.
+        window.location.href = authUrl;
       } catch (error) {
         console.error('Failed to login with Google:', error);
         throw error;

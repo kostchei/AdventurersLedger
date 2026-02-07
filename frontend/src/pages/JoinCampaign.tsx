@@ -1,16 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { campaignApi } from '../lib/campaigns';
+import { useAuthStore } from '../store/authStore';
 
 export default function JoinCampaign() {
     const { campaignId } = useParams<{ campaignId: string }>();
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [isJoining, setIsJoining] = useState(true);
+    const { isAuthenticated, loginWithGoogle, isLoading } = useAuthStore();
 
     useEffect(() => {
         const join = async () => {
             if (!campaignId) return;
+
+            // If the user isn't signed in, start Google OAuth automatically and return here.
+            if (!isAuthenticated && !isLoading) {
+                await loginWithGoogle(`/campaign/${campaignId}/join`);
+                return;
+            }
+
+            if (!isAuthenticated) return;
             try {
                 await campaignApi.joinCampaign(campaignId);
                 // Small delay for thematic effect
@@ -25,7 +35,7 @@ export default function JoinCampaign() {
         };
 
         join();
-    }, [campaignId, navigate]);
+    }, [campaignId, navigate, isAuthenticated, loginWithGoogle, isLoading]);
 
     return (
         <div className="min-h-screen flex items-center justify-center adnd-page relative overflow-hidden">
@@ -43,7 +53,9 @@ export default function JoinCampaign() {
                             <div className="absolute inset-0 flex items-center justify-center text-3xl">🔮</div>
                         </div>
                         <h1 className="text-2xl adnd-display text-[#2c1d0f] tracking-tight">Stabilizing Realm Portal...</h1>
-                        <p className="adnd-muted font-medium italic">Joining the chronicle as an adventurer.</p>
+                        <p className="adnd-muted font-medium italic">
+                            {!isAuthenticated ? 'Summoning the gatekeeper (Google)...' : 'Joining the chronicle as an adventurer.'}
+                        </p>
                     </div>
                 ) : (
                     <div className="adnd-surface rounded-3xl p-8 shadow-2xl">

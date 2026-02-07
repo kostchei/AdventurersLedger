@@ -19,8 +19,8 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setError(null);
     try {
-      await loginWithGoogle();
-      navigate(from, { replace: true });
+      // loginWithGoogle() performs a redirect and completes in /auth/callback.
+      await loginWithGoogle(from);
     } catch (err: unknown) {
       console.error('Login failed:', err);
       setError(err instanceof Error ? err.message : 'Login failed. Please ensure Google OAuth is configured in PocketBase.');

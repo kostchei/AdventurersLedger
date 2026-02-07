@@ -53,9 +53,7 @@ function App() {
             <Route
               path="/campaign/:campaignId/join"
               element={
-                <ProtectedRoute>
-                  <JoinCampaign />
-                </ProtectedRoute>
+                <JoinCampaign />
               }
             />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

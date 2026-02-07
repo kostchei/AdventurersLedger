@@ -359,7 +359,8 @@ export const campaignApi = {
 
   getMaps: async (campaignId: string): Promise<RecordModel[]> => {
     return pb.collection('world_state').getFullList({
-      filter: `campaign = "${campaignId}"`,
+      // PocketBase filter strings require single-quoted string literals.
+      filter: `campaign = '${campaignId}'`,
       sort: '-created',
     });
   },

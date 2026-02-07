@@ -203,6 +203,24 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
 
             formData.append('map_file', file);
             formData.append('campaign', campaignId);
+
+            // Required by the PocketBase `world_state` schema on production.
+            // Default to stacking on top of existing layers.
+            let zIndex = 0;
+            try {
+                const existingLayers = await campaignApi.getMaps(campaignId);
+                const maxExisting = Math.max(
+                    -1,
+                    ...existingLayers
+                        .map((layer) => Number((layer as unknown as { z_index?: unknown }).z_index))
+                        .filter((n) => Number.isFinite(n))
+                );
+                zIndex = Math.max(0, maxExisting + 1);
+            } catch {
+                zIndex = 0;
+            }
+            formData.append('z_index', zIndex.toString());
+
             formData.append('hex_columns', derivedLayout.columns.toString());
             formData.append('hex_rows', derivedLayout.rows.toString());
             formData.append('image_width', dimensions.width.toString());
@@ -274,8 +292,12 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium adnd-muted mb-1">Map Image</label>
+                        <label htmlFor="map-file" className="block text-sm font-medium adnd-muted mb-1">
+                            Map Image
+                        </label>
                         <input
+                            id="map-file"
+                            name="map_file"
                             type="file"
                             ref={fileInputRef}
                             onChange={handleFileChange}
@@ -380,6 +402,8 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                                 <label className="space-y-1 text-left">
                                     <span className="text-xs adnd-muted">Measured miles for the line</span>
                                     <input
+                                        id="scale-miles"
+                                        name="scale_miles"
                                         type="number"
                                         min={1}
                                         step={1}
@@ -391,6 +415,8 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
                                 <label className="space-y-1 text-left">
                                     <span className="text-xs adnd-muted">Target hex width (across flats)</span>
                                     <input
+                                        id="miles-per-hex"
+                                        name="miles_per_hex"
                                         type="number"
                                         min={1}
                                         step={0.5}

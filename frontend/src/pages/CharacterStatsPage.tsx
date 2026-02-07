@@ -59,6 +59,8 @@ export default function CharacterStatsPage() {
 
     const isDM = currentUser?.id === campaign?.dmId;
     const isTargetingSelf = stats ? stats.user === currentUser?.id : true;
+    // Allow players to edit their own character sheet; DM can edit anyone.
+    const canEdit = isDM || isTargetingSelf;
     const totalLevel = stats?.levels
         ? Object.values(stats.levels).reduce((sum, value) => sum + value, 0)
         : 0;
@@ -142,15 +144,15 @@ export default function CharacterStatsPage() {
                             )}
                         </div>
 
-                        <CharacterStats isDM={isDM} userId={stats?.user} campaignId={campaignId} statsId={statsId} />
+                        <CharacterStats isDM={canEdit} userId={stats?.user} campaignId={campaignId} statsId={statsId} />
 
                         {/* Renown & Factions Section */}
                         <div className="mt-12 pt-8 border-t adnd-divider">
-                            <FactionRenown isDM={isDM} statsId={statsId} campaignId={campaignId} userId={stats?.user} />
+                            <FactionRenown isDM={canEdit} statsId={statsId} campaignId={campaignId} userId={stats?.user} />
                         </div>
 
                         {/* Divine Piety Section */}
-                        <DivinePiety isDM={isDM} statsId={statsId} campaignId={campaignId} userId={stats?.user} />
+                        <DivinePiety isDM={canEdit} statsId={statsId} campaignId={campaignId} userId={stats?.user} />
                     </div>
                 </div>
 

@@ -1,16 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { campaignApi } from '../lib/campaigns';
 import { pb } from '../lib/pb';
-import HexMapViewer from '../components/HexMapViewer';
 import { useAuthStore } from '../store/authStore';
 import WorldState from '../components/WorldState';
-import type { HexCoord } from '../utils/hexGrid';
 import type { CampaignNomination, MapLayer, PBUser, UserStats } from '../types';
 import MapAssetManager from '../components/MapAssetManager';
 import { characterApi } from '../lib/characterApi';
 import CampaignLogsTab from '../components/CampaignLogsTab';
+import ImageMapViewer from '../components/ImageMapViewer';
 
 
 
@@ -20,8 +19,6 @@ export default function CampaignPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-  const currentZ = 0;
-  const [partyPosition, setPartyPosition] = useState<{ hexX: number; hexY: number; z: number } | null>(null);
   const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
   const [enteredWorld, setEnteredWorld] = useState(false);
@@ -67,7 +64,8 @@ export default function CampaignPage() {
     queryKey: ['maps', campaignId],
     queryFn: async () => {
       const records = await pb.collection('world_state').getFullList({
-        filter: `campaign = "${campaignId}"`,
+        // PocketBase filter strings require single-quoted string literals.
+        filter: `campaign = '${campaignId}'`,
         sort: '-created',
       });
       return records.map(r => ({
@@ -75,11 +73,11 @@ export default function CampaignPage() {
         imageUrl: r.map_file ? pb.files.getURL(r, r.map_file) : r.map_url,
         imageWidth: r.image_width || 2000,
         imageHeight: r.image_height || 2000,
-        hexSize: typeof r.hex_size === 'number' ? r.hex_size : undefined,
-        pixelsPerMile: typeof r.pixels_per_mile === 'number' ? r.pixels_per_mile : undefined,
-        milesPerHex: typeof r.miles_per_hex === 'number' ? r.miles_per_hex : undefined,
-        hexColumns: r.hex_columns || 50,
-        hexRows: r.hex_rows || 50,
+        hexSize: undefined,
+        pixelsPerMile: undefined,
+        milesPerHex: undefined,
+        hexColumns: 0,
+        hexRows: 0,
         hexOrientation: 'flat',
         createdAt: r.created,
         updatedAt: r.updated,
@@ -181,39 +179,7 @@ export default function CampaignPage() {
     }
   };
 
-  // Subscribe to Party Position
-  useEffect(() => {
-    if (!campaignId) return;
-
-    pb.collection('decals').subscribe('*', (e) => {
-      if (e.action === 'update' && e.record.site_name === 'party') {
-        setPartyPosition({
-          hexX: e.record.q,
-          hexY: e.record.r,
-          z: e.record.z,
-        });
-      }
-    });
-
-    return () => {
-      pb.collection('decals').unsubscribe('*');
-    };
-  }, [campaignId]);
-
-  const handleHexClick = async (hex: HexCoord & { z: number }) => {
-    if (!isDM) return;
-
-    try {
-      const partyDecal = await pb.collection('decals').getFirstListItem('site_name="party"');
-      await pb.collection('decals').update(partyDecal.id, {
-        q: hex.q,
-        r: hex.r,
-        z: hex.z,
-      });
-    } catch (err: unknown) {
-      console.error('Failed to move party:', err);
-    }
-  };
+  // Party movement + hex interactions intentionally omitted for now (image-only map display).
 
   if (isLoading) {
     return (
@@ -591,13 +557,7 @@ export default function CampaignPage() {
               </div>
             </div>
           ) : activeMap ? (
-            <HexMapViewer
-              map={activeMap}
-              currentZ={currentZ}
-              partyPosition={partyPosition || undefined}
-              isDM={isDM}
-              onHexClick={handleHexClick}
-            />
+            <ImageMapViewer map={activeMap} />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center max-w-sm px-6">

@@ -2,34 +2,24 @@
 
 /**
  * Collection Hook for users (auth collection)
+ *
+ * IMPORTANT (PocketBase v0.26.x):
+ * Handlers may execute in a context where outer-scope variables are not available.
+ * Keep helpers INSIDE each handler to avoid "ReferenceError: X is not defined".
+ *
  * Goals:
  * - Allow new users to sign up via Google OAuth (global_role is required by schema).
  * - Ensure self-serve signups are always `USER` (cannot self-escalate to GM/ADMIN).
  * - Prevent users from changing their own `global_role` via update requests.
  */
 
-const normalizeRole = (role) => {
-  const r = typeof role === "string" ? role.toUpperCase() : "";
-  return r === "GM" || r === "ADMIN" || r === "USER" ? r : "";
-};
-
-const getAuthRecord = (e) => {
-  try {
-    return e && e.httpContext ? e.httpContext.get("authRecord") : null;
-  } catch {
-    return null;
-  }
-};
-
-const canManageRoles = (authRecord) => {
-  const role = normalizeRole(authRecord?.get?.("global_role"));
-  return role === "ADMIN";
-};
-
 onRecordAuthWithOAuth2Request(
   (e) => {
-    // PocketBase expects createData to be mutable. Still, be defensive to avoid
-    // breaking the OAuth flow if the runtime changes its shape.
+    const normalizeRole = (role) => {
+      const r = typeof role === "string" ? role.toUpperCase() : "";
+      return r === "GM" || r === "ADMIN" || r === "USER" ? r : "";
+    };
+
     if (!e.createData || typeof e.createData !== "object") {
       e.createData = {};
     }
@@ -56,9 +46,28 @@ onRecordAuthWithOAuth2Request(
 
 onRecordCreateRequest(
   (e) => {
+    const normalizeRole = (role) => {
+      const r = typeof role === "string" ? role.toUpperCase() : "";
+      return r === "GM" || r === "ADMIN" || r === "USER" ? r : "";
+    };
+
+    const getAuthRecord = (ev) => {
+      try {
+        return ev && ev.httpContext ? ev.httpContext.get("authRecord") : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const canManageRoles = (authRecord) => {
+      const role = normalizeRole(authRecord?.get?.("global_role"));
+      return role === "ADMIN";
+    };
+
     // Defensive: if a user record is created through any request path, force safe role.
     const authRecord = getAuthRecord(e);
     const incoming = normalizeRole(e.record?.get?.("global_role"));
+
     if (!canManageRoles(authRecord)) {
       e.record.set("global_role", "USER");
     } else if (!incoming) {
@@ -72,6 +81,24 @@ onRecordCreateRequest(
 
 onRecordUpdateRequest(
   (e) => {
+    const normalizeRole = (role) => {
+      const r = typeof role === "string" ? role.toUpperCase() : "";
+      return r === "GM" || r === "ADMIN" || r === "USER" ? r : "";
+    };
+
+    const getAuthRecord = (ev) => {
+      try {
+        return ev && ev.httpContext ? ev.httpContext.get("authRecord") : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const canManageRoles = (authRecord) => {
+      const role = normalizeRole(authRecord?.get?.("global_role"));
+      return role === "ADMIN";
+    };
+
     // Prevent users from updating their own role (or anyone's) via API.
     const authRecord = getAuthRecord(e);
     if (canManageRoles(authRecord)) {
@@ -97,3 +124,4 @@ onRecordUpdateRequest(
   },
   "users"
 );
+

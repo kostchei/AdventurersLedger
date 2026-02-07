@@ -36,7 +36,8 @@ export default function CampaignLogsTab({ campaignId, userId }: CampaignLogsTabP
     queryKey: ['campaign', campaignId, 'logs'],
     queryFn: async () => {
       const records = await pb.collection('campaign_logs').getFullList<CampaignLogRecord>({
-        filter: `campaign = "${campaignId}"`,
+        // PocketBase filter strings require single-quoted string literals.
+        filter: `campaign = '${campaignId}'`,
         sort: 'happened_on,created',
       });
       return records.map(mapLogRecord);

@@ -74,9 +74,25 @@ export default function AuthCallback() {
         sessionStorage.removeItem('tk_oauth');
         navigate(nextPath, { replace: true });
       } catch (e: unknown) {
-        console.error('OAuth callback exchange failed:', e);
+        const err = e as any;
+        console.error('OAuth callback exchange failed:', err);
+        try {
+          console.error('OAuth callback exchange failed (full):', JSON.stringify(err, null, 2));
+        } catch {
+          // ignore
+        }
+
         sessionStorage.removeItem('tk_oauth');
-        setError('Authentication failed while completing sign-in. Please try again.');
+        const msg =
+          err?.response?.message ||
+          err?.message ||
+          'Authentication failed while completing sign-in. Please try again.';
+        const details =
+          err?.response?.data && typeof err.response.data === 'object'
+            ? JSON.stringify(err.response.data)
+            : '';
+
+        setError(details ? `${msg}\n\n${details}` : msg);
         setTimeout(() => navigate('/login', { replace: true }), 2500);
       }
     };
@@ -105,4 +121,3 @@ export default function AuthCallback() {
     </div>
   );
 }
-

@@ -16,8 +16,9 @@ const mapLogRecord = (record: CampaignLogRecord): CampaignLog => ({
   createdBy: record.created_by,
   activityText: record.activity_text,
   happenedOn: record.happened_on,
-  createdAt: record.created,
-  updatedAt: record.updated,
+  // Some installations may not include system autodate fields on this collection.
+  createdAt: record.created ?? '',
+  updatedAt: record.updated ?? '',
 });
 
 const toDateInputValue = (value: Date): string => {
@@ -38,7 +39,9 @@ export default function CampaignLogsTab({ campaignId, userId }: CampaignLogsTabP
       const records = await pb.collection('campaign_logs').getFullList<CampaignLogRecord>({
         // PocketBase filter strings require single-quoted string literals.
         filter: `campaign = '${campaignId}'`,
-        sort: 'happened_on,created',
+        // Avoid sorting by `created` since the backing column may not exist if the collection
+        // was created without system autodate fields in older migrations.
+        sort: 'happened_on',
       });
       return records.map(mapLogRecord);
     },
@@ -65,7 +68,10 @@ export default function CampaignLogsTab({ campaignId, userId }: CampaignLogsTabP
   });
 
   const sortedLogs = useMemo(
-    () => [...logs].sort((a, b) => a.happenedOn.localeCompare(b.happenedOn) || a.createdAt.localeCompare(b.createdAt)),
+    () =>
+      [...logs].sort(
+        (a, b) => a.happenedOn.localeCompare(b.happenedOn) || a.id.localeCompare(b.id)
+      ),
     [logs]
   );
 

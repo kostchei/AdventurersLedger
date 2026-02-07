@@ -28,6 +28,12 @@ const canManageRoles = (authRecord) => {
 
 onRecordAuthWithOAuth2Request(
   (e) => {
+    // PocketBase expects createData to be mutable. Still, be defensive to avoid
+    // breaking the OAuth flow if the runtime changes its shape.
+    if (!e.createData || typeof e.createData !== "object") {
+      e.createData = {};
+    }
+
     // For newly created OAuth users, ensure required `global_role` is present and safe.
     if (e.isNewRecord) {
       const incoming = normalizeRole(e.createData?.global_role);
@@ -91,4 +97,3 @@ onRecordUpdateRequest(
   },
   "users"
 );
-

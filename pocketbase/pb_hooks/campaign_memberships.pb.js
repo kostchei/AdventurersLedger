@@ -8,9 +8,21 @@
  */
 onRecordCreateRequest(
   (e) => {
+    // Run without relying on tags filtering (PocketBase v0.26.x tag matching can
+    // be surprising depending on route/collection id). Filter manually.
+    if (e.collection?.name !== "campaign_memberships") {
+      return e.next();
+    }
+
     try {
       const v = e.record?.get?.("is_primary_dm");
-      if (v === null || v === undefined || v === "") {
+
+      // Normalize common cases where boolean may come as string.
+      if (v === "true") {
+        e.record.set("is_primary_dm", true);
+      } else if (v === "false") {
+        e.record.set("is_primary_dm", false);
+      } else if (v === null || v === undefined || v === "") {
         e.record.set("is_primary_dm", false);
       }
     } catch {
@@ -19,7 +31,5 @@ onRecordCreateRequest(
     }
 
     return e.next();
-  },
-  "campaign_memberships"
+  }
 );
-

@@ -10,6 +10,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [joiningCampaignId, setJoiningCampaignId] = useState<string | null>(null);
 
   const { data: memberCampaigns, isLoading: isMemberLoading } = useQuery({
     queryKey: ['campaigns', 'member'],
@@ -23,9 +24,15 @@ export default function Dashboard() {
 
   const joinMutation = useMutation({
     mutationFn: campaignApi.joinCampaign,
+    onMutate: (campaignId: string) => {
+      setJoiningCampaignId(campaignId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns', 'member'] });
       queryClient.invalidateQueries({ queryKey: ['campaigns', 'all'] });
+    },
+    onSettled: () => {
+      setJoiningCampaignId(null);
     },
   });
 
@@ -168,7 +175,7 @@ export default function Dashboard() {
                   className="btn btn-primary text-sm mt-auto hover:bg-[#4b311a]"
                   disabled={joinMutation.isPending}
                 >
-                  {joinMutation.isPending ? 'Joining...' : 'Join Campaign'}
+                  {joinMutation.isPending && joiningCampaignId === campaign.id ? 'Joining...' : 'Join Campaign'}
                 </button>
               </div>
             ))}

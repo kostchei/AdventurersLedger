@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { HexGrid } from '../utils/hexGrid';
 import type { HexCoord } from '../utils/hexGrid';
 import type { Map } from '../types';
+
+type RevealedHex = { q: number; r: number; z?: number };
 
 interface HexMapViewerProps {
   map: Map;
   currentZ: number;
   partyPosition?: { hexX: number; hexY: number; z: number };
   isDM: boolean;
+  revealedHexes?: RevealedHex[];
   onHexClick?: (hex: HexCoord & { z: number }) => void;
 }
 
@@ -16,6 +19,7 @@ export default function HexMapViewer({
   currentZ,
   partyPosition,
   isDM,
+  revealedHexes,
   onHexClick,
 }: HexMapViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,13 +29,14 @@ export default function HexMapViewer({
   const imageRef = useRef<HTMLImageElement | null>(null);
   const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Initialize hex grid with correct scaling and offset
   const hexGrid = useMemo(() => {
     const orientation = (map.hexOrientation as 'flat' | 'pointy') || 'flat';
     const W = map.imageWidth;
     const H = map.imageHeight;
     const Q = map.hexColumns;
     const R = map.hexRows;
+
+    if (!W || !H || !Q || !R) return null;
 
     let hexSize = 20;
     let offsetX = 0;
@@ -47,24 +52,22 @@ export default function HexMapViewer({
       offsetY = hexSize;
     }
 
-    return new HexGrid(
-      hexSize,
-      Q,
-      R,
-      orientation,
-      offsetX,
-      offsetY
-    );
-  }, [
-    map.imageWidth,
-    map.hexColumns,
-    map.imageHeight,
-    map.hexRows,
-    map.hexOrientation,
-  ]);
+    return new HexGrid(hexSize, Q, R, orientation, offsetX, offsetY);
+  }, [map.imageWidth, map.imageHeight, map.hexColumns, map.hexRows, map.hexOrientation]);
 
-  // Load map image
+  const revealedSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const h of revealedHexes || []) {
+      if (!h || typeof h.q !== 'number' || typeof h.r !== 'number') continue;
+      set.add(`${h.q},${h.r}`);
+    }
+    return set;
+  }, [revealedHexes]);
+
   useEffect(() => {
+    setImageLoaded(false);
+    setImageLoadError(null);
+
     const img = new Image();
     img.onload = () => {
       imageRef.current = img;
@@ -76,16 +79,11 @@ export default function HexMapViewer({
       setImageLoaded(true);
     };
     img.src = map.imageUrl;
-    // Reset state for new image load
-        setImageLoaded(false);
-        setImageLoadError(null);
   }, [map.imageUrl]);
 
-  // State to trigger the interactive layer render
   const [renderNonce, setRenderNonce] = useState(0);
-  const triggerInteractiveRender = () => setRenderNonce(prev => prev + 1);
+  const triggerInteractiveRender = () => setRenderNonce((prev) => prev + 1);
 
-  // Render base layer (static parts: map, fog, grid)
   useEffect(() => {
     if (!hexGrid || !imageLoaded || !imageRef.current) return;
 
@@ -95,34 +93,53 @@ export default function HexMapViewer({
     const ctx = baseCanvas.getContext('2d');
     if (!ctx) return;
 
-    // 1. Draw map image
     ctx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
     ctx.drawImage(imageRef.current, 0, 0, map.imageWidth, map.imageHeight);
 
-    ctx.drawImage(imageRef.current, 0, 0, map.imageWidth, map.imageHeight);
+    // Fog of War: fill unrevealed hexes for non-DMs.
+    if (!isDM) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.78)';
+      for (let q = 0; q < map.hexColumns; q++) {
+        for (let r = 0; r < map.hexRows; r++) {
+          if (revealedSet.has(`${q},${r}`)) continue;
+          const corners = hexGrid.getHexCorners({ q, r, z: currentZ });
+          ctx.beginPath();
+          ctx.moveTo(corners[0].x, corners[0].y);
+          for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+    }
 
-    // 3. Draw hex grid overlay
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    // Grid overlay.
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
     ctx.lineWidth = 1;
     for (let q = 0; q < map.hexColumns; q++) {
       for (let r = 0; r < map.hexRows; r++) {
         const corners = hexGrid.getHexCorners({ q, r, z: currentZ });
         ctx.beginPath();
         ctx.moveTo(corners[0].x, corners[0].y);
-        for (let i = 1; i < corners.length; i++) {
-          ctx.lineTo(corners[i].x, corners[i].y);
-        }
+        for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
         ctx.closePath();
         ctx.stroke();
       }
     }
 
     baseCanvasRef.current = baseCanvas;
-    // Trigger interactive layer re-render after base canvas is ready
-        triggerInteractiveRender();
-  }, [hexGrid, imageLoaded, isDM, map.imageWidth, map.imageHeight, map.hexColumns, map.hexRows, currentZ]);
+    triggerInteractiveRender();
+  }, [
+    hexGrid,
+    imageLoaded,
+    isDM,
+    revealedSet,
+    map.imageWidth,
+    map.imageHeight,
+    map.hexColumns,
+    map.hexRows,
+    currentZ,
+  ]);
 
-  // Render interactive layer (hover, party)
   useEffect(() => {
     if (!canvasRef.current || !baseCanvasRef.current || !hexGrid) return;
 
@@ -130,28 +147,25 @@ export default function HexMapViewer({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Draw cached base layer
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(baseCanvasRef.current, 0, 0);
 
-    // 4. Highlight hovered hex (if DM)
+    // Hover highlight (DM only).
     if (isDM && hoveredHex && hexGrid.isInBounds(hoveredHex)) {
       const corners = hexGrid.getHexCorners(hoveredHex);
-      ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+      ctx.fillStyle = 'rgba(255, 255, 0, 0.25)';
       ctx.beginPath();
       ctx.moveTo(corners[0].x, corners[0].y);
-      for (let i = 1; i < corners.length; i++) {
-        ctx.lineTo(corners[i].x, corners[i].y);
-      }
+      for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
       ctx.closePath();
       ctx.fill();
 
-      ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+      ctx.strokeStyle = 'rgba(255, 255, 0, 0.85)';
       ctx.lineWidth = 2;
       ctx.stroke();
     }
 
-    // 5. Draw party position if on current Z layer
+    // Party marker (optional).
     if (partyPosition && partyPosition.z === currentZ) {
       const partyHex = { q: partyPosition.hexX, r: partyPosition.hexY, z: partyPosition.z };
       const center = hexGrid.hexToPixel(partyHex);
@@ -171,7 +185,7 @@ export default function HexMapViewer({
       ctx.stroke();
 
       ctx.fillStyle = 'white';
-      ctx.font = `bold ${hexSize * 0.6}px Inter, sans-serif`;
+      ctx.font = `bold ${hexSize * 0.6}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('P', center.x, center.y);
@@ -179,7 +193,6 @@ export default function HexMapViewer({
     }
   }, [renderNonce, hoveredHex, partyPosition, isDM, currentZ, hexGrid]);
 
-  // Interaction handlers...
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!hexGrid || !isDM) return;
     const canvas = canvasRef.current;
@@ -203,10 +216,22 @@ export default function HexMapViewer({
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
     const hex = hexGrid.pixelToHex({ x, y }, currentZ);
-    if (hexGrid.isInBounds(hex)) {
-      onHexClick({ ...hex, z: currentZ });
-    }
+    if (hexGrid.isInBounds(hex)) onHexClick({ ...hex, z: currentZ });
   };
+
+  if (!map.hexColumns || !map.hexRows) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center max-w-md px-6">
+          <div className="text-2xl mb-3 opacity-40">[hex]</div>
+          <p className="adnd-muted text-[10px] font-black uppercase tracking-widest">Map Not Calibrated</p>
+          <p className="adnd-muted-light text-[10px] mt-2 leading-relaxed">
+            This map layer is missing hex grid metadata (columns/rows). Upload again with hex settings to enable Fog of War.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!imageLoaded) {
     return (
@@ -235,7 +260,7 @@ export default function HexMapViewer({
       {imageLoadError && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="adnd-surface p-6 rounded-xl max-w-md text-center shadow-2xl">
-            <div className="text-4xl mb-3">⚠️</div>
+            <div className="text-4xl mb-3">!</div>
             <h3 className="text-xl adnd-display text-[#2c1d0f] mb-2">Map Load Failed</h3>
             <p className="adnd-muted text-sm mb-4">{imageLoadError}</p>
             <p className="text-xs adnd-muted italic">Verify the map URL in the database or try re-uploading the asset.</p>
@@ -253,3 +278,4 @@ export default function HexMapViewer({
     </div>
   );
 }
+

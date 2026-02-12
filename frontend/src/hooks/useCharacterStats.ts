@@ -120,7 +120,16 @@ export function useCharacterStats(statsId?: string, campaignId?: string, userId?
 
 
 
-    const updateDetails = async (details: { character_name?: string, class_name?: string, species?: string, background?: string }) => {
+    const updateDetails = async (
+        details: {
+            character_name?: string;
+            class_name?: string;
+            subclass?: string;
+            species?: string;
+            background?: string;
+            dndbeyond_character_link?: string;
+        }
+    ) => {
         if (!stats) return;
         await characterApi.updateDetails(stats.id, details);
     };
@@ -138,6 +147,11 @@ export function useCharacterStats(statsId?: string, campaignId?: string, userId?
     const updateBastion = async (bastion: string[]) => {
         if (!stats) return;
         await characterApi.updateBastion(stats.id, bastion);
+    };
+
+    const updateBastionTurns = async (bastion_turns: unknown) => {
+        if (!stats) return;
+        await characterApi.updateBastionTurns(stats.id, bastion_turns);
     };
 
     const updateInventory = async (inventory: string[]) => {
@@ -165,6 +179,7 @@ export function useCharacterStats(statsId?: string, campaignId?: string, userId?
         updateSpells,
         updateFeats,
         updateBastion,
+        updateBastionTurns,
         updateInventory
     };
 }

@@ -161,6 +161,7 @@ export interface MapLayer {
   imageUrl: string;
   imageWidth: number;
   imageHeight: number;
+  zIndex?: number;
   hexSize?: number;
   pixelsPerMile?: number;
   milesPerHex?: number;

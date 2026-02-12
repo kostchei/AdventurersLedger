@@ -74,7 +74,10 @@ export default function AuthCallback() {
         sessionStorage.removeItem('tk_oauth');
         navigate(nextPath, { replace: true });
       } catch (e: unknown) {
-        const err = e as any;
+        const err = e as {
+          message?: unknown;
+          response?: { message?: unknown; data?: unknown };
+        };
         console.error('OAuth callback exchange failed:', err);
         try {
           console.error('OAuth callback exchange failed (full):', JSON.stringify(err, null, 2));
@@ -84,8 +87,8 @@ export default function AuthCallback() {
 
         sessionStorage.removeItem('tk_oauth');
         const msg =
-          err?.response?.message ||
-          err?.message ||
+          (typeof err?.response?.message === 'string' ? err.response.message : undefined) ||
+          (typeof err?.message === 'string' ? err.message : undefined) ||
           'Authentication failed while completing sign-in. Please try again.';
         const details =
           err?.response?.data && typeof err.response.data === 'object'

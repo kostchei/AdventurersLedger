@@ -47,11 +47,14 @@ export interface UserStats extends PBBaseRecord {
   inventory: string[];
   character_name: string;
   class_name: string;
+  subclass?: string;
   species: string;
   background: string;
   spells: string[];
   feats: string[];
   bastion: string[];
+  bastion_turns?: unknown;
+  dndbeyond_character_link?: string;
 }
 
 /**
@@ -83,10 +86,25 @@ export interface FogOfWar extends PBBaseRecord {
  * Defines map layers and dungeon clearing progress
  */
 export interface WorldState extends PBBaseRecord {
-  campaign: string;
-  layer_id: string;
-  map_url: string;
-  cleared_dungeons_list: string[];
+  // world_state is used by multiple features; treat fields as optional.
+  campaign?: string;
+
+  // Map layer fields
+  map_url?: string;
+  map_file?: string;
+  z_index?: number;
+  hex_columns?: number;
+  hex_rows?: number;
+  hex_orientation?: 'flat' | 'pointy' | string;
+  image_width?: number;
+  image_height?: number;
+  pixels_per_mile?: number;
+  miles_per_hex?: number;
+  hex_size?: number;
+
+  // World log fields (legacy / future)
+  cleared_dungeons_list?: string[];
+  layer_id?: string;
 }
 
 /**
@@ -109,6 +127,17 @@ export interface CampaignRecord extends PBBaseRecord {
   active_map_id?: string;
   pending_nomination_player_id?: string;
   dndbeyond_link?: string;
+
+  // Optional campaign configuration (stored as JSON fields)
+  species_options?: unknown;
+  background_options?: unknown;
+  class_options?: unknown;
+  subclass_options?: unknown;
+  deities?: unknown;
+  factions?: unknown;
+  piety_ranks?: unknown;
+  renown_ranks?: unknown;
+  name_generator?: unknown;
 }
 
 export interface CampaignMembershipRecord extends PBBaseRecord {

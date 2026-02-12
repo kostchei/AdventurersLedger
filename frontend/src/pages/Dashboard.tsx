@@ -114,6 +114,19 @@ export default function Dashboard() {
               </div>
             </button>
 
+            {/* Name Generator Card */}
+            <button
+              onClick={() => navigate('/name-generator')}
+              className="card hover:shadow-xl transition-shadow border border-[#7a4f24]/60 flex items-center justify-center min-h-[200px] hover:border-[#2c1d0f] cursor-pointer"
+              title="Open Name Generator"
+            >
+              <div className="text-center">
+                <div className="text-4xl mb-3">✍️</div>
+                <h3 className="text-xl font-semibold adnd-ink mb-2">Name Generator</h3>
+                <p className="adnd-muted text-sm">Forge names for heroes, rivals, and NPCs.</p>
+              </div>
+            </button>
+
             {/* Campaign Cards */}
             {memberCampaigns?.map((campaign) => (
               <div

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { campaignApi } from '../lib/campaigns';
@@ -9,7 +9,8 @@ import type { CampaignNomination, MapLayer, PBUser, UserStats } from '../types';
 import MapAssetManager from '../components/MapAssetManager';
 import { characterApi } from '../lib/characterApi';
 import CampaignLogsTab from '../components/CampaignLogsTab';
-import ImageMapViewer from '../components/ImageMapViewer';
+import HexMapViewer from '../components/HexMapViewer';
+import { fogOfWarApi } from '../lib/pbClient';
 
 
 
@@ -22,6 +23,7 @@ export default function CampaignPage() {
   const [isMapManagerOpen, setIsMapManagerOpen] = useState(false);
   const [viewAsPlayer, setViewAsPlayer] = useState(false);
   const [enteredWorld, setEnteredWorld] = useState(false);
+  const [currentZ, setCurrentZ] = useState(0);
   const [activeHubTab, setActiveHubTab] = useState<'overview' | 'logs'>('overview');
   const queryClient = useQueryClient();
 
@@ -66,24 +68,46 @@ export default function CampaignPage() {
       const records = await pb.collection('world_state').getFullList({
         // PocketBase filter strings require single-quoted string literals.
         filter: `campaign = '${campaignId}'`,
-        sort: '-created',
+        sort: 'z_index,created',
       });
       return records.map(r => ({
         id: r.id,
         imageUrl: r.map_file ? pb.files.getURL(r, r.map_file) : r.map_url,
         imageWidth: r.image_width || 2000,
         imageHeight: r.image_height || 2000,
-        hexSize: undefined,
-        pixelsPerMile: undefined,
-        milesPerHex: undefined,
-        hexColumns: 0,
-        hexRows: 0,
-        hexOrientation: 'flat',
+        zIndex: typeof r.z_index === 'number' ? r.z_index : 0,
+        hexSize: typeof r.hex_size === 'number' ? r.hex_size : undefined,
+        pixelsPerMile: typeof r.pixels_per_mile === 'number' ? r.pixels_per_mile : undefined,
+        milesPerHex: typeof r.miles_per_hex === 'number' ? r.miles_per_hex : undefined,
+        hexColumns: typeof r.hex_columns === 'number' ? r.hex_columns : 0,
+        hexRows: typeof r.hex_rows === 'number' ? r.hex_rows : 0,
+        hexOrientation: r.hex_orientation || 'flat',
         createdAt: r.created,
         updatedAt: r.updated,
       }));
     },
     enabled: !!campaignId,
+  });
+
+  useEffect(() => {
+    if (!maps || !maps.length) return;
+    const zValues = maps.map((m) => m.zIndex ?? 0);
+    if (!zValues.includes(currentZ)) {
+      setCurrentZ(zValues[0] ?? 0);
+    }
+  }, [maps, currentZ]);
+
+  const activeMap = maps?.[0];
+  const activeLayer = (maps || []).find((m) => (m.zIndex ?? 0) === currentZ) || activeMap;
+
+  const { data: revealedHexes } = useQuery({
+    queryKey: ['fog_of_war', user?.id, currentZ],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      return fogOfWarApi.getByUserIdAndLayer(user.id, currentZ);
+    },
+    enabled: Boolean(user?.id && enteredWorld),
+    staleTime: 5_000,
   });
 
   type UserStatsRecord = UserStats & { expand?: { user?: PBUser } };
@@ -210,8 +234,6 @@ export default function CampaignPage() {
     navigator.clipboard.writeText(link);
     alert('Invitation link copied to chronicle clipboard!');
   };
-
-  const activeMap = maps?.[0];
 
   return (
     <div className="min-h-screen adnd-page flex flex-col">
@@ -556,8 +578,34 @@ export default function CampaignPage() {
                 )}
               </div>
             </div>
-          ) : activeMap ? (
-            <ImageMapViewer map={activeMap} />
+          ) : activeLayer ? (
+            <div className="absolute inset-0 flex flex-col">
+              <div className="p-3 bg-[#e7d3aa]/90 backdrop-blur-sm border-b border-[#3b2a18]/30 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#6b4a2b]">Layer</span>
+                  <select
+                    value={currentZ}
+                    onChange={(e) => setCurrentZ(parseInt(e.target.value, 10) || 0)}
+                    className="adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
+                  >
+                    {(maps || [])
+                      .slice()
+                      .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
+                      .map((m) => (
+                        <option key={m.id} value={m.zIndex ?? 0}>
+                          z={m.zIndex ?? 0} ({m.hexColumns}x{m.hexRows})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-[#6b4a2b]">
+                  {isDM ? 'DM View' : `Fog: ${revealedHexes?.length || 0} hexes`}
+                </div>
+              </div>
+              <div className="flex-1 min-h-0">
+                <HexMapViewer map={activeLayer} currentZ={currentZ} isDM={isDM} revealedHexes={revealedHexes || []} />
+              </div>
+            </div>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center max-w-sm px-6">

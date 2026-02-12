@@ -13,6 +13,10 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [zIndex, setZIndex] = useState(0);
+  const [hexColumns, setHexColumns] = useState<number | ''>('');
+  const [hexRows, setHexRows] = useState<number | ''>('');
+  const [hexOrientation, setHexOrientation] = useState<'flat' | 'pointy'>('flat');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,6 +70,16 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
       if (dimensions) {
         formData.append('image_width', dimensions.width.toString());
         formData.append('image_height', dimensions.height.toString());
+      }
+
+      // Hex grid metadata (optional but recommended for Fog of War).
+      formData.append('z_index', String(zIndex));
+      formData.append('hex_orientation', hexOrientation);
+      if (hexColumns !== '' && Number.isFinite(Number(hexColumns))) {
+        formData.append('hex_columns', String(hexColumns));
+      }
+      if (hexRows !== '' && Number.isFinite(Number(hexRows))) {
+        formData.append('hex_rows', String(hexRows));
       }
 
       await campaignApi.uploadMapLayer(campaignId, formData);
@@ -151,6 +165,60 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
             </div>
           )}
 
+          <div className="rounded-xl border border-[#7a4f24]/60 bg-[#f0dcb4] p-4 space-y-3">
+            <div>
+              <h3 className="text-xs font-black adnd-muted uppercase tracking-widest">Hex Grid</h3>
+              <p className="text-[10px] adnd-muted-light font-bold uppercase tracking-widest mt-1">
+                Needed for Fog of War and hex interactions.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] adnd-muted uppercase font-black tracking-widest mb-1">Z Index</label>
+                <input
+                  type="number"
+                  value={zIndex}
+                  onChange={(e) => setZIndex(parseInt(e.target.value || '0', 10) || 0)}
+                  className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] adnd-muted uppercase font-black tracking-widest mb-1">Orientation</label>
+                <select
+                  value={hexOrientation}
+                  onChange={(e) => setHexOrientation(e.target.value === 'pointy' ? 'pointy' : 'flat')}
+                  className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
+                >
+                  <option value="flat">Flat</option>
+                  <option value="pointy">Pointy</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] adnd-muted uppercase font-black tracking-widest mb-1">Hex Columns</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={hexColumns}
+                  onChange={(e) => setHexColumns(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                  className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
+                  placeholder="e.g. 80"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] adnd-muted uppercase font-black tracking-widest mb-1">Hex Rows</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={hexRows}
+                  onChange={(e) => setHexRows(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                  className="w-full adnd-input-dark rounded px-2 py-1 text-sm focus:outline-none focus:border-[#d8b46c]"
+                  placeholder="e.g. 60"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="pt-4 flex gap-3">
             <button
               type="button"
@@ -172,4 +240,3 @@ export default function MapUploadModal({ campaignId, onClose, onUploadSuccess }:
     </div>
   );
 }
-

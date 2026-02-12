@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import CampaignPage from './pages/CampaignPage';
 import JoinCampaign from './pages/JoinCampaign';
 import CharacterStatsPage from './pages/CharacterStatsPage';
+import NameGenerator from './pages/NameGenerator';
 import ProtectedRoute from './components/ProtectedRoute';
 import ServerOffline from './components/ServerOffline';
 
@@ -47,6 +48,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CharacterStatsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/name-generator"
+              element={
+                <ProtectedRoute>
+                  <NameGenerator />
                 </ProtectedRoute>
               }
             />

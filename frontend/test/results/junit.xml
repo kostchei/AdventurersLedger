@@ -1,45 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="4" failures="2" errors="0" time="0.0123888">
-    <testsuite name="test/globalRoles.test.ts" timestamp="2026-01-22T13:19:42.236Z" hostname="DESKTOP-J05866Q" tests="4" failures="2" errors="0" skipped="0" time="0.0123888">
-        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should connect to PocketBase" time="0.0084713">
-            <failure message="Something went wrong." type="ClientResponseError 0">
-ClientResponseError 0: Something went wrong.
- ❯ node_modules/pocketbase/dist/pocketbase.es.mjs:1:37027
- ❯ test/globalRoles.test.ts:13:24
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-Serialized Error: { url: &apos;&apos;, status: +0, response: {}, isAbort: false, originalError: { stack: &apos;TypeError: fetch failed\n    at node:internal/deps/undici/undici:13510:13\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at D:/Code/AdventurersLedger/Check/AdventurersLedger_Codex/frontend/test/globalRoles.test.ts:13:24\n    at file:///D:/Code/AdventurersLedger/Check/AdventurersLedger_Codex/frontend/node_modules/@vitest/runner/dist/index.js:915:20&apos;, message: &apos;fetch failed&apos;, cause: { stack: &apos;Error: connect ECONNREFUSED 127.0.0.1:8090\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)&apos;, message: &apos;connect ECONNREFUSED 127.0.0.1:8090&apos;, errno: -4078, code: &apos;ECONNREFUSED&apos;, syscall: &apos;connect&apos;, address: &apos;127.0.0.1&apos;, port: 8090, constructor: &apos;Function&lt;Error&gt;&apos;, name: &apos;Error&apos;, toString: &apos;Function&lt;toString&gt;&apos; }, constructor: &apos;Function&lt;TypeError&gt;&apos;, name: &apos;TypeError&apos;, toString: &apos;Function&lt;toString&gt;&apos; } }
-Caused by: TypeError: fetch failed
- ❯ test/globalRoles.test.ts:13:24
-
-Caused by: Error: connect ECONNREFUSED 127.0.0.1:8090
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-Serialized Error: { errno: -4078, code: &apos;ECONNREFUSED&apos;, syscall: &apos;connect&apos;, address: &apos;127.0.0.1&apos;, port: 8090 }
-            </failure>
+<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="0.010006">
+    <testsuite name="test/nameGenerator.test.ts" timestamp="2026-02-12T10:28:40.616Z" hostname="DESKTOP-J05866Q" tests="8" failures="0" errors="0" skipped="0" time="0.010006">
+        <testcase classname="test/nameGenerator.test.ts" name="randomName &gt; uses default first/last pools when no config is provided" time="0.0013078">
         </testcase>
-        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should allow user registration (default role USER)" time="0.0026242">
-            <system-err>
-Registration failed: {}
-
-            </system-err>
-            <failure message="Something went wrong." type="ClientResponseError 0">
-ClientResponseError 0: Something went wrong.
- ❯ node_modules/pocketbase/dist/pocketbase.es.mjs:1:37027
- ❯ test/globalRoles.test.ts:19:26
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-Serialized Error: { url: &apos;&apos;, status: +0, response: {}, isAbort: false, originalError: { stack: &apos;TypeError: fetch failed\n    at node:internal/deps/undici/undici:13510:13\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at D:/Code/AdventurersLedger/Check/AdventurersLedger_Codex/frontend/test/globalRoles.test.ts:19:26\n    at file:///D:/Code/AdventurersLedger/Check/AdventurersLedger_Codex/frontend/node_modules/@vitest/runner/dist/index.js:915:20&apos;, message: &apos;fetch failed&apos;, cause: { stack: &apos;Error: connect ECONNREFUSED 127.0.0.1:8090\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)&apos;, message: &apos;connect ECONNREFUSED 127.0.0.1:8090&apos;, errno: -4078, code: &apos;ECONNREFUSED&apos;, syscall: &apos;connect&apos;, address: &apos;127.0.0.1&apos;, port: 8090, constructor: &apos;Function&lt;Error&gt;&apos;, name: &apos;Error&apos;, toString: &apos;Function&lt;toString&gt;&apos; }, constructor: &apos;Function&lt;TypeError&gt;&apos;, name: &apos;TypeError&apos;, toString: &apos;Function&lt;toString&gt;&apos; } }
-Caused by: TypeError: fetch failed
- ❯ test/globalRoles.test.ts:19:26
-
-Caused by: Error: connect ECONNREFUSED 127.0.0.1:8090
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-Serialized Error: { errno: -4078, code: &apos;ECONNREFUSED&apos;, syscall: &apos;connect&apos;, address: &apos;127.0.0.1&apos;, port: 8090 }
-            </failure>
+        <testcase classname="test/nameGenerator.test.ts" name="randomName &gt; uses species-specific config pools when available" time="0.0003639">
         </testcase>
-        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should allow login as USER" time="0.0002158">
+        <testcase classname="test/nameGenerator.test.ts" name="randomName &gt; falls back missing first/last config values to defaults" time="0.0001516">
         </testcase>
-        <testcase classname="test/globalRoles.test.ts" name="Global Roles Schema Integration &gt; should FORBID USER from creating campaigns" time="0.0000752">
+        <testcase classname="test/nameGenerator.test.ts" name="nameGenerator &gt; generates a non-empty name for every culture" time="0.0008328">
+        </testcase>
+        <testcase classname="test/nameGenerator.test.ts" name="nameGenerator &gt; includes a surname for non-ledger cultures when requested" time="0.000281">
+        </testcase>
+        <testcase classname="test/nameGenerator.test.ts" name="nameGenerator &gt; omits appended surname for non-ledger cultures when includeSurname=false" time="0.0001076">
+        </testcase>
+        <testcase classname="test/nameGenerator.test.ts" name="nameGenerator &gt; clamps batch count between 1 and 100" time="0.0049759">
+        </testcase>
+        <testcase classname="test/nameGenerator.test.ts" name="nameGenerator &gt; falls back to duplicates when unique generation cannot satisfy count" time="0.0005398">
         </testcase>
     </testsuite>
 </testsuites>

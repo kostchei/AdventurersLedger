@@ -35,6 +35,9 @@ export const useAuthStore = create<AuthState>((set) => {
   const initialUser = mapPBUser(pb.authStore.model);
   const initialToken = pb.authStore.token;
 
+  const asRecord = (v: unknown): Record<string, unknown> | null =>
+    typeof v === 'object' && v !== null ? (v as Record<string, unknown>) : null;
+
   // Listen for auth changes to keep Zustand in sync
   pb.authStore.onChange((token, model) => {
     set({
@@ -56,13 +59,19 @@ export const useAuthStore = create<AuthState>((set) => {
         // Redirect-based OAuth flow (no realtime popup). This works well for join links
         // and avoids browser popup restrictions.
         const authMethods = await pb.collection('users').listAuthMethods();
-        const providers = authMethods?.oauth2?.providers || [];
-        const google = providers.find((p: any) => p?.name === 'google');
+        const methods = asRecord(authMethods);
+        const oauth2 = asRecord(methods?.oauth2);
+        const providers = Array.isArray(oauth2?.providers) ? oauth2?.providers : [];
+        const google = providers
+          .map(asRecord)
+          .find((p) => (typeof p?.name === 'string' ? p.name : '') === 'google');
         if (!google) {
           throw new Error('Google OAuth is not enabled on the server.');
         }
 
-        const baseAuthUrl: string | undefined = (google as any)?.authUrl || (google as any)?.authURL;
+        const baseAuthUrl =
+          (typeof google.authUrl === 'string' ? google.authUrl : undefined) ||
+          (typeof google.authURL === 'string' ? google.authURL : undefined);
         if (!baseAuthUrl) {
           throw new Error('Google OAuth is not enabled on the server.');
         }
@@ -77,8 +86,8 @@ export const useAuthStore = create<AuthState>((set) => {
           JSON.stringify({
             provider: 'google',
             redirectUrl,
-            codeVerifier: (google as any).codeVerifier,
-            expectedState: (google as any).state,
+            codeVerifier: typeof google.codeVerifier === 'string' ? google.codeVerifier : '',
+            expectedState: typeof google.state === 'string' ? google.state : undefined,
             nextPath,
             startedAt: Date.now(),
           })

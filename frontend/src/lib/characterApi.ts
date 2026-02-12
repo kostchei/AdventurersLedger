@@ -154,7 +154,17 @@ export const characterApi = {
     /**
      * Update character details
      */
-    updateDetails: async (id: string, details: { character_name?: string, class_name?: string, species?: string, background?: string }) => {
+    updateDetails: async (
+        id: string,
+        details: {
+            character_name?: string;
+            class_name?: string;
+            subclass?: string;
+            species?: string;
+            background?: string;
+            dndbeyond_character_link?: string;
+        }
+    ) => {
         return userStatsApi.update(id, details);
     },
 
@@ -184,5 +194,12 @@ export const characterApi = {
      */
     updateBastion: async (id: string, bastion: string[]) => {
         return userStatsApi.update(id, { bastion });
+    },
+
+    /**
+     * Update bastion turns log (structured JSON)
+     */
+    updateBastionTurns: async (id: string, bastion_turns: unknown) => {
+        return userStatsApi.update(id, { bastion_turns });
     }
 };

@@ -29,6 +29,8 @@ export interface UserStats extends PBBaseRecord {
   campaign: string;
   hp: number;
   max_hp: number;
+  // JSON: { skills/tools/kits/instruments/gaming_sets: { [name]: "none|half|full|expertise" } }
+  proficiencies?: unknown;
   strength: number;
   dexterity: number;
   constitution: number;

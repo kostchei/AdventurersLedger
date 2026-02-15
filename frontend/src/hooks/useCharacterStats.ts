@@ -159,6 +159,11 @@ export function useCharacterStats(statsId?: string, campaignId?: string, userId?
         await characterApi.updateInventory(stats.id, inventory);
     };
 
+    const updateProficiencies = async (proficiencies: unknown) => {
+        if (!stats) return;
+        await characterApi.updateProficiencies(stats.id, proficiencies);
+    };
+
     return {
         stats,
         loading,
@@ -180,6 +185,7 @@ export function useCharacterStats(statsId?: string, campaignId?: string, userId?
         updateFeats,
         updateBastion,
         updateBastionTurns,
-        updateInventory
+        updateInventory,
+        updateProficiencies
     };
 }

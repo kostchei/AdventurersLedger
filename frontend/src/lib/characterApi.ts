@@ -201,5 +201,12 @@ export const characterApi = {
      */
     updateBastionTurns: async (id: string, bastion_turns: unknown) => {
         return userStatsApi.update(id, { bastion_turns });
-    }
+    },
+
+    /**
+     * Update proficiencies (structured JSON)
+     */
+    updateProficiencies: async (id: string, proficiencies: unknown) => {
+        return userStatsApi.update(id, { proficiencies });
+    },
 };

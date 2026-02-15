@@ -9,6 +9,7 @@ import ConditionSelector from './character/ConditionSelector';
 import ClassLevelEditor from './character/ClassLevelEditor';
 import StringListEditor from './character/StringListEditor';
 import HPBar from './character/HPBar';
+import ProficiencyEditor from './character/ProficiencyEditor';
 
 interface CharacterStatsProps {
     isDM?: boolean;
@@ -35,7 +36,8 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
         updateFeats,
         updateBastion,
         updateBastionTurns,
-        updateInventory
+        updateInventory,
+        updateProficiencies
     } = useCharacterStats(statsId, campaignId, userId);
     const { data: campaignConfig } = useCampaignConfig(campaignId);
     const [editingStat, setEditingStat] = useState<'gold' | 'xp' | null>(null);
@@ -428,6 +430,13 @@ export default function CharacterStats({ isDM = false, userId, campaignId, stats
                 onUpdate={(items) => updateFeats && updateFeats(items)}
                 isDM={isDM}
                 placeholder="Add feat..."
+            />
+
+            {/* Proficiencies (Skills/Tools/etc) */}
+            <ProficiencyEditor
+                value={stats.proficiencies}
+                isDM={isDM}
+                onUpdate={(next) => updateProficiencies && updateProficiencies(next)}
             />
 
             {/* Spells */}
